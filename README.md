@@ -22,3 +22,7 @@ Serad, David Aaron P.
 ### Forgot Password Page
 ![Login Screenshot](images/forgot.JPG)
 
+## Live Demo
+[Click here to view](https://lazyladz.github.io/StoryLine-PHP/
+)
+
