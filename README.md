@@ -11,11 +11,14 @@ Serad, David Aaron P.
 ## Screenshots
 
 ### Homepage
-![Homepage Screenshot](images/homepage.png)
+![Homepage Screenshot](images/homepage.JPG)
 
 ### Register Page
-![Register Screenshot](images/register.png)
+![Register Screenshot](images/register.JPG)
 
 ### Login Page
-![Login Screenshot](images/login.png)
+![Login Screenshot](images/login.JPG)
+
+### Forgot Password Page
+![Login Screenshot](images/forgot.JPG)
 
