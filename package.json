@@ -1,0 +1,23 @@
+{
+  "name": "storyline-web",
+  "version": "1.0.0",
+  "description": "StoryLine is a PHP-based web application that allows multiple users to collaboratively write, read, and publish stories. Users can create stories, add chapters, invite other writers, and comment on each other’s work. The platform fosters creativity and interactive storytelling while offering an organized space for authors to build and manage their content. Readers can browse stories by genre or tags and provide feedback to support their favorite authors.",
+  "main": "index.js",
+  "scripts": {
+    "start": "live-server --port=3000 --open=index.html"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/lazyladz/StoryLine-PHP.git"
+  },
+  "keywords": [],
+  "author": "",
+  "license": "ISC",
+  "bugs": {
+    "url": "https://github.com/lazyladz/StoryLine-PHP/issues"
+  },
+  "homepage": "https://github.com/lazyladz/StoryLine-PHP#readme",
+  "devDependencies": {
+    "live-server": "^1.2.2"
+  }
+}
