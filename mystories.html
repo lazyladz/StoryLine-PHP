@@ -42,7 +42,6 @@
 
 <body>
 
-    <!-- NAVBAR -->
     <nav class="navbar navbar-expand-lg navbar-dark" style="background-color:#006d77;">
         <div class="container">
             <a class="navbar-brand fw-bold" href="index.html">
@@ -66,7 +65,6 @@
                     <li class="nav-item"><a class="nav-link" href="write.html">Write</a></li>
                 </ul>
 
-                <!-- Profile Image on the right -->
                 <ul class="navbar-nav ms-3">
                     <li class="nav-item dropdown">
                         <a class="nav-link p-0" href="#" role="button" data-bs-toggle="dropdown" aria-expanded="false">
@@ -94,7 +92,6 @@
     <div class="container mt-5 mb-5">
         <h2 class="mb-4">📚 My Stories</h2>
         <div class="row" id="storiesContainer">
-            <!-- Story cards will be injected here -->
         </div>
         <div id="noStories" class="no-stories d-none">
             <p>You haven’t uploaded any stories yet. Start writing one! 📝</p>
@@ -110,17 +107,14 @@
         const storiesContainer = document.getElementById('storiesContainer');
         const noStories = document.getElementById('noStories');
 
-        // Load stories from localStorage
         function getUserStories() {
             return JSON.parse(localStorage.getItem('userStories')) || [];
         }
 
-        // Save stories to localStorage
         function saveUserStories(stories) {
             localStorage.setItem('userStories', JSON.stringify(stories));
         }
 
-        // Render stories
         function renderStories() {
             const userStories = getUserStories();
             storiesContainer.innerHTML = '';
@@ -157,19 +151,16 @@
             });
         }
 
-        // View story
         function viewStory(index) {
-            localStorage.setItem('viewStoryIndex', index); // store story index for viewing
-            window.location.href = 'stories.html'; // redirect to story details page
+            localStorage.setItem('viewStoryIndex', index);
+            window.location.href = 'stories.html';
         }
 
-        // Edit story
         function editStory(index) {
-            localStorage.setItem('editStoryIndex', index); // mark story to edit
-            window.location.href = 'write.html'; // redirect to write page
+            localStorage.setItem('editStoryIndex', index);
+            window.location.href = 'write.html';
         }
 
-        // Delete story
         function deleteStory(index) {
             if (confirm('Are you sure you want to delete this story?')) {
                 const stories = getUserStories();
