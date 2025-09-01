@@ -139,6 +139,44 @@
 
   <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.7/dist/js/bootstrap.bundle.min.js" 
           integrity="sha384-ndDqU0Gzau9qJ1lfW4pNLlhNTkCfHzAVBReH9diLvGRem5+R9g2FzA8ZGN954O5Q" 
-          crossorigin="anonymous"></script>
+          crossorigin="anonymous">
+        
+        </script>
 </body>
+
+<script>
+document.getElementById("signupForm").addEventListener("submit", function(e) {
+  e.preventDefault(); // prevent normal form submit
+
+  const alertContainer = document.getElementById("alertContainer");
+  alertContainer.innerHTML = ""; // clear previous alerts
+
+  fetch("http://localhost/StoryLine%20Web/register.php", {
+    method: "POST",
+    body: new FormData(this)
+  })
+  .then(res => res.json())
+  .then(data => {
+    // Create alert
+    const alertDiv = document.createElement("div");
+    alertDiv.className = data.success ? "alert alert-success alert-dismissible fade show" : "alert alert-danger alert-dismissible fade show";
+    alertDiv.role = "alert";
+    alertDiv.innerHTML = `
+      ${data.message}
+      <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+    `;
+    alertContainer.appendChild(alertDiv);
+
+    // Redirect on success
+    if (data.success) {
+      setTimeout(() => {
+        window.location.href = "login.html";
+      }, 1500);
+    }
+  })
+  .catch(err => console.error("Error:", err));
+});
+</script>
+
+
 </html>

@@ -12,7 +12,7 @@
 </head>
 <body>
   <!-- Navbar -->
-  <nav class="navbar navbar-expand-lg">
+  <nav class="navbar navbar-expand-lg navbar-dark" style="background-color:#006d77;">
     <div class="container">
       <a class="navbar-brand fw-bold" href="index.html">
         <svg xmlns="http://www.w3.org/2000/svg" width="28" height="28" fill="currentColor" class="bi bi-book me-2" viewBox="0 0 16 16">
@@ -20,21 +20,137 @@
         </svg>
         Storyline
       </a>
-      
-      <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNav" 
-              aria-controls="navbarNav" aria-expanded="false" aria-label="Toggle navigation">
+
+      <!-- Toggler button for mobile -->
+      <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarContent" aria-controls="navbarContent" aria-expanded="false" aria-label="Toggle navigation">
         <span class="navbar-toggler-icon"></span>
       </button>
-      
-        <form class="d-flex mx-auto" role="search" style="max-width: 400px; flex-grow:1;">
-          <input class="form-control me-2" type="search" placeholder="Search stories..." aria-label="Search">
-          <button class="btn btn-main" type="submit">Search</button>
+
+      <!-- Desktop Search Form -->
+      <form class="d-none d-lg-flex mx-auto position-relative" role="search" style="max-width: 400px; flex-grow:1;">
+        <input 
+          id="searchInput" 
+          class="form-control me-2" 
+          type="search" 
+          role="combobox"                      
+          aria-haspopup="listbox"               
+          aria-controls="searchDropdown"        
+          placeholder="Search stories..." 
+          aria-label="Search" 
+          autocomplete="off"
+          data-bs-toggle="dropdown"
+          aria-expanded="false"
+        />
+        <button class="btn btn-light" type="submit">Search</button>
+
+        <ul class="dropdown-menu p-3" style="width: 250px;" aria-labelledby="searchInput">
+          <h6 class="dropdown-header">Filter by Genre</h6>
+          <li>
+            <div class="form-check">
+              <input class="form-check-input" type="checkbox" value="Fantasy" id="filterFantasy" />
+              <label class="form-check-label" for="filterFantasy">Fantasy</label>
+            </div>
+          </li>
+          <li>
+            <div class="form-check">
+              <input class="form-check-input" type="checkbox" value="Thriller" id="filterThriller" />
+              <label class="form-check-label" for="filterThriller">Thriller</label>
+            </div>
+          </li>
+          <li>
+            <div class="form-check">
+              <input class="form-check-input" type="checkbox" value="Horror" id="filterHorror" />
+              <label class="form-check-label" for="filterHorror">Horror</label>
+            </div>
+          </li>
+          <li>
+            <div class="form-check">
+              <input class="form-check-input" type="checkbox" value="Mystery" id="filterMystery" />
+              <label class="form-check-label" for="filterMystery">Mystery</label>
+            </div>
+          </li>
+          <li>
+            <div class="form-check">
+              <input class="form-check-input" type="checkbox" value="Action" id="filterAction" />
+              <label class="form-check-label" for="filterAction">Action</label>
+            </div>
+          </li>
+          <li>
+            <div class="form-check">
+              <input class="form-check-input" type="checkbox" value="Sci-Fi" id="filterSciFi" />
+              <label class="form-check-label" for="filterSciFi">Sci-Fi</label>
+            </div>
+          </li>
+        </ul>
+      </form>
+
+      <!-- Collapsible content -->
+      <div class="collapse navbar-collapse" id="navbarContent">
+        <!-- Mobile Search Form (hidden on larger screens) -->
+        <form class="d-lg-none mt-3 mb-2" role="search">
+          <div class="input-group">
+            <input 
+              type="search" 
+              class="form-control" 
+              placeholder="Search stories..." 
+              aria-label="Search"
+            />
+            <button class="btn btn-light" type="submit">Search</button>
+          </div>
+          
+          <div class="mt-2">
+            <h6 class="text-white">Filter by Genre</h6>
+            <div class="d-flex flex-wrap">
+              <div class="form-check me-3 mb-2">
+                <input class="form-check-input" type="checkbox" value="Fantasy" id="mobileFilterFantasy" />
+                <label class="form-check-label text-white" for="mobileFilterFantasy">Fantasy</label>
+              </div>
+              <div class="form-check me-3 mb-2">
+                <input class="form-check-input" type="checkbox" value="Thriller" id="mobileFilterThriller" />
+                <label class="form-check-label text-white" for="mobileFilterThriller">Thriller</label>
+              </div>
+              <div class="form-check me-3 mb-2">
+                <input class="form-check-input" type="checkbox" value="Horror" id="mobileFilterHorror" />
+                <label class="form-check-label text-white" for="mobileFilterHorror">Horror</label>
+              </div>
+              <div class="form-check me-3 mb-2">
+                <input class="form-check-input" type="checkbox" value="Mystery" id="mobileFilterMystery" />
+                <label class="form-check-label text-white" for="mobileFilterMystery">Mystery</label>
+              </div>
+              <div class="form-check me-3 mb-2">
+                <input class="form-check-input" type="checkbox" value="Action" id="mobileFilterAction" />
+                <label class="form-check-label text-white" for="mobileFilterAction">Action</label>
+              </div>
+              <div class="form-check me-3 mb-2">
+                <input class="form-check-input" type="checkbox" value="Sci-Fi" id="mobileFilterSciFi" />
+                <label class="form-check-label text-white" for="mobileFilterSciFi">Sci-Fi</label>
+              </div>
+            </div>
+          </div>
         </form>
-      <div class="collapse navbar-collapse" id="navbarNav">
-        <ul class="navbar-nav ms-auto">
+
+        <ul class="navbar-nav ms-auto align-items-center">
+          <li class="nav-item"><a class="nav-link" href="write.html">Write</a></li>
           <li class="nav-item"><a class="nav-link" href="dashboard.html">Dashboard</a></li>
           <li class="nav-item"><a class="nav-link" href="login.html">Login</a></li>
           <li class="nav-item"><a class="nav-link" href="register.html">Sign Up</a></li>
+          
+          <!-- Circle Profile on the right -->
+          <li class="nav-item dropdown ms-2">
+  <a class="nav-link p-0" href="#" role="button" data-bs-toggle="dropdown" aria-expanded="false">
+    <div class="rounded-circle overflow-hidden" style="width: 38px; height: 38px; cursor: pointer;">
+      <img src="images/download (1).jpeg" alt="Profile" class="w-100 h-100">
+    </div>
+  </a>
+  <ul class="dropdown-menu dropdown-menu-end">
+    <li><a class="dropdown-item" href="profile.html">My Profile</a></li>
+    <li><a class="dropdown-item" href="mystories.html">My Stories</a></li>
+    <li><a class="dropdown-item" href="#">Settings</a></li>
+    <li><hr class="dropdown-divider"></li>
+    <li><a class="dropdown-item" href="#">Logout</a></li>
+  </ul>
+</li>
+
         </ul>
       </div>
     </div>

@@ -1,21 +1,16 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-  <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Dashboard - Under Maintenance</title>
-  <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.7/dist/css/bootstrap.min.css" 
-        rel="stylesheet" 
-        integrity="sha384-LN+7fdVzj6u52u30Kp6M/trliBMCMKTyK833zpbD+pXdCLuTusPj697FH4R/5mcr" 
-        crossorigin="anonymous">
-  <link href="css/styles.css" rel="stylesheet">
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>Dashboard - Storyline</title>
+  <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.7/dist/css/bootstrap.min.css" rel="stylesheet" />
+  <link rel="stylesheet" href="css/styles.css" />
 </head>
 <body>
 
-  <!-- Navbar -->
-  <nav class="navbar navbar-expand-lg">
+  <nav class="navbar navbar-expand-lg navbar-dark" style="background-color:#006d77;">
     <div class="container">
- 
       <a class="navbar-brand fw-bold" href="index.html">
         <svg xmlns="http://www.w3.org/2000/svg" width="28" height="28" fill="currentColor" class="bi bi-book me-2" viewBox="0 0 16 16">
           <path d="M1 2.828c.885-.37 2.154-.769 3.388-.893 1.33-.134 2.458.063 3.112.752v9.746c-.935-.53-2.12-.603-3.213-.493-1.18.12-2.37.461-3.287.811V2.828zm7.5-.141c.654-.689 1.782-.886 3.112-.752 1.234.124 2.503.523 3.388.893v9.923c-.918-.35-2.107-.692-3.287-.81-1.094-.111-2.278-.039-3.213.492V2.687zM8 1.783C7.015.936 5.587.81 4.287.94c-1.514.153-3.042.672-3.994 1.105A.5.5 0 0 0 0 2.5v11a.5.5 0 0 0 .707.455c.882-.4 2.303-.881 3.68-1.02 1.409-.142 2.59.087 3.223.877a.5.5 0 0 0 .78 0c.633-.79 1.814-1.019 3.222-.877 1.378.139 2.8.62 3.681 1.02A.5.5 0 0 0 16 13.5v-11a.5.5 0 0 0-.293-.455c-.952-.433-2.48-.952-3.994-1.105C10.413.809 8.985.936 8 1.783z"/>
@@ -23,40 +18,531 @@
         Storyline
       </a>
 
-      <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNav" 
-              aria-controls="navbarNav" aria-expanded="false" aria-label="Toggle navigation">
+      <!-- Toggler button for mobile -->
+      <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarContent" aria-controls="navbarContent" aria-expanded="false" aria-label="Toggle navigation">
         <span class="navbar-toggler-icon"></span>
       </button>
 
-        <form class="d-flex mx-auto" role="search" style="max-width: 400px; flex-grow:1;">
-          <input class="form-control me-2" type="search" placeholder="Search stories..." aria-label="Search">
-          <button class="btn btn-main" type="submit">Search</button>
+      <!-- Desktop Search Form -->
+      <form class="d-none d-lg-flex mx-auto position-relative" role="search" style="max-width: 400px; flex-grow:1;">
+        <input 
+          id="searchInput" 
+          class="form-control me-2" 
+          type="search" 
+          role="combobox"                      
+          aria-haspopup="listbox"               
+          aria-controls="searchDropdown"        
+          placeholder="Search stories..." 
+          aria-label="Search" 
+          autocomplete="off"
+          data-bs-toggle="dropdown"
+          aria-expanded="false"
+        />
+        <button class="btn btn-light" type="submit">Search</button>
+
+        <ul class="dropdown-menu p-3" style="width: 250px;" aria-labelledby="searchInput">
+          <h6 class="dropdown-header">Filter by Genre</h6>
+          <li>
+            <div class="form-check">
+              <input class="form-check-input" type="checkbox" value="Fantasy" id="filterFantasy" />
+              <label class="form-check-label" for="filterFantasy">Fantasy</label>
+            </div>
+          </li>
+          <li>
+            <div class="form-check">
+              <input class="form-check-input" type="checkbox" value="Thriller" id="filterThriller" />
+              <label class="form-check-label" for="filterThriller">Thriller</label>
+            </div>
+          </li>
+          <li>
+            <div class="form-check">
+              <input class="form-check-input" type="checkbox" value="Horror" id="filterHorror" />
+              <label class="form-check-label" for="filterHorror">Horror</label>
+            </div>
+          </li>
+          <li>
+            <div class="form-check">
+              <input class="form-check-input" type="checkbox" value="Mystery" id="filterMystery" />
+              <label class="form-check-label" for="filterMystery">Mystery</label>
+            </div>
+          </li>
+          <li>
+            <div class="form-check">
+              <input class="form-check-input" type="checkbox" value="Action" id="filterAction" />
+              <label class="form-check-label" for="filterAction">Action</label>
+            </div>
+          </li>
+          <li>
+            <div class="form-check">
+              <input class="form-check-input" type="checkbox" value="Sci-Fi" id="filterSciFi" />
+              <label class="form-check-label" for="filterSciFi">Sci-Fi</label>
+            </div>
+          </li>
+        </ul>
+      </form>
+
+      <!-- Collapsible content -->
+      <div class="collapse navbar-collapse" id="navbarContent">
+        <!-- Mobile Search Form (hidden on larger screens) -->
+        <form class="d-lg-none mt-3 mb-2" role="search">
+          <div class="input-group">
+            <input 
+              type="search" 
+              class="form-control" 
+              placeholder="Search stories..." 
+              aria-label="Search"
+            />
+            <button class="btn btn-light" type="submit">Search</button>
+          </div>
+          
+          <div class="mt-2">
+            <h6 class="text-white">Filter by Genre</h6>
+            <div class="d-flex flex-wrap">
+              <div class="form-check me-3 mb-2">
+                <input class="form-check-input" type="checkbox" value="Fantasy" id="mobileFilterFantasy" />
+                <label class="form-check-label text-white" for="mobileFilterFantasy">Fantasy</label>
+              </div>
+              <div class="form-check me-3 mb-2">
+                <input class="form-check-input" type="checkbox" value="Thriller" id="mobileFilterThriller" />
+                <label class="form-check-label text-white" for="mobileFilterThriller">Thriller</label>
+              </div>
+              <div class="form-check me-3 mb-2">
+                <input class="form-check-input" type="checkbox" value="Horror" id="mobileFilterHorror" />
+                <label class="form-check-label text-white" for="mobileFilterHorror">Horror</label>
+              </div>
+              <div class="form-check me-3 mb-2">
+                <input class="form-check-input" type="checkbox" value="Mystery" id="mobileFilterMystery" />
+                <label class="form-check-label text-white" for="mobileFilterMystery">Mystery</label>
+              </div>
+              <div class="form-check me-3 mb-2">
+                <input class="form-check-input" type="checkbox" value="Action" id="mobileFilterAction" />
+                <label class="form-check-label text-white" for="mobileFilterAction">Action</label>
+              </div>
+              <div class="form-check me-3 mb-2">
+                <input class="form-check-input" type="checkbox" value="Sci-Fi" id="mobileFilterSciFi" />
+                <label class="form-check-label text-white" for="mobileFilterSciFi">Sci-Fi</label>
+              </div>
+            </div>
+          </div>
         </form>
 
-      <div class="collapse navbar-collapse" id="navbarNav">
-    
-       
-        <ul class="navbar-nav ms-auto">
-        <li class="nav-item"><a class="nav-link active" href="#">Dashboard</a></li>
-          <li class="nav-item"><a class="nav-link" href="browse.html">Browse Stories</a></li>
+        <ul class="navbar-nav ms-auto align-items-center">
+          <li class="nav-item"><a class="nav-link" href="write.html">Write</a></li>
+          <li class="nav-item"><a class="nav-link" href="browse.html">Browse</a></li>
           <li class="nav-item"><a class="nav-link" href="login.html">Login</a></li>
           <li class="nav-item"><a class="nav-link" href="register.html">Sign Up</a></li>
+          
+          <!-- Circle Profile on the right -->
+          <li class="nav-item dropdown ms-2">
+  <a class="nav-link p-0" href="#" role="button" data-bs-toggle="dropdown" aria-expanded="false">
+    <div class="rounded-circle overflow-hidden" style="width: 38px; height: 38px; cursor: pointer;">
+      <img src="images/download (1).jpeg" alt="Profile" class="w-100 h-100">
+    </div>
+  </a>
+  <ul class="dropdown-menu dropdown-menu-end">
+    <li><a class="dropdown-item" href="profile.html">My Profile</a></li>
+    <li><a class="dropdown-item" href="mystories.html">My Stories</a></li>
+    <li><a class="dropdown-item" href="#">Settings</a></li>
+    <li><hr class="dropdown-divider"></li>
+    <li><a class="dropdown-item" href="#">Logout</a></li>
+  </ul>
+</li>
+
         </ul>
       </div>
     </div>
   </nav>
 
-  <div class="container maintenance-container text-center">
-    <img src="images/maintenance.jpeg" alt="Maintenance Icon" class="img-fluid mb-3" style="max-width: 250px;">
-    <h2>Under Maintenance</h2>
-    <p>Our dashboard is currently under maintenance. Please check back later.</p>
+  <!-- Page Content -->
+  <div class="container mt-4">
+
+    <!-- Community Stories -->
+    <h4 class="section-title">📚 Community Stories</h4>
+    <div class="row g-3">
+      <div class="col-xl-2 col-lg-3 col-md-4 col-sm-6 col-6">
+  <a href="stories.html" class="text-decoration-none text-reset">
+    <div class="card h-100 story-card">
+      <img src="https://picsum.photos/id/1011/300/200" class="card-img-top story-img" alt="Whispers of Dawn Cover">
+      <div class="card-body d-flex flex-column justify-content-between">
+        <div>
+          <h6 class="card-title mb-1">Whispers of Dawn</h6>
+          <small class="text-muted">by Ana Cruz</small>
+        </div>
+        <div class="mt-2">
+          <span class="badge bg-primary">Fantasy</span>
+          <p class="small text-muted mt-1 mb-0">1.2k reads</p>
+        </div>
+      </div>
+    </div>
+  </a>
+</div>
+
+
+      <div class="col-xl-2 col-lg-3 col-md-4 col-sm-6 col-6">
+        <div class="card story-card h-100">
+          <img src="https://picsum.photos/id/1021/300/200" class="story-img" alt="" />
+          <div class="card-body">
+            <h6 class="card-title mb-1">Echoes in the Dark</h6>
+            <small class="text-muted">by Leo Martinez</small><br />
+            <span class="badge bg-success mt-2">Thriller</span>
+            <p class="small mt-2 text-muted">980 reads</p>
+          </div>
+        </div>
+      </div>
+
+      <div class="col-xl-2 col-lg-3 col-md-4 col-sm-6 col-6">
+        <div class="card story-card h-100">
+          <img src="https://picsum.photos/id/1031/300/200" class="story-img" alt="" />
+          <div class="card-body">
+            <h6 class="card-title mb-1">Shadows Beneath</h6>
+            <small class="text-muted">by Sofia Lim</small><br />
+            <span class="badge bg-warning mt-2">Horror</span>
+            <p class="small mt-2 text-muted">540 reads</p>
+          </div>
+        </div>
+      </div>
+
+      <div class="col-xl-2 col-lg-3 col-md-4 col-sm-6 col-6">
+        <div class="card story-card h-100">
+          <img src="https://picsum.photos/id/1041/300/200" class="story-img" alt="" />
+          <div class="card-body">
+            <h6 class="card-title mb-1">The Last Melody</h6>
+            <small class="text-muted">by Maria Gomez</small><br />
+            <span class="badge bg-info mt-2">Mystery</span>
+            <p class="small mt-2 text-muted">2.1k reads</p>
+          </div>
+        </div>
+      </div>
+
+      <div class="col-xl-2 col-lg-3 col-md-4 col-sm-6 col-6">
+        <div class="card story-card h-100">
+          <img src="https://picsum.photos/id/1051/300/200" class="story-img" alt="" />
+          <div class="card-body">
+            <h6 class="card-title mb-1">Broken Horizon</h6>
+            <small class="text-muted">by Kenji Tanaka</small><br />
+            <span class="badge bg-danger mt-2">Action</span>
+            <p class="small mt-2 text-muted">3.4k reads</p>
+          </div>
+        </div>
+      </div>
+
+      <div class="col-xl-2 col-lg-3 col-md-4 col-sm-6 col-6">
+        <div class="card story-card h-100">
+          <img src="https://picsum.photos/id/1061/300/200" class="story-img" alt="" />
+          <div class="card-body">
+            <h6 class="card-title mb-1">Across the Void</h6>
+            <small class="text-muted">by Aiden Walker</small><br />
+            <span class="badge bg-dark mt-2">Sci-Fi</span>
+            <p class="small mt-2 text-muted">5.6k reads</p>
+          </div>
+        </div>
+      </div>
+      
+      <!-- Additional stories -->
+      <div class="col-xl-2 col-lg-3 col-md-4 col-sm-6 col-6">
+        <div class="card story-card h-100">
+          <img src="https://picsum.photos/id/1071/300/200" class="story-img" alt="" />
+          <div class="card-body">
+            <h6 class="card-title mb-1">Moonlight Sonata</h6>
+            <small class="text-muted">by Elena Rivera</small><br />
+            <span class="badge bg-primary mt-2">Fantasy</span>
+            <p class="small mt-2 text-muted">890 reads</p>
+          </div>
+        </div>
+      </div>
+
+      <div class="col-xl-2 col-lg-3 col-md-4 col-sm-6 col-6">
+        <div class="card story-card h-100">
+          <img src="https://picsum.photos/id/1081/300/200" class="story-img" alt="" />
+          <div class="card-body">
+            <h6 class="card-title mb-1">Silent Whispers</h6>
+            <small class="text-muted">by Marcus Chen</small><br />
+            <span class="badge bg-success mt-2">Thriller</span>
+            <p class="small mt-2 text-muted">1.5k reads</p>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Adults and Teens -->
+    <h4 class="section-title">📖 Adults and Teens</h4>
+    <div class="row g-3">
+      <div class="col-xl-2 col-lg-3 col-md-4 col-sm-6 col-6">
+        <div class="card story-card h-100">
+          <img src="https://picsum.photos/id/2011/300/200" class="story-img" alt="" />
+          <div class="card-body">
+            <h6 class="card-title mb-1">Fallen Skies</h6>
+            <small class="text-muted">by Ana Cruz</small><br />
+            <span class="badge bg-primary mt-2">Fantasy</span>
+            <p class="small mt-2 text-muted">1.2k reads</p>
+          </div>
+        </div>
+      </div>
+
+      <div class="col-xl-2 col-lg-3 col-md-4 col-sm-6 col-6">
+        <div class="card story-card h-100">
+          <img src="https://picsum.photos/id/2021/300/200" class="story-img" alt="" />
+          <div class="card-body">
+            <h6 class="card-title mb-1">Twisted Fate</h6>
+            <small class="text-muted">by Leo Martinez</small><br />
+            <span class="badge bg-success mt-2">Thriller</span>
+            <p class="small mt-2 text-muted">980 reads</p>
+          </div>
+        </div>
+      </div>
+
+      <div class="col-xl-2 col-lg-3 col-md-4 col-sm-6 col-6">
+        <div class="card story-card h-100">
+          <img src="https://picsum.photos/id/2031/300/200" class="story-img" alt="" />
+          <div class="card-body">
+            <h6 class="card-title mb-1">Nightfall Secrets</h6>
+            <small class="text-muted">by Sofia Lim</small><br />
+            <span class="badge bg-warning mt-2">Horror</span>
+            <p class="small mt-2 text-muted">540 reads</p>
+          </div>
+        </div>
+      </div>
+
+      <div class="col-xl-2 col-lg-3 col-md-4 col-sm-6 col-6">
+        <div class="card story-card h-100">
+          <img src="https://picsum.photos/id/2041/300/200" class="story-img" alt="" />
+          <div class="card-body">
+            <h6 class="card-title mb-1">Crimson City</h6>
+            <small class="text-muted">by Maria Gomez</small><br />
+            <span class="badge bg-info mt-2">Mystery</span>
+            <p class="small mt-2 text-muted">2.1k reads</p>
+          </div>
+        </div>
+      </div>
+
+      <div class="col-xl-2 col-lg-3 col-md-4 col-sm-6 col-6">
+        <div class="card story-card h-100">
+          <img src="https://picsum.photos/id/2051/300/200" class="story-img" alt="" />
+          <div class="card-body">
+            <h6 class="card-title mb-1">Iron Blood</h6>
+            <small class="text-muted">by Kenji Tanaka</small><br />
+            <span class="badge bg-danger mt-2">Action</span>
+            <p class="small mt-2 text-muted">3.4k reads</p>
+          </div>
+        </div>
+      </div>
+
+      <div class="col-xl-2 col-lg-3 col-md-4 col-sm-6 col-6">
+        <div class="card story-card h-100">
+          <img src="https://picsum.photos/id/2061/300/200" class="story-img" alt="" />
+          <div class="card-body">
+            <h6 class="card-title mb-1">Galaxy's Edge</h6>
+            <small class="text-muted">by Aiden Walker</small><br />
+            <span class="badge bg-dark mt-2">Sci-Fi</span>
+            <p class="small mt-2 text-muted">5.6k reads</p>
+          </div>
+        </div>
+      </div>
+      
+      <!-- Additional stories -->
+      <div class="col-xl-2 col-lg-3 col-md-4 col-sm-6 col-6">
+        <div class="card story-card h-100">
+          <img src="https://picsum.photos/id/2071/300/200" class="story-img" alt="" />
+          <div class="card-body">
+            <h6 class="card-title mb-1">Dark Waters</h6>
+            <small class="text-muted">by Noah Williams</small><br />
+            <span class="badge bg-warning mt-2">Horror</span>
+            <p class="small mt-2 text-muted">1.8k reads</p>
+          </div>
+        </div>
+      </div>
+
+      <div class="col-xl-2 col-lg-3 col-md-4 col-sm-6 col-6">
+        <div class="card story-card h-100">
+          <img src="https://picsum.photos/id/2081/300/200" class="story-img" alt="" />
+          <div class="card-body">
+            <h6 class="card-title mb-1">Lost Legacy</h6>
+            <small class="text-muted">by Chloe Kim</small><br />
+            <span class="badge bg-info mt-2">Mystery</span>
+            <p class="small mt-2 text-muted">2.3k reads</p>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- New Section: Trending Now -->
+    <h4 class="section-title">🔥 Trending Now</h4>
+    <div class="row g-3">
+      <div class="col-xl-2 col-lg-3 col-md-4 col-sm-6 col-6">
+        <div class="card story-card h-100">
+          <img src="https://picsum.photos/id/3011/300/200" class="story-img" alt="" />
+          <div class="card-body">
+            <h6 class="card-title mb-1">Dragon's Fire</h6>
+            <small class="text-muted">by Ryan O'Connell</small><br />
+            <span class="badge bg-primary mt-2">Fantasy</span>
+            <p class="small mt-2 text-muted">8.7k reads</p>
+          </div>
+        </div>
+      </div>
+
+      <div class="col-xl-2 col-lg-3 col-md-4 col-sm-6 col-6">
+        <div class="card story-card h-100">
+          <img src="https://picsum.photos/id/3021/300/200" class="story-img" alt="" />
+          <div class="card-body">
+            <h6 class="card-title mb-1">Shadow Games</h6>
+            <small class="text-muted">by Isabella Rossi</small><br />
+            <span class="badge bg-success mt-2">Thriller</span>
+            <p class="small mt-2 text-muted">7.2k reads</p>
+          </div>
+        </div>
+      </div>
+
+      <div class="col-xl-2 col-lg-3 col-md-4 col-sm-6 col-6">
+        <div class="card story-card h-100">
+          <img src="https://picsum.photos/id/3031/300/200" class="story-img" alt="" />
+          <div class="card-body">
+            <h6 class="card-title mb-1">Haunted Minds</h6>
+            <small class="text-muted">by David Chen</small><br />
+            <span class="badge bg-warning mt-2">Horror</span>
+            <p class="small mt-2 text-muted">6.5k reads</p>
+          </div>
+        </div>
+      </div>
+
+      <div class="col-xl-2 col-lg-3 col-md-4 col-sm-6 col-6">
+        <div class="card story-card h-100">
+          <img src="https://picsum.photos/id/3041/300/200" class="story-img" alt="" />
+          <div class="card-body">
+            <h6 class="card-title mb-1">Vanishing Act</h6>
+            <small class="text-muted">by Sophia Martinez</small><br />
+            <span class="badge bg-info mt-2">Mystery</span>
+            <p class="small mt-2 text-muted">9.1k reads</p>
+          </div>
+        </div>
+      </div>
+
+      <div class="col-xl-2 col-lg-3 col-md-4 col-sm-6 col-6">
+        <div class="card story-card h-100">
+          <img src="https://picsum.photos/id/3051/300/200" class="story-img" alt="" />
+          <div class="card-body">
+            <h6 class="card-title mb-1">Final Stand</h6>
+            <small class="text-muted">by Michael Johnson</small><br />
+            <span class="badge bg-danger mt-2">Action</span>
+            <p class="small mt-2 text-muted">10.4k reads</p>
+          </div>
+        </div>
+      </div>
+
+      <div class="col-xl-2 col-lg-3 col-md-4 col-sm-6 col-6">
+        <div class="card story-card h-100">
+          <img src="https://picsum.photos/id/3061/300/200" class="story-img" alt="" />
+          <div class="card-body">
+            <h6 class="card-title mb-1">Cosmic Drift</h6>
+            <small class="text-muted">by Emma Wright</small><br />
+            <span class="badge bg-dark mt-2">Sci-Fi</span>
+            <p class="small mt-2 text-muted">11.2k reads</p>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- New Section: Recently Added -->
+    <h4 class="section-title">🆕 Recently Added</h4>
+    <div class="row g-3">
+      <div class="col-xl-2 col-lg-3 col-md-4 col-sm-6 col-6">
+        <div class="card story-card h-100">
+          <img src="https://picsum.photos/id/4011/300/200" class="story-img" alt="" />
+          <div class="card-body">
+            <h6 class="card-title mb-1">Forest Whispers</h6>
+            <small class="text-muted">by Lily Anderson</small><br />
+            <span class="badge bg-primary mt-2">Fantasy</span>
+            <p class="small mt-2 text-muted">320 reads</p>
+          </div>
+        </div>
+      </div>
+
+      <div class="col-xl-2 col-lg-3 col-md-4 col-sm-6 col-6">
+        <div class="card story-card h-100">
+          <img src="https://picsum.photos/id/4021/300/200" class="story-img" alt="" />
+          <div class="card-body">
+            <h6 class="card-title mb-1">Hidden Truths</h6>
+            <small class="text-muted">by Oliver Queen</small><br />
+            <span class="badge bg-success mt-2">Thriller</span>
+            <p class="small mt-2 text-muted">280 reads</p>
+          </div>
+        </div>
+      </div>
+
+      <div class="col-xl-2 col-lg-3 col-md-4 col-sm-6 col-6">
+        <div class="card story-card h-100">
+          <img src="https://picsum.photos/id/4031/300/200" class="story-img" alt="" />
+          <div class="card-body">
+            <h6 class="card-title mb-1">Midnight Caller</h6>
+            <small class="text-muted">by Grace Lee</small><br />
+            <span class="badge bg-warning mt-2">Horror</span>
+            <p class="small mt-2 text-muted">190 reads</p>
+          </div>
+        </div>
+      </div>
+
+      <div class="col-xl-2 col-lg-3 col-md-4 col-sm-6 col-6">
+        <div class="card story-card h-100">
+          <img src="https://picsum.photos/id/4041/300/200" class="story-img" alt="" />
+          <div class="card-body">
+            <h6 class="card-title mb-1">Puzzle Box</h6>
+            <small class="text-muted">by Thomas Reed</small><br />
+            <span class="badge bg-info mt-2">Mystery</span>
+            <p class="small mt-2 text-muted">410 reads</p>
+          </div>
+        </div>
+      </div>
+
+      <div class="col-xl-2 col-lg-3 col-md-4 col-sm-6 col-6">
+        <div class="card story-card h-100">
+          <img src="https://picsum.photos/id/4051/300/200" class="story-img" alt="" />
+          <div class="card-body">
+            <h6 class="card-title mb-1">Rogue Agent</h6>
+            <small class="text-muted">by Jason Bourne</small><br />
+            <span class="badge bg-danger mt-2">Action</span>
+            <p class="small mt-2 text-muted">550 reads</p>
+          </div>
+        </div>
+      </div>
+
+      <div class="col-xl-2 col-lg-3 col-md-4 col-sm-6 col-6">
+        <div class="card story-card h-100">
+          <img src="https://picsum.photos/id/4061/300/200" class="story-img" alt="" />
+          <div class="card-body">
+            <h6 class="card-title mb-1">Quantum Leap</h6>
+            <small class="text-muted">by Sam Beckett</small><br />
+            <span class="badge bg-dark mt-2">Sci-Fi</span>
+            <p class="small mt-2 text-muted">490 reads</p>
+          </div>
+        </div>
+      </div>
+    </div>
+
   </div>
 
   <!-- Footer -->
-  <footer class="text-center mt-5">
+  <footer class="text-center mt-5 p-3 bg-light">
     <p>&copy; 2025 Storyline. All rights reserved.</p>
   </footer>
 
-  <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.bundle.min.js"></script>
+  <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.7/dist/js/bootstrap.bundle.min.js"></script>
+
+  <!-- Minimal fix: keep your HTML unchanged; adjust aria-expanded at runtime -->
+  <script>
+    document.addEventListener('DOMContentLoaded', function () {
+      var searchInput = document.getElementById('searchInput');
+      if (!searchInput) return;
+
+      // Remove invalid aria-expanded from <input> so axe passes
+      searchInput.removeAttribute('aria-expanded');
+
+      // Keep aria-expanded in sync with Bootstrap dropdown (no visual changes)
+      searchInput.addEventListener('shown.bs.dropdown', function () {
+        searchInput.setAttribute('aria-expanded', 'true');
+      });
+      searchInput.addEventListener('hidden.bs.dropdown', function () {
+        searchInput.setAttribute('aria-expanded', 'false');
+      });
+    });
+  </script>
 </body>
 </html>
