@@ -60,14 +60,14 @@
             </button>
 
             <div class="collapse navbar-collapse" id="navbarContent">
-                <ul class="navbar-nav ms-auto align-items-center">
+                <ul class="navbar-nav ms-lg-auto align-items-left">
                     <li class="nav-item"><a class="nav-link active" href="dashboard.html">Dashboard</a></li>
                     <li class="nav-item"><a class="nav-link" href="browse.html">Browse</a></li>
                     <li class="nav-item"><a class="nav-link" href="write.html">Write</a></li>
                 </ul>
 
                 <!-- Profile Image on the right -->
-                <ul class="navbar-nav ms-3">
+                <ul class="navbar-nav ms-2">
                     <li class="nav-item dropdown">
                         <a class="nav-link p-0" href="#" role="button" data-bs-toggle="dropdown" aria-expanded="false">
                             <div class="rounded-circle overflow-hidden"
@@ -120,6 +120,23 @@
             localStorage.setItem('userStories', JSON.stringify(stories));
         }
 
+        function getGenreColor(genre) {
+            const colors = {
+                'Fantasy': 'bg-primary',
+                'Thriller': 'bg-success',
+                'Horror': 'bg-warning text-dark',
+                'Mystery': 'bg-info text-dark',
+                'Action': 'bg-danger',
+                'Sci-Fi': 'bg-dark',
+                'Romance': 'bg-danger',      // changed from bg-pink to a valid class
+                'Comedy': 'bg-secondary',
+                'Drama': 'bg-light text-dark',
+                'Adventure': 'bg-success',
+                'Historical': 'bg-info text-dark'
+            };
+            return colors[genre] || 'bg-primary';
+        }
+
         // Render stories
         function renderStories() {
             const userStories = getUserStories();
@@ -136,23 +153,25 @@
                 const col = document.createElement('div');
                 col.classList.add('col-md-6', 'col-lg-4', 'mb-4');
                 col.innerHTML = `
-      <div class="card story-card h-100">
-        <img src="${story.cover}" class="card-img-top" alt="${story.title} Cover">
-        <div class="card-body">
-          <h5 class="card-title">${story.title}</h5>
-          <p class="card-text text-muted">by ${story.author}</p>
-          <span class="badge bg-primary badge-genre">${story.genre}</span>
-          <div class="chapter-preview mt-2">
-            ${story.chapters.map(ch => `<strong>${ch.title}</strong>`).join('<br>')}
-          </div>
-          <div class="mt-3 d-flex justify-content-between">
-            <button class="btn btn-sm btn-primary" onclick="viewStory(${index})">View</button>
-            <button class="btn btn-sm btn-warning" onclick="editStory(${index})">Edit</button>
-            <button class="btn btn-sm btn-danger" onclick="deleteStory(${index})">Delete</button>
-          </div>
-        </div>
+  <div class="card story-card h-100">
+    <img src="${story.cover}" class="card-img-top" alt="${story.title} Cover">
+    <div class="card-body">
+      <h5 class="card-title">${story.title}</h5>
+      <p class="card-text text-muted">by ${story.author}</p>
+      <div class="mb-2">
+        ${Array.isArray(story.genre) ? story.genre.map(g => `<span class="badge me-1 ${getGenreColor(g)}">${g}</span>`).join('') : `<span class="badge bg-primary">${story.genre}</span>`}
       </div>
-    `;
+      <div class="chapter-preview mt-2">
+        ${story.chapters.map(ch => `<strong>${ch.title}</strong>`).join('<br>')}
+      </div>
+      <div class="mt-3 d-flex justify-content-between">
+        <button class="btn btn-sm btn-primary" onclick="viewStory(${index})">View</button>
+        <button class="btn btn-sm btn-warning" onclick="editStory(${index})">Edit</button>
+        <button class="btn btn-sm btn-danger" onclick="deleteStory(${index})">Delete</button>
+      </div>
+    </div>
+  </div>
+`;
                 storiesContainer.appendChild(col);
             });
         }

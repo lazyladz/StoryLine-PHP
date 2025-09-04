@@ -116,7 +116,7 @@
           </div>
         </form>
 
-        <ul class="navbar-nav ms-auto align-items-center">
+        <ul class="navbar-nav ms-auto align-items-left">
           <li class="nav-item"><a class="nav-link" href="write.html">Write</a></li>
           <li class="nav-item"><a class="nav-link" href="browse.html">Browse</a></li>
           <li class="nav-item"><a class="nav-link" href="login.html">Login</a></li>
@@ -136,7 +136,7 @@
               <li>
                 <hr class="dropdown-divider">
               </li>
-              <li><a class="dropdown-item" href="#">Logout</a></li>
+              <li><a class="dropdown-item" href="#" id="logoutBtn">Logout</a></li>
             </ul>
           </li>
 
@@ -519,22 +519,34 @@
 
   <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.7/dist/js/bootstrap.bundle.min.js"></script>
 
-  <!-- Minimal fix: keep your HTML unchanged; adjust aria-expanded at runtime -->
   <script>
-    document.addEventListener('DOMContentLoaded', function () {
-      var searchInput = document.getElementById('searchInput');
-      if (!searchInput) return;
+    document.addEventListener("DOMContentLoaded", function () {
+      const currentUser = JSON.parse(localStorage.getItem("currentUser"));
 
-      // Remove invalid aria-expanded from <input> so axe passes
-      searchInput.removeAttribute('aria-expanded');
+      const loginLink = document.querySelector('a[href="login.html"]')?.closest("li");
+      const signupLink = document.querySelector('a[href="register.html"]')?.closest("li");
+      const profileDropdown = document.querySelector(".nav-item.dropdown");
 
-      // Keep aria-expanded in sync with Bootstrap dropdown (no visual changes)
-      searchInput.addEventListener('shown.bs.dropdown', function () {
-        searchInput.setAttribute('aria-expanded', 'true');
-      });
-      searchInput.addEventListener('hidden.bs.dropdown', function () {
-        searchInput.setAttribute('aria-expanded', 'false');
-      });
+      if (currentUser) {
+        // User is logged in → hide login/signup, show profile
+        if (loginLink) loginLink.style.display = "none";
+        if (signupLink) signupLink.style.display = "none";
+        if (profileDropdown) profileDropdown.style.display = "block";
+      } else {
+        // No logged-in user → show login/signup, hide profile
+        if (loginLink) loginLink.style.display = "block";
+        if (signupLink) signupLink.style.display = "block";
+        if (profileDropdown) profileDropdown.style.display = "none";
+      }
+
+      const logoutBtn = document.getElementById("logoutBtn");
+      if (logoutBtn) {
+        logoutBtn.addEventListener("click", function (e) {
+          e.preventDefault();
+          localStorage.removeItem("currentUser"); // clear the logged-in user
+          window.location.href = "index.html";   // redirect after logout
+        });
+      }
     });
   </script>
 </body>

@@ -6,9 +6,7 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>Storyline — Login</title>
 
-  <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.7/dist/css/bootstrap.min.css" rel="stylesheet"
-    integrity="sha384-LN+7fdVzj6u52u30Kp6M/trliBMCMKTyK833zpbD+pXdCLuTusPj697FH4R/5mcr" crossorigin="anonymous">
-
+  <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.7/dist/css/bootstrap.min.css" rel="stylesheet">
   <link rel="stylesheet" href="css/styles.css">
 </head>
 
@@ -25,20 +23,6 @@
         </svg>
         Storyline
       </a>
-      <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNav"
-        aria-controls="navbarNav" aria-expanded="false" aria-label="Toggle navigation">
-        <span class="navbar-toggler-icon"></span>
-      </button>
-      <div class="collapse navbar-collapse" id="navbarNav">
-        <ul class="navbar-nav ms-auto">
-          <li class="nav-item">
-            <a class="nav-link" href="index.html">Home</a>
-          </li>
-          <li class="nav-item">
-            <a class="nav-link" href="register.html">Sign Up</a>
-          </li>
-        </ul>
-      </div>
     </div>
   </nav>
 
@@ -52,20 +36,23 @@
               <p>Sign in to continue your reading journey</p>
             </div>
             <div class="card-body p-4 pt-0">
-              <form id="loginForm" class="needs-validation" novalidate>
+              <form id="loginForm" novalidate>
+                <!-- Email -->
                 <div class="mb-3">
                   <label for="email" class="form-label">Email</label>
-                  <input id="email" name="email" type="email" class="form-control" placeholder="Enter your email"
-                    required>
+                  <input id="email" name="email" type="email" class="form-control" placeholder="Enter your email">
+                  <div class="invalid-feedback"></div>
                 </div>
 
+                <!-- Password -->
                 <div class="mb-3">
                   <label for="password" class="form-label">Password</label>
                   <div class="input-group">
                     <input id="password" name="password" type="password" class="form-control"
-                      placeholder="Enter your password" required>
+                      placeholder="Enter your password">
                     <button type="button" class="btn btn-outline-secondary toggle-password">Show</button>
                   </div>
+                  <div class="invalid-feedback"></div>
                 </div>
 
                 <div class="mb-3 d-flex justify-content-between align-items-center">
@@ -76,7 +63,7 @@
                   <a href="forgot.html" class="text-decoration-none">Forgot password?</a>
                 </div>
 
-                <a href="dashboard.html" class="btn btn-main w-100 mb-3">Sign In</a>
+                <button type="submit" class="btn btn-main w-100 mb-3">Sign In</button>
 
                 <div class="divider">
                   <span>Or continue with</span>
@@ -105,15 +92,74 @@
   <footer class="mt-5">
     <div class="container">
       <p>© 2023 Storyline. All rights reserved.</p>
-      <p class="small">
-        <a href="#" class="text-decoration-none text-muted">Privacy Policy</a> |
-        <a href="#" class="text-decoration-none text-muted">Terms of Service</a> |
-        <a href="#" class="text-decoration-none text-muted">Contact Us</a>
-      </p>
     </div>
   </footer>
 
-  <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.bundle.min.js"></script>
+  <script>
+    document.getElementById("loginForm").addEventListener("submit", function (e) {
+      e.preventDefault();
+
+      const emailEl = document.getElementById("email");
+      const passwordEl = document.getElementById("password");
+
+      let valid = true;
+
+      function showError(input, message) {
+        input.classList.add("is-invalid");
+        input.nextElementSibling.textContent = message;
+        valid = false;
+      }
+
+      function clearError(input) {
+        input.classList.remove("is-invalid");
+        input.nextElementSibling.textContent = "";
+      }
+
+      clearError(emailEl);
+      clearError(passwordEl);
+
+      if (!emailEl.value.trim()) {
+        showError(emailEl, "Email is required.");
+      }
+
+      if (!passwordEl.value.trim()) {
+        showError(passwordEl, "Password is required.");
+      }
+
+      if (!valid) return;
+
+      const users = JSON.parse(localStorage.getItem("users")) || [];
+      const email = emailEl.value.trim().toLowerCase();
+      const password = passwordEl.value;
+
+      const user = users.find(u => u.email === email && u.password === password);
+
+      if (!user) {
+        showError(emailEl, "Invalid email or password.");
+        showError(passwordEl, "");
+        return;
+      }
+
+      // ✅ Save session (optional)
+      localStorage.setItem("currentUser", JSON.stringify(user));
+
+      // Redirect to dashboard
+      window.location.href = "dashboard.html";
+    });
+
+    document.querySelectorAll(".toggle-password").forEach(btn => {
+      btn.addEventListener("click", function () {
+        const input = this.previousElementSibling;
+        if (input.type === "password") {
+          input.type = "text";
+          this.textContent = "Hide";
+        } else {
+          input.type = "password";
+          this.textContent = "Show";
+        }
+      });
+    });
+  </script>
 
 </body>
 

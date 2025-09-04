@@ -10,12 +10,9 @@
     integrity="sha384-LN+7fdVzj6u52u30Kp6M/trliBMCMKTyK833zpbD+pXdCLuTusPj697FH4R/5mcr" crossorigin="anonymous">
 
   <link rel="stylesheet" href="css/styles.css">
-
 </head>
 
 <body>
-  <div id="alertContainer" class="position-fixed top-0 end-0 p-3" style="z-index:1050;"></div>
-
   <nav class="navbar navbar-expand-lg">
     <div class="container">
       <a class="navbar-brand fw-bold" href="index.html">
@@ -32,15 +29,9 @@
       </button>
       <div class="collapse navbar-collapse" id="navbarNav">
         <ul class="navbar-nav ms-auto">
-          <li class="nav-item">
-            <a class="nav-link" href="index.html">Home</a>
-          </li>
-          <li class="nav-item">
-            <a class="nav-link" href="about.html">About</a>
-          </li>
-          <li class="nav-item">
-            <a class="nav-link active" href="login.html">Login</a>
-          </li>
+          <li class="nav-item"><a class="nav-link" href="index.html">Home</a></li>
+          <li class="nav-item"><a class="nav-link" href="about.html">About</a></li>
+          <li class="nav-item"><a class="nav-link active" href="login.html">Login</a></li>
         </ul>
       </div>
     </div>
@@ -57,68 +48,61 @@
                 <p>Join Storyline to start your reading journey</p>
               </div>
 
-              <form action="register.php" method="POST" id="signupForm" class="needs-validation" novalidate>
+              <form id="signupForm" class="needs-validation" novalidate>
                 <div class="row">
                   <div class="col-md-6">
                     <div class="mb-3">
                       <label for="firstName" class="form-label">First Name</label>
-                      <input id="firstName" name="firstName" type="text" class="form-control" required>
+                      <input id="firstName" name="firstName" type="text" class="form-control">
+                      <div class="invalid-feedback"></div>
                     </div>
                   </div>
                   <div class="col-md-6">
                     <div class="mb-3">
                       <label for="lastName" class="form-label">Last Name</label>
-                      <input id="lastName" name="lastName" type="text" class="form-control" required>
+                      <input id="lastName" name="lastName" type="text" class="form-control">
+                      <div class="invalid-feedback"></div>
                     </div>
                   </div>
                 </div>
 
                 <div class="mb-3">
                   <label for="email" class="form-label">Email</label>
-                  <input id="email" name="email" type="email" class="form-control" required>
+                  <input id="email" name="email" type="email" class="form-control">
+                  <div class="invalid-feedback"></div>
                 </div>
 
                 <div class="mb-3">
                   <label for="password" class="form-label">Password</label>
                   <div class="input-group">
-                    <input id="password" name="password" type="password" class="form-control" required>
+                    <input id="password" name="password" type="password" class="form-control">
                     <button type="button" class="btn btn-outline-secondary toggle-password">Show</button>
                   </div>
+                  <div class="invalid-feedback"></div>
                   <div class="form-text">Must be at least 8 characters</div>
                 </div>
 
                 <div class="mb-4">
                   <label for="confirmPassword" class="form-label">Confirm Password</label>
                   <div class="input-group">
-                    <input id="confirmPassword" name="confirmPassword" type="password" class="form-control" required>
+                    <input id="confirmPassword" name="confirmPassword" type="password" class="form-control">
                     <button type="button" class="btn btn-outline-secondary toggle-password">Show</button>
                   </div>
+                  <div class="invalid-feedback"></div>
                 </div>
 
-                <div class="mb-4">
-                  <div class="form-check">
-                    <input class="form-check-input" type="checkbox" id="termsAgreement" required>
-                    <label class="form-check-label" for="termsAgreement">
-                      I agree to the <a href="#">Terms of Service</a> and <a href="#">Privacy Policy</a>
-                    </label>
-                  </div>
+                <div class="mb-4 form-check">
+                  <input class="form-check-input" type="checkbox" id="termsAgreement">
+                  <label class="form-check-label" for="termsAgreement">
+                    I agree to the <a href="#">Terms of Service</a> and <a href="#">Privacy Policy</a>
+                  </label>
+                  <div class="invalid-feedback"></div>
                 </div>
 
                 <button type="submit" class="btn btn-main w-100 mb-3">Create Account</button>
-
-                <div class="divider">
-                  <span>Or continue with</span>
-                </div>
-
-                <div class="d-grid gap-2">
-                  <button type="button" class="btn btn-secondary">
-                    <i class="bi bi-google"></i> Sign up with Google
-                  </button>
-                </div>
               </form>
 
               <hr class="my-4">
-
               <p class="text-center mb-0">
                 Already have an account? <a href="login.html" class="text-decoration-none">Sign in</a>
               </p>
@@ -132,53 +116,112 @@
   <footer class="mt-5">
     <div class="container">
       <p>© 2023 Storyline. All rights reserved.</p>
-      <p class="small">
-        <a href="#" class="text-decoration-none text-muted">Privacy Policy</a> |
-        <a href="#" class="text-decoration-none text-muted">Terms of Service</a> |
-        <a href="#" class="text-decoration-none text-muted">Contact Us</a>
-      </p>
     </div>
   </footer>
 
   <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.7/dist/js/bootstrap.bundle.min.js"
-    integrity="sha384-ndDqU0Gzau9qJ1lfW4pNLlhNTkCfHzAVBReH9diLvGRem5+R9g2FzA8ZGN954O5Q" crossorigin="anonymous">
+    integrity="sha384-ndDqU0Gzau9qJ1lfW4pNLlhNTkCfHzAVBReH9diLvGRem5+R9g2FzA8ZGN954O5Q"
+    crossorigin="anonymous"></script>
 
-    </script>
-</body>
+  <script>
+    document.getElementById("signupForm").addEventListener("submit", function (e) {
+      e.preventDefault();
 
-<script>
-  document.getElementById("signupForm").addEventListener("submit", function (e) {
-    e.preventDefault(); // prevent normal form submit
+      const firstNameEl = document.getElementById("firstName");
+      const lastNameEl = document.getElementById("lastName");
+      const emailEl = document.getElementById("email");
+      const passwordEl = document.getElementById("password");
+      const confirmPasswordEl = document.getElementById("confirmPassword");
+      const termsEl = document.getElementById("termsAgreement");
 
-    const alertContainer = document.getElementById("alertContainer");
-    alertContainer.innerHTML = ""; // clear previous alerts
+      let valid = true;
 
-    fetch("http://localhost/StoryLine%20Web/register.php", {
-      method: "POST",
-      body: new FormData(this)
-    })
-      .then(res => res.json())
-      .then(data => {
-        // Create alert
-        const alertDiv = document.createElement("div");
-        alertDiv.className = data.success ? "alert alert-success alert-dismissible fade show" : "alert alert-danger alert-dismissible fade show";
-        alertDiv.role = "alert";
-        alertDiv.innerHTML = `
-      ${data.message}
-      <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
-    `;
-        alertContainer.appendChild(alertDiv);
+      // Clear old errors
+      [firstNameEl, lastNameEl, emailEl, passwordEl, confirmPasswordEl].forEach(el => {
+        el.classList.remove("is-invalid");
+        if (el.nextElementSibling) el.nextElementSibling.textContent = "";
+      });
+      termsEl.classList.remove("is-invalid");
+      termsEl.parentElement.querySelector(".invalid-feedback").textContent = "";
 
-        // Redirect on success
-        if (data.success) {
-          setTimeout(() => {
-            window.location.href = "login.html";
-          }, 1500);
+      // Validation
+      if (!firstNameEl.value.trim()) {
+        firstNameEl.classList.add("is-invalid");
+        firstNameEl.nextElementSibling.textContent = "First name is required.";
+        valid = false;
+      }
+
+      if (!lastNameEl.value.trim()) {
+        lastNameEl.classList.add("is-invalid");
+        lastNameEl.nextElementSibling.textContent = "Last name is required.";
+        valid = false;
+      }
+
+      const emailPattern = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+      if (!emailEl.value.trim()) {
+        showError(emailEl, "Email is required.");
+      } else if (!emailPattern.test(emailEl.value.trim())) {
+        showError(emailEl, "Please enter a valid email.");
+      }
+
+
+      if (passwordEl.value.length < 8) {
+        passwordEl.classList.add("is-invalid");
+        passwordEl.parentElement.nextElementSibling.textContent = "Password must be at least 8 characters.";
+        valid = false;
+      }
+
+      if (confirmPasswordEl.value !== passwordEl.value) {
+        confirmPasswordEl.classList.add("is-invalid");
+        confirmPasswordEl.nextElementSibling.textContent = "Passwords do not match.";
+        valid = false;
+      }
+
+      if (!termsEl.checked) {
+        termsEl.classList.add("is-invalid");
+        termsEl.parentElement.querySelector(".invalid-feedback").textContent = "You must agree before continuing.";
+        valid = false;
+      }
+
+      if (!valid) return;
+
+      // Save to localStorage
+      const users = JSON.parse(localStorage.getItem("users")) || [];
+      const email = emailEl.value.trim().toLowerCase();
+
+      if (users.some(user => user.email === email)) {
+        emailEl.classList.add("is-invalid");
+        emailEl.nextElementSibling.textContent = "Email is already registered.";
+        return;
+      }
+
+      users.push({
+        firstName: firstNameEl.value.trim(),
+        lastName: lastNameEl.value.trim(),
+        email,
+        password: passwordEl.value
+      });
+
+      localStorage.setItem("users", JSON.stringify(users));
+
+      alert("Account created successfully!");
+      window.location.href = "login.html";
+    });
+
+    // Toggle password visibility
+    document.querySelectorAll(".toggle-password").forEach(btn => {
+      btn.addEventListener("click", function () {
+        const input = this.previousElementSibling;
+        if (input.type === "password") {
+          input.type = "text";
+          this.textContent = "Hide";
+        } else {
+          input.type = "password";
+          this.textContent = "Show";
         }
-      })
-      .catch(err => console.error("Error:", err));
-  });
-</script>
-
+      });
+    });
+  </script>
+</body>
 
 </html>

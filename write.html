@@ -7,6 +7,7 @@
   <title>Write a Story - Storyline</title>
   <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.7/dist/css/bootstrap.min.css" rel="stylesheet" />
   <link href="https://cdn.quilljs.com/1.3.7/quill.snow.css" rel="stylesheet" />
+  <link rel="stylesheet" href="css/styles.css" />
   <style>
     .story-img-preview {
       max-height: 200px;
@@ -59,14 +60,14 @@
       </button>
 
       <div class="collapse navbar-collapse" id="navbarContent">
-        <ul class="navbar-nav ms-auto align-items-center">
+        <ul class="navbar-nav ms-auto align-items-left">
           <li class="nav-item"><a class="nav-link active" href="dashboard.html">Dashboard</a></li>
           <li class="nav-item"><a class="nav-link" href="browse.html">Browse</a></li>
           <li class="nav-item"><a class="nav-link" href="write.html">Write</a></li>
         </ul>
 
         <!-- Profile Image on the right -->
-        <ul class="navbar-nav ms-3">
+        <ul class="navbar-nav ms-2">
           <li class="nav-item dropdown">
             <a class="nav-link p-0" href="#" role="button" data-bs-toggle="dropdown" aria-expanded="false">
               <div class="rounded-circle overflow-hidden" style="width: 38px; height: 38px; cursor: pointer;">
@@ -112,16 +113,22 @@
 
             <div class="mb-3">
               <label for="storyGenre" class="form-label">Genre</label>
-              <select class="form-select" id="storyGenre" required>
-                <option selected disabled>Select genre</option>
+              <select class="form-select" id="storyGenre" multiple required>
                 <option>Fantasy</option>
                 <option>Thriller</option>
                 <option>Horror</option>
                 <option>Mystery</option>
                 <option>Action</option>
                 <option>Sci-Fi</option>
+                <option>Romance</option>
+                <option>Comedy</option>
+                <option>Drama</option>
+                <option>Adventure</option>
+                <option>Historical</option>
               </select>
+              <small class="form-text text-muted">Hold Ctrl (Cmd on Mac) to select multiple genres.</small>
             </div>
+
 
             <div class="mb-3">
               <label for="storyImage" class="form-label">Upload Cover Image</label>
@@ -233,7 +240,6 @@
       localStorage.removeItem('editStoryIndex'); // clear edit flag
     }
 
-    // Helper to get genre badge color
     function getGenreColor(genre) {
       const colors = {
         'Fantasy': 'bg-primary',
@@ -241,10 +247,16 @@
         'Horror': 'bg-warning',
         'Mystery': 'bg-info',
         'Action': 'bg-danger',
-        'Sci-Fi': 'bg-dark'
+        'Sci-Fi': 'bg-dark',
+        'Romance': 'bg-pink text-white',
+        'Comedy': 'bg-secondary',
+        'Drama': 'bg-light text-dark',
+        'Adventure': 'bg-success',
+        'Historical': 'bg-info'
       };
       return colors[genre] || 'bg-primary';
     }
+
 
     // Add Chapter Button
     document.getElementById('addChapterBtn').addEventListener('click', () => {
@@ -295,18 +307,46 @@
       document.getElementById('previewTitle').textContent = storyTitle.value || 'Story Title';
       document.getElementById('previewAuthor').textContent = storyAuthor.value ? `by ${storyAuthor.value}` : 'by Author';
 
-      const genre = storyGenre.value;
-      const badge = document.getElementById('previewGenre');
-      badge.textContent = genre || 'Genre';
-      badge.className = `badge ${getGenreColor(genre)}`;
+      const selectedGenres = Array.from(storyGenre.selectedOptions).map(opt => opt.value);
+      const badgeContainer = document.getElementById('previewGenre');
+
+      // Clear previous badges
+      badgeContainer.innerHTML = '';
+
+      if (selectedGenres.length === 0) {
+        badgeContainer.textContent = 'Genre';
+        badgeContainer.className = 'badge bg-primary';
+      } else {
+        selectedGenres.forEach(g => {
+          const span = document.createElement('span');
+          span.textContent = g;
+          span.className = `badge me-1 ${getGenreColor(g)}`;
+          badgeContainer.appendChild(span);
+        });
+      }
 
       previewChapters.innerHTML = '';
       document.querySelectorAll('.chapter-container').forEach((chapter, idx) => {
         const title = chapter.querySelector('.chapter-title').value || `Chapter ${idx + 1}`;
         const content = quillEditors[idx]?.root.innerHTML || '';
-        const div = document.createElement('div');
-        div.innerHTML = `<h6>${title}</h6><p>${content}</p><hr>`;
-        previewChapters.appendChild(div);
+
+        const chapterDiv = document.createElement('div');
+        chapterDiv.classList.add('chapter-collapse', 'mb-2');
+
+        // Use Bootstrap collapse
+        chapterDiv.innerHTML = `
+      <h6>
+        ${title} 
+        <button class="collapse-button" type="button" data-bs-toggle="collapse" data-bs-target="#collapseChapter${idx}" aria-expanded="false" aria-controls="collapseChapter${idx}">
+          Show/Hide
+        </button>
+      </h6>
+      <div class="collapse collapse-content" id="collapseChapter${idx}">
+        ${content}
+      </div>
+      <hr>
+    `;
+        previewChapters.appendChild(chapterDiv);
       });
 
       if (previewChapters.innerHTML === '') {
@@ -314,21 +354,25 @@
       }
     }
 
+
     // Form submission (new or edited)
     document.getElementById('storyForm').addEventListener('submit', (e) => {
       e.preventDefault();
       const stories = JSON.parse(localStorage.getItem('userStories')) || [];
 
+      const selectedGenres = Array.from(storyGenre.selectedOptions).map(opt => opt.value);
+
       const storyData = {
         title: storyTitle.value,
         author: storyAuthor.value,
-        genre: storyGenre.value,
+        genre: selectedGenres, // save as array
         cover: document.getElementById('previewImage').src,
         chapters: quillEditors.map((q, i) => ({
           title: document.querySelectorAll('.chapter-title')[i].value,
           content: q.root.innerHTML
         }))
       };
+
 
       // Check if editing existing story
       if (editIndex !== null) {
