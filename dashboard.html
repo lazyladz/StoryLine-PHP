@@ -148,6 +148,15 @@
   <!-- Page Content -->
   <div class="container mt-4">
 
+  <!-- My Stories -->
+<h4 class="section-title">✍️ My Stories</h4>
+<div class="row g-3" id="dashboardMyStories">
+  <!-- JS will inject user stories here -->
+</div>
+<div id="noDashboardStories" class="text-center text-muted mt-3 d-none">
+  <p>You haven’t uploaded any stories yet. <a href="write.html">Start writing one! 📝</a></p>
+</div>
+
     <!-- Community Stories -->
     <h4 class="section-title">📚 Community Stories</h4>
     <div class="row g-3">
@@ -520,35 +529,119 @@
   <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.7/dist/js/bootstrap.bundle.min.js"></script>
 
   <script>
-    document.addEventListener("DOMContentLoaded", function () {
-      const currentUser = JSON.parse(localStorage.getItem("currentUser"));
+document.addEventListener("DOMContentLoaded", function () {
+  const currentUser = JSON.parse(localStorage.getItem("currentUser"));
 
-      const loginLink = document.querySelector('a[href="login.html"]')?.closest("li");
-      const signupLink = document.querySelector('a[href="register.html"]')?.closest("li");
-      const profileDropdown = document.querySelector(".nav-item.dropdown");
+  const loginLink = document.querySelector('a[href="login.html"]')?.closest("li");
+  const signupLink = document.querySelector('a[href="register.html"]')?.closest("li");
+  const profileDropdown = document.querySelector(".nav-item.dropdown");
 
-      if (currentUser) {
-        // User is logged in → hide login/signup, show profile
-        if (loginLink) loginLink.style.display = "none";
-        if (signupLink) signupLink.style.display = "none";
-        if (profileDropdown) profileDropdown.style.display = "block";
-      } else {
-        // No logged-in user → show login/signup, hide profile
-        if (loginLink) loginLink.style.display = "block";
-        if (signupLink) signupLink.style.display = "block";
-        if (profileDropdown) profileDropdown.style.display = "none";
-      }
+  const myStoriesSection = document.querySelector('h4.section-title'); // first h4 is My Stories
+  const dashboardMyStories = document.getElementById('dashboardMyStories');
+  const noDashboardStories = document.getElementById('noDashboardStories');
 
-      const logoutBtn = document.getElementById("logoutBtn");
-      if (logoutBtn) {
-        logoutBtn.addEventListener("click", function (e) {
-          e.preventDefault();
-          localStorage.removeItem("currentUser"); // clear the logged-in user
-          window.location.href = "index.html";   // redirect after logout
-        });
-      }
+  if (currentUser) {
+    // User is logged in → hide login/signup, show profile
+    if (loginLink) loginLink.style.display = "none";
+    if (signupLink) signupLink.style.display = "none";
+    if (profileDropdown) profileDropdown.style.display = "block";
+
+    // Show My Stories
+    myStoriesSection.style.display = "block";
+    dashboardMyStories.style.display = "flex";
+    noDashboardStories.style.display = "block";
+
+    renderDashboardMyStories();
+
+  } else {
+    // No logged-in user → show login/signup, hide profile
+    if (loginLink) loginLink.style.display = "block";
+    if (signupLink) signupLink.style.display = "block";
+    if (profileDropdown) profileDropdown.style.display = "none";
+
+    // Hide My Stories section
+    myStoriesSection.style.display = "none";
+    dashboardMyStories.style.display = "none";
+    noDashboardStories.style.display = "none";
+  }
+
+  const logoutBtn = document.getElementById("logoutBtn");
+  if (logoutBtn) {
+    logoutBtn.addEventListener("click", function (e) {
+      e.preventDefault();
+      localStorage.removeItem("currentUser"); // clear the logged-in user
+      window.location.href = "index.html";   // redirect after logout
     });
-  </script>
+  }
+
+  function getUserStories() {
+    return JSON.parse(localStorage.getItem('userStories')) || [];
+  }
+
+  function getGenreColor(genre) {
+    const colors = {
+      'Fantasy': 'bg-primary',
+      'Thriller': 'bg-success',
+      'Horror': 'bg-warning text-dark',
+      'Mystery': 'bg-info text-dark',
+      'Action': 'bg-danger',
+      'Sci-Fi': 'bg-dark',
+      'Romance': 'bg-danger',
+      'Comedy': 'bg-secondary',
+      'Drama': 'bg-light text-dark',
+      'Adventure': 'bg-success',
+      'Historical': 'bg-info text-dark'
+    };
+    return colors[genre] || 'bg-primary';
+  }
+
+  function renderDashboardMyStories() {
+    const container = document.getElementById('dashboardMyStories');
+    const noStories = document.getElementById('noDashboardStories');
+    const userStories = getUserStories();
+
+    container.innerHTML = '';
+
+    if (userStories.length === 0) {
+      noStories.classList.remove('d-none');
+      return;
+    }
+
+    noStories.classList.add('d-none');
+
+    // Limit to first 6 stories for dashboard
+    userStories.slice(0, 6).forEach((story, index) => {
+      const col = document.createElement('div');
+      col.classList.add('col-xl-2', 'col-lg-3', 'col-md-4', 'col-sm-6', 'col-6');
+
+      col.innerHTML = `
+        <div class="card h-100 story-card" style="cursor:pointer;">
+          <img src="${story.cover}" class="card-img-top story-img" alt="${story.title}">
+          <div class="card-body d-flex flex-column justify-content-between">
+            <div>
+              <h6 class="card-title mb-1">${story.title}</h6>
+              <small class="text-muted">by ${story.author}</small>
+            </div>
+            <div class="mt-2">
+              ${Array.isArray(story.genre) ? story.genre.map(g => `<span class="badge me-1 ${getGenreColor(g)}">${g}</span>`).join('') : `<span class="badge bg-primary">${story.genre}</span>`}
+            </div>
+          </div>
+        </div>
+      `;
+
+      // Add click listener to go to stories.html
+      col.querySelector(".story-card").addEventListener("click", () => {
+        const globalIndex = getUserStories().indexOf(story); // index in full userStories array
+        localStorage.setItem("viewStoryIndex", globalIndex);
+        window.location.href = "stories.html";
+      });
+
+      container.appendChild(col);
+    });
+  }
+});
+</script>
+
 </body>
 
 </html>
