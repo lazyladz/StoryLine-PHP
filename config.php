@@ -1,10 +1,13 @@
 <?php
-// Get database connection details from Railway's environment variables
-    $host = getenv('MYSQLHOST');
-    $user = getenv('MYSQLUSER');
-    $password = getenv('MYSQLPASSWORD');
-    $dbname = getenv('MYSQLDATABASE');
-    $port = getenv('MYSQLPORT');
+// Read environment variables
+$host = getenv('MYSQLHOST') ?: 'containers-us-west-123.railway.app';
+$user = getenv('MYSQLUSER') ?: 'your_username';
+$password = getenv('MYSQLPASSWORD') ?: 'your_password';
+$dbname = getenv('MYSQLDATABASE') ?: 'your_dbname';
+$port = intval(getenv('MYSQLPORT')) ?: 3306;
+
+// Debug: make sure values are set
+var_dump($host, $user, $password, $dbname, $port);
 
 // Create connection
 $mysqli = new mysqli($host, $user, $password, $dbname, $port);
@@ -13,5 +16,6 @@ $mysqli = new mysqli($host, $user, $password, $dbname, $port);
 if ($mysqli->connect_error) {
     die("Connection failed: " . $mysqli->connect_error);
 }
-echo "Connected successfully to Railway's MySQL!";
+
+echo "Connected successfully!";
 ?>
