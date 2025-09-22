@@ -53,7 +53,7 @@ $stmt = $mysqli->prepare("INSERT INTO users (first_name, last_name, email, passw
 $stmt->bind_param("ssss", $firstName, $lastName, $email, $hashedPassword);
 
 if ($stmt->execute()) {
-    echo json_encode(["success" => true, "message" => "Registration successful! Redirecting to login..."]);
+    echo json_encode(["success" => true, "message" => "Registration successful! Redirecting to login...", "redirect" => "login.html"]);
 } else {
     echo json_encode(["success" => false, "errors" => ["Database error: " . $stmt->error]]);
 }
