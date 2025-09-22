@@ -125,8 +125,6 @@
 
   <script>
   document.getElementById("signupForm").addEventListener("submit", function (e) {
-    e.preventDefault();
-
     const firstNameEl = document.getElementById("firstName");
     const lastNameEl = document.getElementById("lastName");
     const emailEl = document.getElementById("email");
@@ -186,10 +184,10 @@
       valid = false;
     }
 
-    if (!valid) return;
-
-    // Submit the form normally
-    e.target.submit();
+    // If valid, allow normal form submission (PHP redirect will work)
+    if (!valid) {
+      e.preventDefault(); // prevent only if invalid
+    }
   });
 
   // Toggle password visibility
@@ -206,6 +204,8 @@
     });
   });
 </script>
+
+  
 </body>
 
 </html>

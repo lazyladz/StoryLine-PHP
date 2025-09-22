@@ -1,13 +1,11 @@
 <?php
 session_start(); // Must be at the very top, before any output
-require_once "config.php"; // Your MySQL connection
-
-header("Content-Type: application/json");
+require_once "config.php"; // Your MySQL connection ($conn)
 
 // Only process POST requests
 if ($_SERVER['REQUEST_METHOD'] !== 'POST') {
     http_response_code(405);
-    echo json_encode(["success" => false, "message" => "Method Not Allowed"]);
+    echo "Method Not Allowed";
     exit;
 }
 
@@ -28,19 +26,22 @@ if (strlen($password) < 8) $errors[] = "Password must be at least 8 characters."
 if ($password !== $confirmPassword) $errors[] = "Passwords do not match.";
 
 if (!empty($errors)) {
-    echo json_encode(["success" => false, "errors" => $errors]);
+    // Store errors in session to display in form if needed
+    $_SESSION['errors'] = $errors;
+    header("Location: register.html"); // Redirect back to registration page
     exit;
 }
 
 // Check if email already exists
-$stmt = $mysqli->prepare("SELECT id FROM users WHERE email = ?");
+$stmt = $conn->prepare("SELECT id FROM users WHERE email = ?");
 $stmt->bind_param("s", $email);
 $stmt->execute();
 $stmt->store_result();
 if ($stmt->num_rows > 0) {
-    echo json_encode(["success" => false, "errors" => ["Email is already registered."]]);
+    $_SESSION['errors'] = ["Email is already registered."];
     $stmt->close();
-    $mysqli->close();
+    $conn->close();
+    header("Location: register.html"); // Redirect back to registration page
     exit;
 }
 $stmt->close();
@@ -49,14 +50,20 @@ $stmt->close();
 $hashedPassword = password_hash($password, PASSWORD_DEFAULT);
 
 // Insert user
-$stmt = $mysqli->prepare("INSERT INTO users (first_name, last_name, email, password) VALUES (?, ?, ?, ?)");
+$stmt = $conn->prepare("INSERT INTO users (first_name, last_name, email, password) VALUES (?, ?, ?, ?)");
 $stmt->bind_param("ssss", $firstName, $lastName, $email, $hashedPassword);
 
 if ($stmt->execute()) {
-    echo json_encode(["success" => true, "message" => "Registration successful! Redirecting to login...", "redirect" => "login.html"]);
+    $stmt->close();
+    $conn->close();
+    // Redirect to login after successful registration
+    header("Location: login.html");
+    exit;
 } else {
-    echo json_encode(["success" => false, "errors" => ["Database error: " . $stmt->error]]);
+    $_SESSION['errors'] = ["Database error: " . $stmt->error];
+    $stmt->close();
+    $conn->close();
+    header("Location: register.html");
+    exit;
 }
-
-$stmt->close();
-$mysqli->close();
+?>
