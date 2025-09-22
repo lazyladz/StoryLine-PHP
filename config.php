@@ -1,13 +1,10 @@
 <?php
-// Read environment variables
-$host = getenv('MYSQLHOST') ?: 'containers-us-west-123.railway.app';
-$user = getenv('MYSQLUSER') ?: 'your_username';
-$password = getenv('MYSQLPASSWORD') ?: 'your_password';
-$dbname = getenv('MYSQLDATABASE') ?: 'your_dbname';
-$port = intval(getenv('MYSQLPORT')) ?: 3306;
-
-// Debug: make sure values are set
-var_dump($host, $user, $password, $dbname, $port);
+// Read environment variables from Railway
+$host = getenv('MYSQLHOST');
+$user = getenv('MYSQLUSER');
+$password = getenv('MYSQLPASSWORD');
+$dbname = getenv('MYSQLDATABASE');
+$port = intval(getenv('MYSQLPORT'));
 
 // Create connection
 $mysqli = new mysqli($host, $user, $password, $dbname, $port);
