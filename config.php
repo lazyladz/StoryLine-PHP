@@ -1,5 +1,5 @@
 <?php
-$host = 'cmysql.railway.internal'; // Railway MySQL host
+$host = 'containers-us-west-123.railway.app'; // Railway MySQL host
 $user = 'root';                       // Railway MySQL user
 $password = 'JdnuFjCVaPQpxmDEfYhiuRMewYgxSxmM';                   // Railway MySQL password
 $dbname = 'railway';                       // Railway MySQL database
