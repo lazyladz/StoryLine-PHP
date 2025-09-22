@@ -48,59 +48,59 @@
                 <p>Join Storyline to start your reading journey</p>
               </div>
 
-              <form id="signupForm" class="needs-validation" novalidate>
-                <div class="row">
-                  <div class="col-md-6">
-                    <div class="mb-3">
-                      <label for="firstName" class="form-label">First Name</label>
-                      <input id="firstName" name="firstName" type="text" class="form-control">
-                      <div class="invalid-feedback"></div>
-                    </div>
-                  </div>
-                  <div class="col-md-6">
-                    <div class="mb-3">
-                      <label for="lastName" class="form-label">Last Name</label>
-                      <input id="lastName" name="lastName" type="text" class="form-control">
-                      <div class="invalid-feedback"></div>
-                    </div>
-                  </div>
-                </div>
+              <form id="signupForm" class="needs-validation" novalidate method="POST" action="register.php">
+  <div class="row">
+    <div class="col-md-6">
+      <div class="mb-3">
+        <label for="firstName" class="form-label">First Name</label>
+        <input id="firstName" name="firstName" type="text" class="form-control">
+        <div class="invalid-feedback"></div>
+      </div>
+    </div>
+    <div class="col-md-6">
+      <div class="mb-3">
+        <label for="lastName" class="form-label">Last Name</label>
+        <input id="lastName" name="lastName" type="text" class="form-control">
+        <div class="invalid-feedback"></div>
+      </div>
+    </div>
+  </div>
 
-                <div class="mb-3">
-                  <label for="email" class="form-label">Email</label>
-                  <input id="email" name="email" type="email" class="form-control">
-                  <div class="invalid-feedback"></div>
-                </div>
+  <div class="mb-3">
+    <label for="email" class="form-label">Email</label>
+    <input id="email" name="email" type="email" class="form-control">
+    <div class="invalid-feedback"></div>
+  </div>
 
-                <div class="mb-3">
-                  <label for="password" class="form-label">Password</label>
-                  <div class="input-group">
-                    <input id="password" name="password" type="password" class="form-control">
-                    <button type="button" class="btn btn-outline-secondary toggle-password">Show</button>
-                  </div>
-                  <div class="invalid-feedback"></div>
-                  <div class="form-text">Must be at least 8 characters</div>
-                </div>
+  <div class="mb-3">
+    <label for="password" class="form-label">Password</label>
+    <div class="input-group">
+      <input id="password" name="password" type="password" class="form-control">
+      <button type="button" class="btn btn-outline-secondary toggle-password">Show</button>
+    </div>
+    <div class="invalid-feedback"></div>
+    <div class="form-text">Must be at least 8 characters</div>
+  </div>
 
-                <div class="mb-4">
-                  <label for="confirmPassword" class="form-label">Confirm Password</label>
-                  <div class="input-group">
-                    <input id="confirmPassword" name="confirmPassword" type="password" class="form-control">
-                    <button type="button" class="btn btn-outline-secondary toggle-password">Show</button>
-                  </div>
-                  <div class="invalid-feedback"></div>
-                </div>
+  <div class="mb-4">
+    <label for="confirmPassword" class="form-label">Confirm Password</label>
+    <div class="input-group">
+      <input id="confirmPassword" name="confirmPassword" type="password" class="form-control">
+      <button type="button" class="btn btn-outline-secondary toggle-password">Show</button>
+    </div>
+    <div class="invalid-feedback"></div>
+  </div>
 
-                <div class="mb-4 form-check">
-                  <input class="form-check-input" type="checkbox" id="termsAgreement">
-                  <label class="form-check-label" for="termsAgreement">
-                    I agree to the <a href="#">Terms of Service</a> and <a href="#">Privacy Policy</a>
-                  </label>
-                  <div class="invalid-feedback"></div>
-                </div>
+  <div class="mb-4 form-check">
+    <input class="form-check-input" type="checkbox" id="termsAgreement">
+    <label class="form-check-label" for="termsAgreement">
+      I agree to the <a href="#">Terms of Service</a> and <a href="#">Privacy Policy</a>
+    </label>
+    <div class="invalid-feedback"></div>
+  </div>
 
-                <button type="submit" class="btn btn-main w-100 mb-3">Create Account</button>
-              </form>
+  <button type="submit" class="btn btn-main w-100 mb-3">Create Account</button>
+</form>
 
               <hr class="my-4">
               <p class="text-center mb-0">
@@ -124,104 +124,88 @@
     crossorigin="anonymous"></script>
 
   <script>
-    document.getElementById("signupForm").addEventListener("submit", function (e) {
-      e.preventDefault();
+  document.getElementById("signupForm").addEventListener("submit", function (e) {
+    e.preventDefault();
 
-      const firstNameEl = document.getElementById("firstName");
-      const lastNameEl = document.getElementById("lastName");
-      const emailEl = document.getElementById("email");
-      const passwordEl = document.getElementById("password");
-      const confirmPasswordEl = document.getElementById("confirmPassword");
-      const termsEl = document.getElementById("termsAgreement");
+    const firstNameEl = document.getElementById("firstName");
+    const lastNameEl = document.getElementById("lastName");
+    const emailEl = document.getElementById("email");
+    const passwordEl = document.getElementById("password");
+    const confirmPasswordEl = document.getElementById("confirmPassword");
+    const termsEl = document.getElementById("termsAgreement");
 
-      let valid = true;
+    let valid = true;
 
-      // Clear old errors
-      [firstNameEl, lastNameEl, emailEl, passwordEl, confirmPasswordEl].forEach(el => {
-        el.classList.remove("is-invalid");
-        if (el.nextElementSibling) el.nextElementSibling.textContent = "";
-      });
-      termsEl.classList.remove("is-invalid");
-      termsEl.parentElement.querySelector(".invalid-feedback").textContent = "";
-
-      // Validation
-      if (!firstNameEl.value.trim()) {
-        firstNameEl.classList.add("is-invalid");
-        firstNameEl.nextElementSibling.textContent = "First name is required.";
-        valid = false;
-      }
-
-      if (!lastNameEl.value.trim()) {
-        lastNameEl.classList.add("is-invalid");
-        lastNameEl.nextElementSibling.textContent = "Last name is required.";
-        valid = false;
-      }
-
-      const emailPattern = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
-      if (!emailEl.value.trim()) {
-        showError(emailEl, "Email is required.");
-      } else if (!emailPattern.test(emailEl.value.trim())) {
-        showError(emailEl, "Please enter a valid email.");
-      }
-
-
-      if (passwordEl.value.length < 8) {
-        passwordEl.classList.add("is-invalid");
-        passwordEl.parentElement.nextElementSibling.textContent = "Password must be at least 8 characters.";
-        valid = false;
-      }
-
-      if (confirmPasswordEl.value !== passwordEl.value) {
-        confirmPasswordEl.classList.add("is-invalid");
-        confirmPasswordEl.nextElementSibling.textContent = "Passwords do not match.";
-        valid = false;
-      }
-
-      if (!termsEl.checked) {
-        termsEl.classList.add("is-invalid");
-        termsEl.parentElement.querySelector(".invalid-feedback").textContent = "You must agree before continuing.";
-        valid = false;
-      }
-
-      if (!valid) return;
-
-      // Save to localStorage
-      const users = JSON.parse(localStorage.getItem("users")) || [];
-      const email = emailEl.value.trim().toLowerCase();
-
-      if (users.some(user => user.email === email)) {
-        emailEl.classList.add("is-invalid");
-        emailEl.nextElementSibling.textContent = "Email is already registered.";
-        return;
-      }
-
-      users.push({
-        firstName: firstNameEl.value.trim(),
-        lastName: lastNameEl.value.trim(),
-        email,
-        password: passwordEl.value
-      });
-
-      localStorage.setItem("users", JSON.stringify(users));
-
-      alert("Account created successfully!");
-      window.location.href = "login.html";
+    // Clear old errors
+    [firstNameEl, lastNameEl, emailEl, passwordEl, confirmPasswordEl].forEach(el => {
+      el.classList.remove("is-invalid");
+      if (el.nextElementSibling) el.nextElementSibling.textContent = "";
     });
+    termsEl.classList.remove("is-invalid");
+    termsEl.parentElement.querySelector(".invalid-feedback").textContent = "";
 
-    // Toggle password visibility
-    document.querySelectorAll(".toggle-password").forEach(btn => {
-      btn.addEventListener("click", function () {
-        const input = this.previousElementSibling;
-        if (input.type === "password") {
-          input.type = "text";
-          this.textContent = "Hide";
-        } else {
-          input.type = "password";
-          this.textContent = "Show";
-        }
-      });
+    // Validation
+    if (!firstNameEl.value.trim()) {
+      firstNameEl.classList.add("is-invalid");
+      firstNameEl.nextElementSibling.textContent = "First name is required.";
+      valid = false;
+    }
+
+    if (!lastNameEl.value.trim()) {
+      lastNameEl.classList.add("is-invalid");
+      lastNameEl.nextElementSibling.textContent = "Last name is required.";
+      valid = false;
+    }
+
+    const emailPattern = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+    if (!emailEl.value.trim()) {
+      emailEl.classList.add("is-invalid");
+      emailEl.nextElementSibling.textContent = "Email is required.";
+      valid = false;
+    } else if (!emailPattern.test(emailEl.value.trim())) {
+      emailEl.classList.add("is-invalid");
+      emailEl.nextElementSibling.textContent = "Please enter a valid email.";
+      valid = false;
+    }
+
+    if (passwordEl.value.length < 8) {
+      passwordEl.classList.add("is-invalid");
+      passwordEl.parentElement.nextElementSibling.textContent = "Password must be at least 8 characters.";
+      valid = false;
+    }
+
+    if (confirmPasswordEl.value !== passwordEl.value) {
+      confirmPasswordEl.classList.add("is-invalid");
+      confirmPasswordEl.nextElementSibling.textContent = "Passwords do not match.";
+      valid = false;
+    }
+
+    if (!termsEl.checked) {
+      termsEl.classList.add("is-invalid");
+      termsEl.parentElement.querySelector(".invalid-feedback").textContent = "You must agree before continuing.";
+      valid = false;
+    }
+
+    if (!valid) return;
+
+    // Submit the form normally
+    e.target.submit();
+  });
+
+  // Toggle password visibility
+  document.querySelectorAll(".toggle-password").forEach(btn => {
+    btn.addEventListener("click", function () {
+      const input = this.previousElementSibling;
+      if (input.type === "password") {
+        input.type = "text";
+        this.textContent = "Hide";
+      } else {
+        input.type = "password";
+        this.textContent = "Show";
+      }
     });
-  </script>
+  });
+</script>
 </body>
 
 </html>
