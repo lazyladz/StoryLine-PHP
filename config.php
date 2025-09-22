@@ -1,14 +1,17 @@
 <?php
-$host = "localhost";
-$user = "root";    // default in XAMPP
-$pass = "";        // default is blank
-$db   = "myapp";   // make sure this database exists in phpMyAdmin
+// Get database connection details from Railway's environment variables
+$host = getenv('MYSQLHOST');
+$user = getenv('MYSQLUSER');
+$password = getenv('MYSQLPASSWORD');
+$dbname = getenv('MYSQLDATABASE');
+$port = getenv('MYSQLPORT');
 
 // Create connection
-$conn = new mysqli($host, $user, $pass, $db);
+$mysqli = new mysqli($host, $user, $password, $dbname, $port);
 
 // Check connection
-if ($conn->connect_error) {
-    die("Connection failed: " . $conn->connect_error);
+if ($mysqli->connect_error) {
+    die("Connection failed: " . $mysqli->connect_error);
 }
+echo "Connected successfully to Railway's MySQL!";
 ?>
