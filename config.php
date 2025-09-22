@@ -1,9 +1,9 @@
 <?php
-$host = 'containers-us-west-123.railway.app'; // Railway MySQL host
-$user = 'root';                       // Railway MySQL user
-$password = 'JdnuFjCVaPQpxmDEfYhiuRMewYgxSxmM';                   // Railway MySQL password
-$dbname = 'railway';                       // Railway MySQL database
-$port = 3306;                                  // Railway MySQL port
+$host = getenv('MYSQLHOST');
+$user = getenv('MYSQLUSER');
+$password = getenv('MYSQLPASSWORD');
+$dbname = getenv('MYSQLDATABASE');
+$port = intval(getenv('MYSQLPORT'));
 
 $mysqli = new mysqli($host, $user, $password, $dbname, $port);
 
