@@ -96,69 +96,52 @@
   </footer>
 
   <script>
-    document.getElementById("loginForm").addEventListener("submit", function (e) {
-      e.preventDefault();
+    document.getElementById("loginForm").addEventListener("submit", async function(e) {
+  e.preventDefault();
 
-      const emailEl = document.getElementById("email");
-      const passwordEl = document.getElementById("password");
+  const emailEl = document.getElementById("email");
+  const passwordEl = document.getElementById("password");
 
-      let valid = true;
+  // Clear previous errors
+  emailEl.classList.remove("is-invalid");
+  passwordEl.classList.remove("is-invalid");
+  emailEl.nextElementSibling.textContent = "";
+  passwordEl.nextElementSibling.textContent = "";
 
-      function showError(input, message) {
-        input.classList.add("is-invalid");
-        input.nextElementSibling.textContent = message;
-        valid = false;
-      }
+  if (!emailEl.value.trim()) {
+    emailEl.classList.add("is-invalid");
+    emailEl.nextElementSibling.textContent = "Email is required.";
+    return;
+  }
 
-      function clearError(input) {
-        input.classList.remove("is-invalid");
-        input.nextElementSibling.textContent = "";
-      }
+  if (!passwordEl.value.trim()) {
+    passwordEl.classList.add("is-invalid");
+    passwordEl.nextElementSibling.textContent = "Password is required.";
+    return;
+  }
 
-      clearError(emailEl);
-      clearError(passwordEl);
+  const formData = new FormData();
+  formData.append("email", emailEl.value.trim());
+  formData.append("password", passwordEl.value);
 
-      if (!emailEl.value.trim()) {
-        showError(emailEl, "Email is required.");
-      }
+  try {
+    const res = await fetch("login.php", { method: "POST", body: formData });
+    const data = await res.json();
 
-      if (!passwordEl.value.trim()) {
-        showError(passwordEl, "Password is required.");
-      }
-
-      if (!valid) return;
-
-      const users = JSON.parse(localStorage.getItem("users")) || [];
-      const email = emailEl.value.trim().toLowerCase();
-      const password = passwordEl.value;
-
-      const user = users.find(u => u.email === email && u.password === password);
-
-      if (!user) {
-        showError(emailEl, "Invalid email or password.");
-        showError(passwordEl, "");
-        return;
-      }
-
-      // ✅ Save session (optional)
-      localStorage.setItem("currentUser", JSON.stringify(user));
-
+    if (data.success) {
       // Redirect to dashboard
-      window.location.href = "dashboard.html";
-    });
+      window.location.href = data.redirect;
+    } else {
+      emailEl.classList.add("is-invalid");
+      passwordEl.classList.add("is-invalid");
+      emailEl.nextElementSibling.textContent = data.errors[0];
+      passwordEl.nextElementSibling.textContent = "";
+    }
+  } catch (err) {
+    console.error(err);
+  }
+});
 
-    document.querySelectorAll(".toggle-password").forEach(btn => {
-      btn.addEventListener("click", function () {
-        const input = this.previousElementSibling;
-        if (input.type === "password") {
-          input.type = "text";
-          this.textContent = "Hide";
-        } else {
-          input.type = "password";
-          this.textContent = "Show";
-        }
-      });
-    });
   </script>
 
 </body>
