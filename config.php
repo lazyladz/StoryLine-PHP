@@ -5,14 +5,14 @@ $password = getenv('MYSQLPASSWORD');
 $dbname = getenv('MYSQLDATABASE');
 $port = intval(getenv('MYSQLPORT'));
 
-// Use $conn as the variable name (or stick with $mysqli but be consistent)
-$conn = new mysqli($host, $user, $password, $dbname, $port);
+// Create connection
+$mysqli = new mysqli($host, $user, $password, $dbname, $port);
 
 // Check connection
-if ($conn->connect_error) {
-    die("Connection failed: " . $conn->connect_error);
+if ($mysqli->connect_error) {
+    die("Connection failed: " . $mysqli->connect_error);
 }
 
-// REMOVE any echo statements — do not output anything here
+// ⚠️ DO NOT echo anything here!
 // echo "Connected successfully!";
 ?>
