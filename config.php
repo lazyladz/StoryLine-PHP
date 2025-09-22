@@ -1,15 +1,12 @@
 <?php
-// Read environment variables from Railway
-$host = getenv('MYSQLHOST');
-$user = getenv('MYSQLUSER');
-$password = getenv('MYSQLPASSWORD');
-$dbname = getenv('MYSQLDATABASE');
-$port = intval(getenv('MYSQLPORT'));
+$host = 'cmysql.railway.internal'; // Railway MySQL host
+$user = 'root';                       // Railway MySQL user
+$password = 'JdnuFjCVaPQpxmDEfYhiuRMewYgxSxmM';                   // Railway MySQL password
+$dbname = 'railway';                       // Railway MySQL database
+$port = 3306;                                  // Railway MySQL port
 
-// Create connection
 $mysqli = new mysqli($host, $user, $password, $dbname, $port);
 
-// Check connection
 if ($mysqli->connect_error) {
     die("Connection failed: " . $mysqli->connect_error);
 }
