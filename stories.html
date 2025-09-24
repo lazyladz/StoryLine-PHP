@@ -6,23 +6,347 @@
   <meta name="viewport" content="width=device-width, initial-scale=1">
   <title>Storyline - Story Details</title>
   <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.7/dist/css/bootstrap.min.css" rel="stylesheet">
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" />
   <style>
-    .story-cover {
-      max-width: 350px;
-      object-fit: cover;
+    :root {
+      --primary: #6d28d9;
+      --primary-dark: #5b21b6;
+      --secondary: #f59e0b;
+      --light: #f8fafc;
+      --dark: #1e293b;
+      --gray: #64748b;
     }
-
-    .badge-genre {
-      margin: 2px 2px 2px 0;
+    
+    body {
+      font-family: 'Segoe UI', system-ui, sans-serif;
+      background-color: #f8fafc;
+      color: var(--dark);
+      line-height: 1.6;
+    }
+    
+    /* Navbar */
+    .navbar {
+      background-color: white;
+      box-shadow: 0 2px 15px rgba(0, 0, 0, 0.1);
+      padding: 1rem 0;
+    }
+    
+    .navbar-brand {
+      font-weight: 700;
+      font-size: 1.5rem;
+      color: var(--primary);
+      display: flex;
+      align-items: center;
+    }
+    
+    .navbar-brand svg {
+      color: var(--primary);
+    }
+    
+    .nav-link {
+      font-weight: 500;
+      margin: 0 0.5rem;
+      color: var(--dark);
+      transition: color 0.3s;
+    }
+    
+    .nav-link:hover, .nav-link.active {
+      color: var(--primary);
+    }
+    
+    .btn-main {
+      background-color: var(--primary);
+      color: white;
+      padding: 0.75rem 1.5rem;
+      border-radius: 8px;
+      font-weight: 600;
+      transition: all 0.3s;
+      border: none;
+    }
+    
+    .btn-main:hover {
+      background-color: var(--primary-dark);
+      transform: translateY(-2px);
+      box-shadow: 0 4px 12px rgba(109, 40, 217, 0.3);
+    }
+    
+    .btn-secondary {
+      background-color: transparent;
+      color: var(--primary);
+      border: 2px solid var(--primary);
+      padding: 0.75rem 1.5rem;
+      border-radius: 8px;
+      font-weight: 600;
+      transition: all 0.3s;
+    }
+    
+    .btn-secondary:hover {
+      background-color: rgba(109, 40, 217, 0.1);
+      transform: translateY(-2px);
+    }
+    
+    /* Story Header */
+    .story-header {
+      background: linear-gradient(135deg, var(--primary) 0%, var(--primary-dark) 100%);
+      color: white;
+      padding: 3rem 0;
+      margin-bottom: 2rem;
+    }
+    
+    .story-cover {
+      max-width: 100%;
+      border-radius: 12px;
+      box-shadow: 0 10px 30px rgba(0, 0, 0, 0.2);
+    }
+    
+    .story-title {
+      font-weight: 800;
+      margin-bottom: 1rem;
+      font-size: 2.5rem;
+    }
+    
+    .story-author {
+      font-size: 1.25rem;
+      opacity: 0.9;
+      margin-bottom: 1.5rem;
+    }
+    
+    .story-meta {
+      display: flex;
+      gap: 1.5rem;
+      margin-bottom: 1.5rem;
+    }
+    
+    .meta-item {
+      display: flex;
+      align-items: center;
+      gap: 0.5rem;
+    }
+    
+    .meta-icon {
+      font-size: 1.2rem;
+    }
+    
+    .badge {
+      font-size: 0.8rem;
+      padding: 0.4rem 0.8rem;
+      border-radius: 20px;
+    }
+    
+    /* Chapters Section */
+    .chapters-section {
+      background-color: white;
+      border-radius: 12px;
+      padding: 2rem;
+      box-shadow: 0 5px 15px rgba(0, 0, 0, 0.08);
+      margin-bottom: 2rem;
+    }
+    
+    .section-title {
+      font-weight: 700;
+      margin-bottom: 1.5rem;
+      position: relative;
+      padding-bottom: 0.5rem;
+    }
+    
+    .section-title::after {
+      content: '';
+      position: absolute;
+      bottom: 0;
+      left: 0;
+      width: 50px;
+      height: 3px;
+      background: linear-gradient(to right, var(--primary), var(--secondary));
+      border-radius: 2px;
+    }
+    
+    .chapter-list {
+      list-style: none;
+      padding: 0;
+    }
+    
+    .chapter-item {
+      border: 1px solid #e2e8f0;
+      border-radius: 8px;
+      padding: 1.25rem;
+      margin-bottom: 1rem;
+      transition: all 0.3s;
+      cursor: pointer;
+    }
+    
+    .chapter-item:hover {
+      border-color: var(--primary);
+      box-shadow: 0 5px 15px rgba(0, 0, 0, 0.08);
+    }
+    
+    .chapter-header {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      margin-bottom: 0.5rem;
+    }
+    
+    .chapter-title {
+      font-weight: 600;
+      margin: 0;
+      color: var(--primary);
+    }
+    
+    .chapter-preview {
+      color: var(--gray);
+      font-size: 0.9rem;
+      margin-bottom: 0;
+    }
+    
+    /* Chapter Content */
+    .chapter-content-section {
+      background-color: white;
+      border-radius: 12px;
+      padding: 2rem;
+      box-shadow: 0 5px 15px rgba(0, 0, 0, 0.08);
+      margin-bottom: 2rem;
+    }
+    
+    .chapter-content {
+      font-size: 1.1rem;
+      line-height: 1.8;
+      margin-bottom: 2rem;
+    }
+    
+    .chapter-navigation {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      padding-top: 1.5rem;
+      border-top: 1px solid #e2e8f0;
+    }
+    
+    /* Comments Section */
+    .comments-section {
+      background-color: white;
+      border-radius: 12px;
+      padding: 2rem;
+      box-shadow: 0 5px 15px rgba(0, 0, 0, 0.08);
+      margin-bottom: 2rem;
+    }
+    
+    .comment-form {
+      margin-bottom: 2rem;
+    }
+    
+    .comment-list {
+      list-style: none;
+      padding: 0;
+    }
+    
+    .comment-item {
+      border-bottom: 1px solid #e2e8f0;
+      padding: 1.5rem 0;
+    }
+    
+    .comment-item:last-child {
+      border-bottom: none;
+    }
+    
+    .comment-header {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      margin-bottom: 0.5rem;
+    }
+    
+    .comment-author {
+      font-weight: 600;
+      margin: 0;
+    }
+    
+    .comment-date {
+      color: var(--gray);
+      font-size: 0.9rem;
+    }
+    
+    .comment-text {
+      margin: 0;
+      color: var(--dark);
+    }
+    
+    .no-comments {
+      text-align: center;
+      padding: 2rem;
+      color: var(--gray);
+    }
+    
+    /* Footer */
+    footer {
+      background-color: var(--dark);
+      color: white;
+      padding: 2rem 0 1rem;
+      margin-top: 3rem;
+    }
+    
+    .copyright {
+      text-align: center;
+      padding-top: 1.5rem;
+      margin-top: 1.5rem;
+      border-top: 1px solid rgba(255, 255, 255, 0.1);
+      color: rgba(255, 255, 255, 0.6);
+    }
+    
+    /* Responsive Adjustments */
+    @media (max-width: 768px) {
+      .story-header {
+        padding: 2rem 0;
+      }
+      
+      .story-title {
+        font-size: 2rem;
+      }
+      
+      .story-meta {
+        flex-direction: column;
+        gap: 1rem;
+      }
+      
+      .chapter-navigation {
+        flex-direction: column;
+        gap: 1rem;
+      }
+      
+      .chapter-navigation .btn {
+        width: 100%;
+      }
+    }
+    
+    /* Reading Progress */
+    .reading-progress {
+      height: 4px;
+      background-color: #e2e8f0;
+      position: fixed;
+      top: 0;
+      left: 0;
+      width: 100%;
+      z-index: 1000;
+    }
+    
+    .reading-progress-bar {
+      height: 100%;
+      background: linear-gradient(to right, var(--primary), var(--secondary));
+      width: 0%;
+      transition: width 0.3s;
     }
   </style>
 </head>
 
 <body>
+  <!-- Reading Progress Bar -->
+  <div class="reading-progress">
+    <div class="reading-progress-bar" id="readingProgress"></div>
+  </div>
+
   <!-- Navbar -->
-  <nav class="navbar navbar-expand-lg navbar-dark" style="background-color:#006d77;">
+  <nav class="navbar navbar-expand-lg">
     <div class="container">
-      <a class="navbar-brand fw-bold" href="index.html">
+      <a class="navbar-brand" href="index.html">
         <svg xmlns="http://www.w3.org/2000/svg" width="28" height="28" fill="currentColor" class="bi bi-book me-2"
           viewBox="0 0 16 16">
           <path
@@ -38,176 +362,441 @@
 
       <div class="collapse navbar-collapse" id="navbarContent">
         <ul class="navbar-nav ms-auto align-items-center">
-          <li class="nav-item"><a class="nav-link active" href="dashboard.html">Dashboard</a></li>
-          <li class="nav-item"><a class="nav-link" href="browse.html">Browse</a></li>
-          <li class="nav-item"><a class="nav-link" href="write.html">Write</a></li>
-        </ul>
-
-        <!-- Profile Image on the right -->
-        <ul class="navbar-nav ms-3">
-          <li class="nav-item dropdown">
+          <li class="nav-item"><a class="nav-link" href="dashboard.html"><i class="fas fa-th-large me-1"></i>Dashboard</a></li>
+          <li class="nav-item"><a class="nav-link" href="browse.html"><i class="fas fa-compass me-1"></i>Browse</a></li>
+          <li class="nav-item"><a class="nav-link" href="write.html"><i class="fas fa-pen me-1"></i>Write</a></li>
+          <li class="nav-item"><a class="nav-link" href="mystories.html"><i class="fas fa-book me-1"></i>My Stories</a></li>
+          
+          <!-- User dropdown -->
+          <li class="nav-item dropdown ms-2">
             <a class="nav-link p-0" href="#" role="button" data-bs-toggle="dropdown" aria-expanded="false">
-              <div class="rounded-circle overflow-hidden" style="width: 38px; height: 38px; cursor: pointer;">
-                <img src="images/download (1).jpeg" alt="Profile" class="w-100 h-100">
+              <div class="rounded-circle overflow-hidden d-flex align-items-center justify-content-center" style="width: 40px; height: 40px; background: linear-gradient(135deg, var(--primary) 0%, var(--secondary) 100%); color: white; font-weight: bold;">
+                <span id="userInitial">U</span>
               </div>
             </a>
             <ul class="dropdown-menu dropdown-menu-end">
-              <li><a class="dropdown-item" href="profile.html">My Profile</a></li>
-              <li><a class="dropdown-item" href="mystories.html">My Stories</a></li>
-              <li><a class="dropdown-item" href="#">Settings</a></li>
-              <li>
-                <hr class="dropdown-divider">
-              </li>
-              <li><a class="dropdown-item" href="#">Logout</a></li>
+              <li><a class="dropdown-item" href="profile.html"><i class="fas fa-user me-2"></i>My Profile</a></li>
+              <li><a class="dropdown-item" href="mystories.html"><i class="fas fa-book me-2"></i>My Stories</a></li>
+              <li><a class="dropdown-item" href="#"><i class="fas fa-cog me-2"></i>Settings</a></li>
+              <li><hr class="dropdown-divider"></li>
+              <li><a class="dropdown-item" href="#" id="logoutBtn"><i class="fas fa-sign-out-alt me-2"></i>Logout</a></li>
             </ul>
           </li>
         </ul>
-
       </div>
     </div>
   </nav>
 
-  <!-- Story Content -->
-  <div class="container mt-4">
-    <a href="mystories.html" class="btn btn-outline-primary mb-3">&larr; Back to My Stories</a>
-    <div class="d-flex flex-column flex-md-row gap-4">
-      <img id="storyCover" src="" alt="Story Cover" class="img-fluid rounded shadow story-cover">
-      <div class="flex-grow-1">
-        <h2 id="storyTitle" class="fw-bold"></h2>
-        <p class="lead" id="storyDescription"></p>
-        <div id="storyGenres" class="mb-3"></div>
-
-        <h4>Chapters</h4>
-        <ul class="list-group mb-4" id="storyChapters"></ul>
-
-        <h4>Comments</h4>
-        <ul class="list-group" id="storyComments">
-          <li class="list-group-item">No comments yet.</li>
-        </ul>
+  <!-- Story Header -->
+  <div class="story-header">
+    <div class="container">
+      <div class="row align-items-center">
+        <div class="col-lg-4 text-center text-lg-start mb-4 mb-lg-0">
+          <img id="storyCover" src="" alt="Story Cover" class="story-cover">
+        </div>
+        <div class="col-lg-8 text-center text-lg-start">
+          <h1 class="story-title" id="storyTitle"></h1>
+          <p class="story-author" id="storyAuthor"></p>
+          
+          <div class="story-meta">
+            <div class="meta-item">
+              <i class="fas fa-book-open meta-icon"></i>
+              <span id="chapterCount">0 Chapters</span>
+            </div>
+            <div class="meta-item">
+              <i class="fas fa-eye meta-icon"></i>
+              <span id="readCount">0 Reads</span>
+            </div>
+            <div class="meta-item">
+              <i class="fas fa-star meta-icon"></i>
+              <span id="rating">Not Rated</span>
+            </div>
+          </div>
+          
+          <div id="storyGenres" class="mb-3"></div>
+          
+          <div class="d-flex gap-2 flex-wrap">
+            <button class="btn btn-main" onclick="startReading()">
+              <i class="fas fa-play me-1"></i>Start Reading
+            </button>
+            <a href="mystories.html" class="btn btn-secondary">
+              <i class="fas fa-arrow-left me-1"></i>Back to My Stories
+            </a>
+          </div>
+        </div>
       </div>
     </div>
   </div>
-  <div id="chapterContent" class="mt-4 p-3 border rounded bg-light d-none">
-    <h5 id="chapterTitle"></h5>
-    <p id="chapterText"></p>
-    <div class="d-flex justify-content-between mt-3">
-      <button id="prevChapter" class="btn btn-sm btn-secondary">Previous</button>
-      <button id="nextChapter" class="btn btn-sm btn-secondary">Next</button>
+
+  <!-- Main Content -->
+  <div class="container">
+    <!-- Chapters List -->
+    <div class="chapters-section">
+      <h3 class="section-title"><i class="fas fa-list-ol me-2"></i>Chapters</h3>
+      <ul class="chapter-list" id="storyChapters">
+        <!-- Chapters will be populated here -->
+      </ul>
+    </div>
+
+    <!-- Chapter Content (Initially Hidden) -->
+    <div class="chapter-content-section d-none" id="chapterContentSection">
+      <div class="d-flex justify-content-between align-items-center mb-4">
+        <h3 class="section-title mb-0" id="chapterTitleDisplay"></h3>
+        <button class="btn btn-secondary btn-sm" onclick="closeChapter()">
+          <i class="fas fa-times me-1"></i>Close
+        </button>
+      </div>
+      
+      <div class="chapter-content" id="chapterText"></div>
+      
+      <div class="chapter-navigation">
+        <button id="prevChapter" class="btn btn-secondary" onclick="navigateChapter(-1)">
+          <i class="fas fa-chevron-left me-1"></i>Previous Chapter
+        </button>
+        
+        <div class="chapter-progress">
+          Chapter <span id="currentChapterIndex">1</span> of <span id="totalChapters">0</span>
+        </div>
+        
+        <button id="nextChapter" class="btn btn-main" onclick="navigateChapter(1)">
+          Next Chapter <i class="fas fa-chevron-right me-1"></i>
+        </button>
+      </div>
+    </div>
+
+    <!-- Comments Section -->
+    <div class="comments-section">
+      <h3 class="section-title"><i class="fas fa-comments me-2"></i>Comments</h3>
+      
+      <!-- Comment Form -->
+      <div class="comment-form">
+        <div class="mb-3">
+          <label for="commentText" class="form-label">Add a Comment</label>
+          <textarea class="form-control" id="commentText" rows="3" placeholder="Share your thoughts about this story..."></textarea>
+        </div>
+        <button class="btn btn-main" onclick="addComment()">
+          <i class="fas fa-paper-plane me-1"></i>Post Comment
+        </button>
+      </div>
+      
+      <!-- Comments List -->
+      <ul class="comment-list" id="storyComments">
+        <!-- Comments will be populated here -->
+      </ul>
+      
+      <!-- No Comments Message -->
+      <div class="no-comments d-none" id="noComments">
+        <i class="fas fa-comment-slash fa-2x mb-3"></i>
+        <p>No comments yet. Be the first to share your thoughts!</p>
+      </div>
     </div>
   </div>
 
+  <!-- Footer -->
+  <footer>
+    <div class="container">
+      <div class="row">
+        <div class="col-md-6">
+          <a class="navbar-brand text-white mb-3 d-inline-block" href="index.html">
+            <svg xmlns="http://www.w3.org/2000/svg" width="28" height="28" fill="currentColor" class="bi bi-book me-2"
+              viewBox="0 0 16 16">
+              <path
+                d="M1 2.828c.885-.37 2.154-.769 3.388-.893 1.33-.134 2.458.063 3.112.752v9.746c-.935-.53-2.12-.603-3.213-.493-1.18.12-2.37.461-3.287.811V2.828zm7.5-.141c.654-.689 1.782-.886 3.112-.752 1.234.124 2.503.523 3.388.893v9.923c-.918-.35-2.107-.692-3.287-.81-1.094-.111-2.278-.039-3.213.492V2.687zM8 1.783C7.015.936 5.587.81 4.287.94c-1.514.153-3.042.672-3.994 1.105A.5.5 0 0 0 0 2.5v11a.5.5 0 0 0 .707.455c.882-.4 2.303-.881 3.68-1.02 1.409-.142 2.59.087 3.223.877a.5.5 0 0 0 .78 0c.633-.79 1.814-1.019 3.222-.877 1.378.139 2.8.62 3.681 1.02A.5.5 0 0 0 16 13.5v-11a.5.5 0 0 0-.293-.455c-.952-.433-2.48-.952-3.994-1.105C10.413.809 8.985.936 8 1.783z" />
+            </svg>
+            Storyline
+          </a>
+          <p class="text-white-50">Where stories come alive. Discover new tales, write your own, and connect with readers everywhere.</p>
+        </div>
+        <div class="col-md-6 text-md-end">
+          <p class="text-white-50">&copy; 2025 Storyline. All rights reserved.</p>
+        </div>
+      </div>
+      <div class="copyright">
+        <p class="mb-0">Made with <i class="fas fa-heart text-danger"></i> for storytellers</p>
+      </div>
+    </div>
+  </footer>
 
   <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.7/dist/js/bootstrap.bundle.min.js"></script>
 
-
   <script>
-    // Get story index from localStorage
-    const storyIndex = localStorage.getItem('viewStoryIndex');
-    if (!storyIndex) {
-      alert('No story selected!');
-      window.location.href = 'mystories.html';
-    }
-
-    const stories = JSON.parse(localStorage.getItem('userStories')) || [];
-    const story = stories[storyIndex];
-
-    if (!story) {
-      alert('Story not found!');
-      window.location.href = 'mystories.html';
-    }
-
-    // Populate story details
-    document.getElementById('storyCover').src = story.cover || 'https://via.placeholder.com/400x200?text=No+Cover';
-    document.getElementById('storyTitle').textContent = story.title;
-    document.getElementById('storyDescription').textContent = story.description || 'No description available.';
-
-    const genresContainer = document.getElementById('storyGenres');
-    genresContainer.innerHTML = '';
-    if (story.genre) {
-      const genres = Array.isArray(story.genre) ? story.genre : [story.genre];
-      genres.forEach(g => {
-        const span = document.createElement('span');
-        span.className = 'badge bg-secondary badge-genre me-1 mb-1';
-        span.textContent = g;
-        genresContainer.appendChild(span);
-      });
-    }
-
-    // Populate chapters
-    const chaptersContainer = document.getElementById('storyChapters');
-    chaptersContainer.innerHTML = '';
-    if (story.chapters && story.chapters.length > 0) {
-      story.chapters.forEach((ch, i) => {
-        const li = document.createElement('li');
-        li.className = 'list-group-item d-flex justify-content-between align-items-center';
-        li.innerHTML = `
-        ${ch.title} – ${ch.content.substring(0, 50)}...
-        <a href="#" class="btn btn-sm btn-outline-primary" onclick="showChapterContent(${i})">Read</a>
-      `;
-        chaptersContainer.appendChild(li);
-      });
-    } else {
-      chaptersContainer.innerHTML = '<li class="list-group-item">No chapters yet.</li>';
-    }
-
-    // Chapter display
-    const chapterContentDiv = document.getElementById('chapterContent');
-    const chapterTitle = document.getElementById('chapterTitle');
-    const chapterText = document.getElementById('chapterText');
-    const prevBtn = document.getElementById('prevChapter');
-    const nextBtn = document.getElementById('nextChapter');
-
-    let currentChapterIndex = 0;
-
-    window.showChapterContent = function (index) {
-      currentChapterIndex = index;
-      displayChapter(currentChapterIndex);
-      chapterContentDiv.classList.remove('d-none');
-      chapterContentDiv.scrollIntoView({ behavior: 'smooth' });
-    }
-
-    function displayChapter(index) {
-      const chapter = story.chapters[index];
-      chapterTitle.textContent = chapter.title;
-
-      // Use innerHTML directly if content already has HTML tags
-      chapterText.innerHTML = chapter.content;
-
-      // Enable/disable navigation buttons
-      prevBtn.disabled = (index === 0);
-      nextBtn.disabled = (index === story.chapters.length - 1);
-    }
-
-
-    prevBtn.addEventListener('click', () => {
-      if (currentChapterIndex > 0) {
-        currentChapterIndex--;
-        displayChapter(currentChapterIndex);
+    document.addEventListener("DOMContentLoaded", function () {
+      // Initialize user data
+      const currentUser = JSON.parse(localStorage.getItem("currentUser"));
+      if (currentUser && currentUser.name) {
+        document.getElementById("userInitial").textContent = currentUser.name.charAt(0).toUpperCase();
       }
-    });
 
-    nextBtn.addEventListener('click', () => {
-      if (currentChapterIndex < story.chapters.length - 1) {
-        currentChapterIndex++;
-        displayChapter(currentChapterIndex);
+      // Get story index from localStorage
+      const storyIndex = localStorage.getItem('viewStoryIndex');
+      if (!storyIndex) {
+        alert('No story selected!');
+        window.location.href = 'mystories.html';
       }
-    });
 
-    // Populate comments
-    const commentsContainer = document.getElementById('storyComments');
-    commentsContainer.innerHTML = '';
-    if (story.comments && story.comments.length > 0) {
-      story.comments.forEach(c => {
-        const li = document.createElement('li');
-        li.className = 'list-group-item';
-        li.textContent = c;
-        commentsContainer.appendChild(li);
+      const stories = JSON.parse(localStorage.getItem('userStories')) || [];
+      const story = stories[storyIndex];
+
+      if (!story) {
+        alert('Story not found!');
+        window.location.href = 'mystories.html';
+      }
+
+      // Update story reads count
+      if (!story.reads) story.reads = 0;
+      story.reads++;
+      stories[storyIndex] = story;
+      localStorage.setItem('userStories', JSON.stringify(stories));
+
+      // Populate story details
+      document.getElementById('storyCover').src = story.cover || 'https://images.unsplash.com/photo-1455390582262-044cdead277a?ixlib=rb-4.0.3&auto=format&fit=crop&w=600&q=80';
+      document.getElementById('storyTitle').textContent = story.title;
+      document.getElementById('storyAuthor').textContent = `by ${story.author}`;
+      document.getElementById('chapterCount').textContent = `${story.chapters ? story.chapters.length : 0} Chapters`;
+      document.getElementById('readCount').textContent = `${story.reads} Reads`;
+      document.getElementById('rating').textContent = story.rating ? `${story.rating} ★` : 'Not Rated';
+
+      // Populate genres
+      const genresContainer = document.getElementById('storyGenres');
+      genresContainer.innerHTML = '';
+      if (story.genre) {
+        const genres = Array.isArray(story.genre) ? story.genre : [story.genre];
+        genres.forEach(g => {
+          const span = document.createElement('span');
+          span.className = `badge ${getGenreColor(g)} me-1 mb-1`;
+          span.textContent = g;
+          genresContainer.appendChild(span);
+        });
+      }
+
+      // Populate chapters
+      const chaptersContainer = document.getElementById('storyChapters');
+      chaptersContainer.innerHTML = '';
+      
+      if (story.chapters && story.chapters.length > 0) {
+        document.getElementById('totalChapters').textContent = story.chapters.length;
+        
+        story.chapters.forEach((ch, i) => {
+          const li = document.createElement('li');
+          li.className = 'chapter-item';
+          li.innerHTML = `
+            <div class="chapter-header">
+              <h4 class="chapter-title">${ch.title}</h4>
+              <button class="btn btn-main btn-sm" onclick="showChapterContent(${i})">
+                <i class="fas fa-book-open me-1"></i>Read
+              </button>
+            </div>
+            <p class="chapter-preview">${stripHtml(ch.content).substring(0, 100)}...</p>
+          `;
+          chaptersContainer.appendChild(li);
+        });
+      } else {
+        chaptersContainer.innerHTML = '<li class="chapter-item text-center p-4"><p class="text-muted">No chapters available.</p></li>';
+      }
+
+      // Populate comments
+      const commentsContainer = document.getElementById('storyComments');
+      const noComments = document.getElementById('noComments');
+      
+      if (story.comments && story.comments.length > 0) {
+        commentsContainer.innerHTML = '';
+        noComments.classList.add('d-none');
+        
+        story.comments.forEach(c => {
+          const li = document.createElement('li');
+          li.className = 'comment-item';
+          li.innerHTML = `
+            <div class="comment-header">
+              <h5 class="comment-author">${c.author || 'Anonymous'}</h5>
+              <span class="comment-date">${formatDate(c.date)}</span>
+            </div>
+            <p class="comment-text">${c.text}</p>
+          `;
+          commentsContainer.appendChild(li);
+        });
+      } else {
+        commentsContainer.innerHTML = '';
+        noComments.classList.remove('d-none');
+      }
+
+      // Initialize chapter navigation
+      let currentChapterIndex = 0;
+      
+      // Genre color mapping
+      function getGenreColor(genre) {
+        const colors = {
+          'Fantasy': 'bg-primary',
+          'Thriller': 'bg-success',
+          'Horror': 'bg-warning text-dark',
+          'Mystery': 'bg-info text-dark',
+          'Action': 'bg-danger',
+          'Sci-Fi': 'bg-dark',
+          'Romance': 'bg-pink',
+          'Comedy': 'bg-secondary',
+          'Drama': 'bg-light text-dark',
+          'Adventure': 'bg-success',
+          'Historical': 'bg-info text-dark'
+        };
+        return colors[genre] || 'bg-primary';
+      }
+      
+      // Strip HTML tags for preview
+      function stripHtml(html) {
+        const tmp = document.createElement('div');
+        tmp.innerHTML = html;
+        return tmp.textContent || tmp.innerText || '';
+      }
+      
+      // Format date
+      function formatDate(dateString) {
+        const options = { year: 'numeric', month: 'short', day: 'numeric' };
+        return new Date(dateString).toLocaleDateString(undefined, options);
+      }
+      
+      // Show chapter content
+      window.showChapterContent = function (index) {
+        currentChapterIndex = index;
+        displayChapter(currentChapterIndex);
+        
+        // Show chapter content section
+        document.getElementById('chapterContentSection').classList.remove('d-none');
+        
+        // Scroll to chapter content
+        document.getElementById('chapterContentSection').scrollIntoView({ behavior: 'smooth' });
+        
+        // Update reading progress
+        updateReadingProgress();
+      }
+      
+      // Start reading from first chapter
+      window.startReading = function () {
+        if (story.chapters && story.chapters.length > 0) {
+          showChapterContent(0);
+        } else {
+          alert('This story has no chapters yet.');
+        }
+      }
+      
+      // Display chapter
+      function displayChapter(index) {
+        const chapter = story.chapters[index];
+        document.getElementById('chapterTitleDisplay').textContent = chapter.title;
+        document.getElementById('chapterText').innerHTML = chapter.content;
+        document.getElementById('currentChapterIndex').textContent = index + 1;
+        
+        // Enable/disable navigation buttons
+        document.getElementById('prevChapter').disabled = (index === 0);
+        document.getElementById('nextChapter').disabled = (index === story.chapters.length - 1);
+        
+        // Update URL without reloading page
+        history.replaceState(null, null, `#chapter-${index+1}`);
+      }
+      
+      // Navigate between chapters
+      window.navigateChapter = function (direction) {
+        const newIndex = currentChapterIndex + direction;
+        
+        if (newIndex >= 0 && newIndex < story.chapters.length) {
+          currentChapterIndex = newIndex;
+          displayChapter(currentChapterIndex);
+          
+          // Update reading progress
+          updateReadingProgress();
+        }
+      }
+      
+      // Close chapter view
+      window.closeChapter = function () {
+        document.getElementById('chapterContentSection').classList.add('d-none');
+        
+        // Scroll back to chapters list
+        document.getElementById('storyChapters').scrollIntoView({ behavior: 'smooth' });
+      }
+      
+      // Add comment
+      window.addComment = function () {
+        const commentText = document.getElementById('commentText').value.trim();
+        
+        if (!commentText) {
+          alert('Please enter a comment');
+          return;
+        }
+        
+        if (!story.comments) {
+          story.comments = [];
+        }
+        
+        // Add new comment
+        const newComment = {
+          author: currentUser ? currentUser.name : 'Anonymous',
+          text: commentText,
+          date: new Date().toISOString()
+        };
+        
+        story.comments.unshift(newComment);
+        stories[storyIndex] = story;
+        localStorage.setItem('userStories', JSON.stringify(stories));
+        
+        // Clear comment form
+        document.getElementById('commentText').value = '';
+        
+        // Refresh comments display
+        const commentsContainer = document.getElementById('storyComments');
+        const noComments = document.getElementById('noComments');
+        const newCommentElement = document.createElement('li');
+        
+        newCommentElement.className = 'comment-item';
+        newCommentElement.innerHTML = `
+          <div class="comment-header">
+            <h5 class="comment-author">${newComment.author}</h5>
+            <span class="comment-date">Just now</span>
+          </div>
+          <p class="comment-text">${newComment.text}</p>
+        `;
+        
+        if (noComments.classList.contains('d-none')) {
+          commentsContainer.insertBefore(newCommentElement, commentsContainer.firstChild);
+        } else {
+          noComments.classList.add('d-none');
+          commentsContainer.innerHTML = '';
+          commentsContainer.appendChild(newCommentElement);
+        }
+        
+        // Show success message
+        const toast = document.createElement('div');
+        toast.className = 'alert alert-success position-fixed top-0 end-0 m-3';
+        toast.style.zIndex = '9999';
+        toast.innerHTML = `
+          <i class="fas fa-check-circle me-2"></i>
+          Comment added successfully
+        `;
+        document.body.appendChild(toast);
+        
+        setTimeout(() => {
+          document.body.removeChild(toast);
+        }, 3000);
+      }
+      
+      // Update reading progress
+      function updateReadingProgress() {
+        const progress = ((currentChapterIndex + 1) / story.chapters.length) * 100;
+        document.getElementById('readingProgress').style.width = `${progress}%`;
+      }
+      
+      // Check if URL has chapter anchor and navigate to it
+      window.addEventListener('hashchange', function() {
+        const hash = window.location.hash;
+        if (hash.startsWith('#chapter-')) {
+          const chapterIndex = parseInt(hash.replace('#chapter-', '')) - 1;
+          if (chapterIndex >= 0 && chapterIndex < story.chapters.length) {
+            showChapterContent(chapterIndex);
+          }
+        }
       });
-    } else {
-      commentsContainer.innerHTML = '<li class="list-group-item">No comments yet.</li>';
-    }
+      
+      // Initialize reading progress
+      updateReadingProgress();
+    });
   </script>
-
 </body>
-
 </html>

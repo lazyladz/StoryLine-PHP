@@ -6,50 +6,365 @@
     <meta name="viewport" content="width=device-width, initial-scale=1" />
     <title>My Stories - Storyline</title>
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.7/dist/css/bootstrap.min.css" rel="stylesheet" />
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" />
     <style>
-        .story-card img {
-            height: 180px;
-            object-fit: cover;
-            border-radius: 5px;
+        :root {
+            --primary: #6d28d9;
+            --primary-dark: #5b21b6;
+            --secondary: #f59e0b;
+            --light: #f8fafc;
+            --dark: #1e293b;
+            --gray: #64748b;
+            --success: #10b981;
         }
-
+        
+        body {
+            font-family: 'Segoe UI', system-ui, sans-serif;
+            background-color: #f8fafc;
+            color: var(--dark);
+        }
+        
+        /* Navbar */
+        .navbar {
+            background-color: white;
+            box-shadow: 0 2px 15px rgba(0, 0, 0, 0.1);
+            padding: 1rem 0;
+        }
+        
+        .navbar-brand {
+            font-weight: 700;
+            font-size: 1.5rem;
+            color: var(--primary);
+            display: flex;
+            align-items: center;
+        }
+        
+        .navbar-brand svg {
+            color: var(--primary);
+        }
+        
+        .nav-link {
+            font-weight: 500;
+            margin: 0 0.5rem;
+            color: var(--dark);
+            transition: color 0.3s;
+        }
+        
+        .nav-link:hover, .nav-link.active {
+            color: var(--primary);
+        }
+        
+        .btn-main {
+            background-color: var(--primary);
+            color: white;
+            padding: 0.5rem 1.25rem;
+            border-radius: 8px;
+            font-weight: 600;
+            transition: all 0.3s;
+            border: none;
+        }
+        
+        .btn-main:hover {
+            background-color: var(--primary-dark);
+            transform: translateY(-2px);
+            box-shadow: 0 4px 12px rgba(109, 40, 217, 0.3);
+        }
+        
+        .btn-secondary {
+            background-color: transparent;
+            color: var(--primary);
+            border: 2px solid var(--primary);
+            padding: 0.5rem 1.25rem;
+            border-radius: 8px;
+            font-weight: 600;
+            transition: all 0.3s;
+        }
+        
+        .btn-secondary:hover {
+            background-color: rgba(109, 40, 217, 0.1);
+            transform: translateY(-2px);
+        }
+        
+        /* Page Header */
+        .page-header {
+            background: linear-gradient(135deg, var(--primary) 0%, var(--primary-dark) 100%);
+            color: white;
+            padding: 2rem 0;
+            margin-bottom: 2rem;
+        }
+        
+        .page-header h1 {
+            font-weight: 700;
+            margin-bottom: 0.5rem;
+        }
+        
+        .page-header p {
+            opacity: 0.9;
+            margin-bottom: 0;
+        }
+        
+        .stats-card {
+            background-color: rgba(255, 255, 255, 0.15);
+            border-radius: 12px;
+            padding: 1.5rem;
+            text-align: center;
+            backdrop-filter: blur(10px);
+            border: 1px solid rgba(255, 255, 255, 0.2);
+        }
+        
+        .stats-number {
+            font-size: 2rem;
+            font-weight: 700;
+            margin-bottom: 0.5rem;
+        }
+        
+        .stats-label {
+            font-size: 0.9rem;
+            opacity: 0.9;
+        }
+        
+        /* Story Cards */
         .story-card {
+            border: none;
+            border-radius: 12px;
+            overflow: hidden;
+            box-shadow: 0 5px 15px rgba(0, 0, 0, 0.08);
+            transition: all 0.3s;
+            height: 100%;
             cursor: pointer;
-            transition: transform 0.2s;
         }
-
+        
         .story-card:hover {
-            transform: scale(1.03);
+            transform: translateY(-5px);
+            box-shadow: 0 10px 25px rgba(0, 0, 0, 0.15);
         }
-
-        .badge-genre {
+        
+        .story-img {
+            height: 200px;
+            object-fit: cover;
+            transition: transform 0.5s;
+        }
+        
+        .story-card:hover .story-img {
+            transform: scale(1.05);
+        }
+        
+        .card-body {
+            padding: 1.5rem;
+            display: flex;
+            flex-direction: column;
+            justify-content: space-between;
+        }
+        
+        .card-title {
+            font-weight: 600;
+            margin-bottom: 0.5rem;
+            font-size: 1.1rem;
+            line-height: 1.3;
+        }
+        
+        .card-text {
+            color: var(--gray);
+            font-size: 0.9rem;
+            margin-bottom: 0.75rem;
+        }
+        
+        .badge {
+            font-size: 0.7rem;
+            padding: 0.3rem 0.6rem;
+            border-radius: 20px;
+        }
+        
+        .story-stats {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-top: 1rem;
             font-size: 0.8rem;
         }
-
+        
+        .reads {
+            color: var(--gray);
+        }
+        
+        .rating {
+            color: var(--secondary);
+            font-weight: 600;
+        }
+        
         .chapter-preview {
             font-size: 0.85rem;
-            color: #555;
-            margin-top: 5px;
+            color: var(--gray);
+            margin-top: 0.5rem;
+            line-height: 1.4;
+            max-height: 60px;
+            overflow: hidden;
         }
-
-        .no-stories {
+        
+        .chapter-title {
+            font-weight: 600;
+            color: var(--dark);
+        }
+        
+        /* Action Buttons */
+        .action-buttons {
+            display: flex;
+            gap: 0.5rem;
+            margin-top: 1rem;
+        }
+        
+        .btn-action {
+            flex: 1;
+            padding: 0.5rem;
+            font-size: 0.8rem;
+            border-radius: 6px;
+            transition: all 0.3s;
+        }
+        
+        .btn-view {
+            background-color: var(--primary);
+            color: white;
+            border: none;
+        }
+        
+        .btn-view:hover {
+            background-color: var(--primary-dark);
+        }
+        
+        .btn-edit {
+            background-color: var(--secondary);
+            color: white;
+            border: none;
+        }
+        
+        .btn-edit:hover {
+            background-color: #e58e0b;
+        }
+        
+        .btn-delete {
+            background-color: #ef4444;
+            color: white;
+            border: none;
+        }
+        
+        .btn-delete:hover {
+            background-color: #dc2626;
+        }
+        
+        /* Empty State */
+        .empty-state {
             text-align: center;
-            color: #888;
-            margin-top: 50px;
+            padding: 3rem 1rem;
+            background: white;
+            border-radius: 12px;
+            box-shadow: 0 5px 15px rgba(0, 0, 0, 0.08);
+        }
+        
+        .empty-state i {
+            font-size: 3rem;
+            color: var(--gray);
+            margin-bottom: 1rem;
+        }
+        
+        .empty-state h4 {
+            color: var(--dark);
+            margin-bottom: 0.5rem;
+        }
+        
+        .empty-state p {
+            color: var(--gray);
+            margin-bottom: 1.5rem;
+        }
+        
+        /* Filter Section */
+        .filter-section {
+            background-color: white;
+            padding: 1.5rem;
+            border-radius: 12px;
+            box-shadow: 0 5px 15px rgba(0, 0, 0, 0.08);
+            margin-bottom: 2rem;
+        }
+        
+        .filter-title {
+            font-weight: 600;
+            margin-bottom: 1rem;
+            color: var(--dark);
+        }
+        
+        .filter-tags {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 0.5rem;
+        }
+        
+        .filter-tag {
+            background: rgba(109, 40, 217, 0.1);
+            color: var(--primary);
+            padding: 0.5rem 1rem;
+            border-radius: 20px;
+            font-size: 0.9rem;
+            cursor: pointer;
+            transition: all 0.3s;
+            border: 1px solid transparent;
+        }
+        
+        .filter-tag:hover, .filter-tag.active {
+            background: var(--primary);
+            color: white;
+        }
+        
+        /* Footer */
+        footer {
+            background-color: var(--dark);
+            color: white;
+            padding: 2rem 0 1rem;
+            margin-top: 3rem;
+        }
+        
+        .copyright {
+            text-align: center;
+            padding-top: 1.5rem;
+            margin-top: 1.5rem;
+            border-top: 1px solid rgba(255, 255, 255, 0.1);
+            color: rgba(255, 255, 255, 0.6);
+        }
+        
+        /* Responsive Adjustments */
+        @media (max-width: 768px) {
+            .page-header {
+                padding: 1.5rem 0;
+            }
+            
+            .page-header h1 {
+                font-size: 1.75rem;
+            }
+            
+            .stats-card {
+                margin-bottom: 1rem;
+                padding: 1rem;
+            }
+            
+            .stats-number {
+                font-size: 1.5rem;
+            }
+            
+            .action-buttons {
+                flex-direction: column;
+            }
         }
     </style>
 </head>
 
 <body>
 
-    <!-- NAVBAR -->
-    <nav class="navbar navbar-expand-lg navbar-dark" style="background-color:#006d77;">
+    <!-- Navbar -->
+    <nav class="navbar navbar-expand-lg">
         <div class="container">
-            <a class="navbar-brand fw-bold" href="index.html">
-                <svg xmlns="http://www.w3.org/2000/svg" width="28" height="28" fill="currentColor"
-                    class="bi bi-book me-2" viewBox="0 0 16 16">
+            <a class="navbar-brand" href="index.html">
+                <svg xmlns="http://www.w3.org/2000/svg" width="28" height="28" fill="currentColor" class="bi bi-book me-2"
+                    viewBox="0 0 16 16">
                     <path
-                        d="M1 2.828c.885-.37 2.154-.769 3.388-.893 1.33-.134 2.458.063 3.112.752v9.746c-.935-.53-2.12-.603-3.213-.493-1.18.12-2.37.461-3.287.811V2.828zm7.5-.141c.654-.689 1.782-.886 3.112-.752 1.234.124 2.503.523 3.388.893v9.923c-.918-.35-2.107-.692-3.287-.81-1.094-.111-2.278-.039-3.213.492V2.687zM8 1.783C7.015.936 5.587.81 4.287.94c-1.514.153-3.042.672-3.994 1.105A.5.5 0 0 0 0 2.5v11a.5.5 0 0 0 .707.455c.882-.4 2.303-.881 3.68-1.02 1.409-.142 2.59.087 3.223.877a.5.5 0 0 0 .78 0c.633-.79 1.814-1.019 3.222-.877 1.378.139 2.8.62 3.681 1.02A.5.5 0 0 0 16 13.5v-11a.5.5 0 0 0-.293-.455c-.952-.433-2.48-.952-3.994-1.105C10.413.809 8.985.936 8 1.783z" />
+                        d="M1 2.828c.885-.37 2.154-.769 3.388-.893 1.33-.134 2.458.063 3.112.752v9.746c-.935-.53-2.12-.603-3.213-.493-1.18.12-2.37.461-3.287.811V2.828zm7.5-.141c.654-.689 1.782-.886 3.112-.752 1.234.124 2.503.523 3.388.893v9.923c-.918-.35-2.107-.692-3.287-.81-1.094-.111-2.278-.039-3.213.492V2.687zM8 1.783C7.015.936 5.587.81 4.287.94c-1.514.153-3.042.672-3.994 1.105A.5.5 0 0 0 0 2.5v11a.5.5 0 0 0 .707.455c.882-.4 2.303-.881 3.68-1.02 1.409-.142 2.59.087 3.223.877a.5.5 0 0 0 .78 0c.633-.79 1.814-1.019 3.222-.877 1.378.139 2.8.62 3.681 1.02A.5.5 0 0 0 16 13.5v-11a.5.5 0 0 0 -.293-.455c-.952-.433-2.48-.952-3.994-1.105C10.413.809 8.985.936 8 1.783z" />
                 </svg>
                 Storyline
             </a>
@@ -60,147 +375,334 @@
             </button>
 
             <div class="collapse navbar-collapse" id="navbarContent">
-                <ul class="navbar-nav ms-lg-auto align-items-left">
-                    <li class="nav-item"><a class="nav-link active" href="dashboard.html">Dashboard</a></li>
-                    <li class="nav-item"><a class="nav-link" href="browse.html">Browse</a></li>
-                    <li class="nav-item"><a class="nav-link" href="write.html">Write</a></li>
-                </ul>
-
-                <!-- Profile Image on the right -->
-                <ul class="navbar-nav ms-2">
-                    <li class="nav-item dropdown">
+                <ul class="navbar-nav ms-auto align-items-center">
+                    <li class="nav-item"><a class="nav-link" href="dashboard.html"><i class="fas fa-th-large me-1"></i>Dashboard</a></li>
+                    <li class="nav-item"><a class="nav-link" href="browse.html"><i class="fas fa-compass me-1"></i>Browse</a></li>
+                    <li class="nav-item"><a class="nav-link" href="write.html"><i class="fas fa-pen me-1"></i>Write</a></li>
+                    <li class="nav-item"><a class="nav-link active" href="mystories.html"><i class="fas fa-book me-1"></i>My Stories</a></li>
+                    
+                    <!-- User dropdown -->
+                    <li class="nav-item dropdown ms-2">
                         <a class="nav-link p-0" href="#" role="button" data-bs-toggle="dropdown" aria-expanded="false">
-                            <div class="rounded-circle overflow-hidden"
-                                style="width: 38px; height: 38px; cursor: pointer;">
-                                <img src="images/download (1).jpeg" alt="Profile" class="w-100 h-100">
+                            <div class="rounded-circle overflow-hidden d-flex align-items-center justify-content-center" style="width: 40px; height: 40px; background: linear-gradient(135deg, var(--primary) 0%, var(--secondary) 100%); color: white; font-weight: bold;">
+                                <span id="userInitial">U</span>
                             </div>
                         </a>
                         <ul class="dropdown-menu dropdown-menu-end">
-                            <li><a class="dropdown-item" href="profile.html">My Profile</a></li>
-                            <li><a class="dropdown-item" href="mystories.html">My Stories</a></li>
-                            <li><a class="dropdown-item" href="#">Settings</a></li>
-                            <li>
-                                <hr class="dropdown-divider">
-                            </li>
-                            <li><a class="dropdown-item" href="#">Logout</a></li>
+                            <li><a class="dropdown-item" href="profile.html"><i class="fas fa-user me-2"></i>My Profile</a></li>
+                            <li><a class="dropdown-item" href="mystories.html"><i class="fas fa-book me-2"></i>My Stories</a></li>
+                            <li><a class="dropdown-item" href="#"><i class="fas fa-cog me-2"></i>Settings</a></li>
+                            <li><hr class="dropdown-divider"></li>
+                            <li><a class="dropdown-item" href="#" id="logoutBtn"><i class="fas fa-sign-out-alt me-2"></i>Logout</a></li>
                         </ul>
                     </li>
                 </ul>
-
             </div>
         </div>
     </nav>
 
-    <div class="container mt-5 mb-5">
-        <h2 class="mb-4">📚 My Stories</h2>
-        <div class="row" id="storiesContainer">
-            <!-- Story cards will be injected here -->
-        </div>
-        <div id="noStories" class="no-stories d-none">
-            <p>You haven’t uploaded any stories yet. Start writing one! 📝</p>
+    <!-- Page Header -->
+    <div class="page-header">
+        <div class="container">
+            <div class="row align-items-center">
+                <div class="col-lg-6">
+                    <h1><i class="fas fa-book me-2"></i>My Stories</h1>
+                    <p>Manage and view all your published stories</p>
+                </div>
+                <div class="col-lg-6">
+                    <div class="row">
+                        <div class="col-md-4 mb-3">
+                            <div class="stats-card">
+                                <div class="stats-number" id="totalStories">0</div>
+                                <div class="stats-label">Total Stories</div>
+                            </div>
+                        </div>
+                        <div class="col-md-4 mb-3">
+                            <div class="stats-card">
+                                <div class="stats-number" id="totalChapters">0</div>
+                                <div class="stats-label">Total Chapters</div>
+                            </div>
+                        </div>
+                        <div class="col-md-4 mb-3">
+                            <div class="stats-card">
+                                <div class="stats-number" id="totalReads">0</div>
+                                <div class="stats-label">Total Reads</div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
         </div>
     </div>
 
-    <footer class="text-center mt-5 p-3 bg-light">
-        <p>&copy; 2025 Storyline. All rights reserved.</p>
+    <!-- Page Content -->
+    <div class="container mb-5">
+        <!-- Filter Section -->
+        <div class="filter-section">
+            <h5 class="filter-title"><i class="fas fa-filter me-2"></i>Filter by Genre</h5>
+            <div class="filter-tags">
+                <span class="filter-tag active" data-genre="all">All</span>
+                <span class="filter-tag" data-genre="Fantasy">Fantasy</span>
+                <span class="filter-tag" data-genre="Thriller">Thriller</span>
+                <span class="filter-tag" data-genre="Horror">Horror</span>
+                <span class="filter-tag" data-genre="Mystery">Mystery</span>
+                <span class="filter-tag" data-genre="Action">Action</span>
+                <span class="filter-tag" data-genre="Sci-Fi">Sci-Fi</span>
+                <span class="filter-tag" data-genre="Romance">Romance</span>
+                <span class="filter-tag" data-genre="Comedy">Comedy</span>
+                <span class="filter-tag" data-genre="Drama">Drama</span>
+                <span class="filter-tag" data-genre="Adventure">Adventure</span>
+                <span class="filter-tag" data-genre="Historical">Historical</span>
+            </div>
+        </div>
+
+        <!-- Stories Grid -->
+        <div class="row" id="storiesContainer">
+            <!-- Story cards will be injected here -->
+        </div>
+        
+        <!-- Empty State -->
+        <div id="noStories" class="empty-state d-none">
+            <i class="fas fa-book-open"></i>
+            <h4>No stories yet</h4>
+            <p>You haven't published any stories. Start your writing journey today!</p>
+            <a href="write.html" class="btn btn-main">Write Your First Story</a>
+        </div>
+    </div>
+
+    <!-- Footer -->
+    <footer>
+        <div class="container">
+            <div class="row">
+                <div class="col-md-6">
+                    <a class="navbar-brand text-white mb-3 d-inline-block" href="index.html">
+                        <svg xmlns="http://www.w3.org/2000/svg" width="28" height="28" fill="currentColor" class="bi bi-book me-2"
+                            viewBox="0 0 16 16">
+                            <path
+                                d="M1 2.828c.885-.37 2.154-.769 3.388-.893 1.33-.134 2.458.063 3.112.752v9.746c-.935-.53-2.12-.603-3.213-.493-1.18.12-2.37.461-3.287.811V2.828zm7.5-.141c.654-.689 1.782-.886 3.112-.752 1.234.124 2.503.523 3.388.893v9.923c-.918-.35-2.107-.692-3.287-.81-1.094-.111-2.278-.039-3.213.492V2.687zM8 1.783C7.015.936 5.587.81 4.287.94c-1.514.153-3.042.672-3.994 1.105A.5.5 0 0 0 0 2.5v11a.5.5 0 0 0 .707.455c.882-.4 2.303-.881 3.68-1.02 1.409-.142 2.59.087 3.223.877a.5.5 0 0 0 .78 0c.633-.79 1.814-1.019 3.222-.877 1.378.139 2.8.62 3.681 1.02A.5.5 0 0 0 16 13.5v-11a.5.5 0 0 0-.293-.455c-.952-.433-2.48-.952-3.994-1.105C10.413.809 8.985.936 8 1.783z" />
+                        </svg>
+                        Storyline
+                    </a>
+                    <p class="text-white-50">Where stories come alive. Discover new tales, write your own, and connect with readers everywhere.</p>
+                </div>
+                <div class="col-md-6 text-md-end">
+                    <p class="text-white-50">&copy; 2025 Storyline. All rights reserved.</p>
+                </div>
+            </div>
+            <div class="copyright">
+                <p class="mb-0">Made with <i class="fas fa-heart text-danger"></i> for storytellers</p>
+            </div>
+        </div>
     </footer>
 
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.7/dist/js/bootstrap.bundle.min.js"></script>
     <script>
-        const storiesContainer = document.getElementById('storiesContainer');
-        const noStories = document.getElementById('noStories');
-
-        // Load stories from localStorage
-        function getUserStories() {
-            return JSON.parse(localStorage.getItem('userStories')) || [];
-        }
-
-        // Save stories to localStorage
-        function saveUserStories(stories) {
-            localStorage.setItem('userStories', JSON.stringify(stories));
-        }
-
-        function getGenreColor(genre) {
-            const colors = {
-                'Fantasy': 'bg-primary',
-                'Thriller': 'bg-success',
-                'Horror': 'bg-warning text-dark',
-                'Mystery': 'bg-info text-dark',
-                'Action': 'bg-danger',
-                'Sci-Fi': 'bg-dark',
-                'Romance': 'bg-danger',      // changed from bg-pink to a valid class
-                'Comedy': 'bg-secondary',
-                'Drama': 'bg-light text-dark',
-                'Adventure': 'bg-success',
-                'Historical': 'bg-info text-dark'
-            };
-            return colors[genre] || 'bg-primary';
-        }
-
-        // Render stories
-        function renderStories() {
-            const userStories = getUserStories();
-            storiesContainer.innerHTML = '';
-
-            if (userStories.length === 0) {
-                noStories.classList.remove('d-none');
-                return;
+        document.addEventListener("DOMContentLoaded", function () {
+            // Initialize user data
+            const currentUser = JSON.parse(localStorage.getItem("currentUser"));
+            if (currentUser && currentUser.name) {
+                document.getElementById("userInitial").textContent = currentUser.name.charAt(0).toUpperCase();
             }
 
-            noStories.classList.add('d-none');
+            // DOM Elements
+            const storiesContainer = document.getElementById('storiesContainer');
+            const noStories = document.getElementById('noStories');
+            const filterTags = document.querySelectorAll('.filter-tag');
+            let currentFilter = 'all';
 
-            userStories.forEach((story, index) => {
-                const col = document.createElement('div');
-                col.classList.add('col-md-6', 'col-lg-4', 'mb-4');
-                col.innerHTML = `
-  <div class="card story-card h-100">
-    <img src="${story.cover}" class="card-img-top" alt="${story.title} Cover">
-    <div class="card-body">
-      <h5 class="card-title">${story.title}</h5>
-      <p class="card-text text-muted">by ${story.author}</p>
-      <div class="mb-2">
-        ${Array.isArray(story.genre) ? story.genre.map(g => `<span class="badge me-1 ${getGenreColor(g)}">${g}</span>`).join('') : `<span class="badge bg-primary">${story.genre}</span>`}
-      </div>
-      <div class="chapter-preview mt-2">
-        ${story.chapters.map(ch => `<strong>${ch.title}</strong>`).join('<br>')}
-      </div>
-      <div class="mt-3 d-flex justify-content-between">
-        <button class="btn btn-sm btn-primary" onclick="viewStory(${index})">View</button>
-        <button class="btn btn-sm btn-warning" onclick="editStory(${index})">Edit</button>
-        <button class="btn btn-sm btn-danger" onclick="deleteStory(${index})">Delete</button>
-      </div>
-    </div>
-  </div>
-`;
-                storiesContainer.appendChild(col);
+            // Filter functionality
+            filterTags.forEach(tag => {
+                tag.addEventListener('click', function() {
+                    // Update active state
+                    filterTags.forEach(t => t.classList.remove('active'));
+                    this.classList.add('active');
+                    
+                    // Set current filter
+                    currentFilter = this.dataset.genre;
+                    
+                    // Re-render stories with filter
+                    renderStories();
+                });
             });
-        }
 
-        // View story
-        function viewStory(index) {
-            localStorage.setItem('viewStoryIndex', index); // store story index for viewing
-            window.location.href = 'stories.html'; // redirect to story details page
-        }
-
-        // Edit story
-        function editStory(index) {
-            localStorage.setItem('editStoryIndex', index); // mark story to edit
-            window.location.href = 'write.html'; // redirect to write page
-        }
-
-        // Delete story
-        function deleteStory(index) {
-            if (confirm('Are you sure you want to delete this story?')) {
-                const stories = getUserStories();
-                stories.splice(index, 1);
-                saveUserStories(stories);
-                renderStories();
+            // Load stories from localStorage
+            function getUserStories() {
+                return JSON.parse(localStorage.getItem('userStories')) || [];
             }
-        }
 
-        renderStories();
+            // Save stories to localStorage
+            function saveUserStories(stories) {
+                localStorage.setItem('userStories', JSON.stringify(stories));
+            }
+
+            // Genre color mapping
+            function getGenreColor(genre) {
+                const colors = {
+                    'Fantasy': 'bg-primary',
+                    'Thriller': 'bg-success',
+                    'Horror': 'bg-warning text-dark',
+                    'Mystery': 'bg-info text-dark',
+                    'Action': 'bg-danger',
+                    'Sci-Fi': 'bg-dark',
+                    'Romance': 'bg-pink',
+                    'Comedy': 'bg-secondary',
+                    'Drama': 'bg-light text-dark',
+                    'Adventure': 'bg-success',
+                    'Historical': 'bg-info text-dark'
+                };
+                return colors[genre] || 'bg-primary';
+            }
+
+            // Update stats
+            function updateStats(stories) {
+                const totalStories = stories.length;
+                const totalChapters = stories.reduce((sum, story) => sum + (story.chapters ? story.chapters.length : 0), 0);
+                const totalReads = stories.reduce((sum, story) => sum + (story.reads || 0), 0);
+                
+                document.getElementById('totalStories').textContent = totalStories;
+                document.getElementById('totalChapters').textContent = totalChapters;
+                document.getElementById('totalReads').textContent = totalReads.toLocaleString();
+            }
+
+            // Render stories
+            function renderStories() {
+                let userStories = getUserStories();
+                
+                // Apply filter if not "all"
+                if (currentFilter !== 'all') {
+                    userStories = userStories.filter(story => {
+                        if (Array.isArray(story.genre)) {
+                            return story.genre.includes(currentFilter);
+                        }
+                        return story.genre === currentFilter;
+                    });
+                }
+                
+                storiesContainer.innerHTML = '';
+                updateStats(getUserStories()); // Always show total stats, not filtered
+
+                if (userStories.length === 0) {
+                    if (currentFilter === 'all') {
+                        noStories.classList.remove('d-none');
+                    } else {
+                        noStories.innerHTML = `
+                            <i class="fas fa-search"></i>
+                            <h4>No stories found</h4>
+                            <p>You don't have any stories in the ${currentFilter} genre.</p>
+                            <a href="write.html" class="btn btn-main">Write a New Story</a>
+                        `;
+                        noStories.classList.remove('d-none');
+                    }
+                    return;
+                }
+
+                noStories.classList.add('d-none');
+
+                userStories.forEach((story, index) => {
+                    const col = document.createElement('div');
+                    col.classList.add('col-xl-4', 'col-lg-6', 'mb-4');
+                    
+                    // Calculate total reads for this story
+                    const totalReads = story.reads || 0;
+                    const rating = story.rating || 0;
+                    const chapterCount = story.chapters ? story.chapters.length : 0;
+                    
+                    col.innerHTML = `
+                        <div class="card story-card h-100">
+                            <img src="${story.cover || 'https://images.unsplash.com/photo-1455390582262-044cdead277a?ixlib=rb-4.0.3&auto=format&fit=crop&w=600&q=80'}" 
+                                 class="card-img-top story-img" alt="${story.title}">
+                            <div class="card-body">
+                                <h5 class="card-title">${story.title}</h5>
+                                <p class="card-text">by ${story.author}</p>
+                                <div class="mb-2">
+                                    ${Array.isArray(story.genre) ? 
+                                        story.genre.map(g => `<span class="badge me-1 ${getGenreColor(g)}">${g}</span>`).join('') : 
+                                        `<span class="badge ${getGenreColor(story.genre)}">${story.genre}</span>`}
+                                </div>
+                                
+                                <div class="chapter-preview">
+                                    ${story.chapters && story.chapters.length > 0 ? 
+                                        story.chapters.slice(0, 2).map(ch => 
+                                            `<span class="chapter-title">${ch.title}</span><br>`
+                                        ).join('') : 
+                                        'No chapters yet'}
+                                    ${story.chapters && story.chapters.length > 2 ? 
+                                        `<span class="text-muted">+${story.chapters.length - 2} more chapters</span>` : ''}
+                                </div>
+                                
+                                <div class="story-stats">
+                                    <span class="reads">${totalReads.toLocaleString()} reads</span>
+                                    <span class="rating">${rating > 0 ? rating.toFixed(1) + ' ★' : 'Not rated'}</span>
+                                </div>
+                                
+                                <div class="action-buttons">
+                                    <button class="btn btn-action btn-view" onclick="viewStory(${getOriginalIndex(story)})">
+                                        <i class="fas fa-eye me-1"></i>View
+                                    </button>
+                                    <button class="btn btn-action btn-edit" onclick="editStory(${getOriginalIndex(story)})">
+                                        <i class="fas fa-edit me-1"></i>Edit
+                                    </button>
+                                    <button class="btn btn-action btn-delete" onclick="deleteStory(${getOriginalIndex(story)})">
+                                        <i class="fas fa-trash me-1"></i>Delete
+                                    </button>
+                                </div>
+                            </div>
+                        </div>
+                    `;
+                    storiesContainer.appendChild(col);
+                });
+            }
+
+            // Get original index from all stories (not filtered)
+            function getOriginalIndex(story) {
+                const allStories = getUserStories();
+                return allStories.findIndex(s => s.title === story.title && s.author === story.author);
+            }
+
+            // View story
+            function viewStory(index) {
+                localStorage.setItem('viewStoryIndex', index);
+                window.location.href = 'stories.html';
+            }
+
+            // Edit story
+            function editStory(index) {
+                localStorage.setItem('editStoryIndex', index);
+                window.location.href = 'write.html';
+            }
+
+            // Delete story
+            function deleteStory(index) {
+                if (confirm('Are you sure you want to delete this story? This action cannot be undone.')) {
+                    const stories = getUserStories();
+                    stories.splice(index, 1);
+                    saveUserStories(stories);
+                    renderStories();
+                    
+                    // Show confirmation message
+                    const toast = document.createElement('div');
+                    toast.className = 'alert alert-success position-fixed top-0 end-0 m-3';
+                    toast.style.zIndex = '9999';
+                    toast.innerHTML = `
+                        <i class="fas fa-check-circle me-2"></i>
+                        Story deleted successfully
+                    `;
+                    document.body.appendChild(toast);
+                    
+                    setTimeout(() => {
+                        document.body.removeChild(toast);
+                    }, 3000);
+                }
+            }
+
+            // Make functions globally available
+            window.viewStory = viewStory;
+            window.editStory = editStory;
+            window.deleteStory = deleteStory;
+
+            // Initial render
+            renderStories();
+        });
     </script>
-
 </body>
-
 </html>
