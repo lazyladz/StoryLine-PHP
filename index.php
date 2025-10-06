@@ -1,387 +1,23 @@
+<?php
+session_start();
+
+header("Cache-Control: no-cache, no-store, must-revalidate");
+header("Pragma: no-cache");
+header("Expires: 0");
+?>
 <!DOCTYPE html>
 <html lang="en">
 
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta http-equiv="Cache-Control" content="no-cache, no-store, must-revalidate">
+  <meta http-equiv="Pragma" content="no-cache">
+  <meta http-equiv="Expires" content="0">
   <title>Storyline - Where Stories Come Alive</title>
   <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.7/dist/css/bootstrap.min.css" rel="stylesheet">
   <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
-  <style>
-    :root {
-      --primary: #6d28d9;
-      --primary-dark: #5b21b6;
-      --secondary: #f59e0b;
-      --light: #f8fafc;
-      --dark: #1e293b;
-      --gray: #64748b;
-    }
-    
-    body {
-      font-family: 'Segoe UI', system-ui, sans-serif;
-      color: var(--dark);
-      line-height: 1.6;
-    }
-    
-    /* Navbar */
-    .navbar {
-      background-color: rgba(255, 255, 255, 0.95);
-      backdrop-filter: blur(10px);
-      box-shadow: 0 2px 15px rgba(0, 0, 0, 0.1);
-      padding: 1rem 0;
-      transition: all 0.3s ease;
-    }
-    
-    .navbar-brand {
-      font-weight: 700;
-      font-size: 1.5rem;
-      color: var(--primary);
-      display: flex;
-      align-items: center;
-    }
-    
-    .navbar-brand svg {
-      color: var(--primary);
-    }
-    
-    .nav-link {
-      font-weight: 500;
-      margin: 0 0.5rem;
-      color: var(--dark);
-      transition: color 0.3s;
-    }
-    
-    .nav-link:hover {
-      color: var(--primary);
-    }
-    
-    .btn-main {
-      background-color: var(--primary);
-      color: white;
-      padding: 0.75rem 1.5rem;
-      border-radius: 8px;
-      font-weight: 600;
-      transition: all 0.3s;
-      border: none;
-    }
-    
-    .btn-main:hover {
-      background-color: var(--primary-dark);
-      transform: translateY(-2px);
-      box-shadow: 0 4px 12px rgba(109, 40, 217, 0.3);
-    }
-    
-    .btn-secondary {
-      background-color: transparent;
-      color: var(--primary);
-      border: 2px solid var(--primary);
-      padding: 0.75rem 1.5rem;
-      border-radius: 8px;
-      font-weight: 600;
-      transition: all 0.3s;
-    }
-    
-    .btn-secondary:hover {
-      background-color: rgba(109, 40, 217, 0.1);
-      transform: translateY(-2px);
-    }
-    
-    /* Hero Section */
-    .hero {
-      padding: 5rem 0;
-      background: linear-gradient(135deg, #f0f9ff 0%, #e0f2fe 100%);
-      position: relative;
-      overflow: hidden;
-    }
-    
-    .hero::before {
-      content: '';
-      position: absolute;
-      top: 0;
-      right: 0;
-      width: 50%;
-      height: 100%;
-      background: url('data:image/svg+xml;utf8,<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 100 100" preserveAspectRatio="none"><path d="M0,0 L100,0 L100,100 Z" fill="rgba(109, 40, 217, 0.05)"/></svg>');
-      background-size: cover;
-    }
-    
-    .hero-text h1 {
-      font-size: 3.5rem;
-      font-weight: 800;
-      margin-bottom: 1.5rem;
-      background: linear-gradient(135deg, var(--primary) 0%, var(--secondary) 100%);
-      -webkit-background-clip: text;
-      -webkit-text-fill-color: transparent;
-    }
-    
-    .hero-text p {
-      font-size: 1.25rem;
-      color: var(--gray);
-      margin-bottom: 2rem;
-      max-width: 90%;
-    }
-    
-    .hero-img img {
-      max-width: 100%;
-      border-radius: 12px;
-      box-shadow: 0 20px 40px rgba(0, 0, 0, 0.1);
-      transform: perspective(1000px) rotateY(-5deg) rotateX(5deg);
-      transition: transform 0.5s;
-    }
-    
-    .hero-img img:hover {
-      transform: perspective(1000px) rotateY(0) rotateX(0);
-    }
-    
-    /* Featured Stories */
-    .section-title {
-      text-align: center;
-      font-weight: 700;
-      margin-bottom: 3rem;
-      position: relative;
-      font-size: 2.5rem;
-    }
-    
-    .section-title::after {
-      content: '';
-      position: absolute;
-      bottom: -10px;
-      left: 50%;
-      transform: translateX(-50%);
-      width: 80px;
-      height: 4px;
-      background: linear-gradient(to right, var(--primary), var(--secondary));
-      border-radius: 2px;
-    }
-    
-    .card {
-      border: none;
-      border-radius: 12px;
-      overflow: hidden;
-      box-shadow: 0 10px 20px rgba(0, 0, 0, 0.08);
-      transition: all 0.3s;
-      height: 100%;
-    }
-    
-    .card:hover {
-      transform: translateY(-10px);
-      box-shadow: 0 15px 30px rgba(0, 0, 0, 0.15);
-    }
-    
-    .card-img-top {
-      height: 200px;
-      object-fit: cover;
-      transition: transform 0.5s;
-    }
-    
-    .card:hover .card-img-top {
-      transform: scale(1.05);
-    }
-    
-    .card-body {
-      padding: 1.5rem;
-    }
-    
-    .card-title {
-      font-weight: 700;
-      margin-bottom: 0.75rem;
-    }
-    
-    .card-text {
-      color: var(--gray);
-      margin-bottom: 1.5rem;
-    }
-    
-    /* Features Section */
-    .features {
-      padding: 5rem 0;
-      background-color: var(--light);
-    }
-    
-    .feature-item {
-      text-align: center;
-      padding: 2rem 1rem;
-    }
-    
-    .feature-icon {
-      width: 80px;
-      height: 80px;
-      background: linear-gradient(135deg, var(--primary) 0%, var(--secondary) 100%);
-      border-radius: 50%;
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      margin: 0 auto 1.5rem;
-    }
-    
-    .feature-icon i {
-      font-size: 2rem;
-      color: white;
-    }
-    
-    .feature-item h3 {
-      font-weight: 700;
-      margin-bottom: 1rem;
-    }
-    
-    .feature-item p {
-      color: var(--gray);
-    }
-    
-    /* Testimonials */
-    .testimonials {
-      padding: 5rem 0;
-    }
-    
-    .testimonial-card {
-      background: white;
-      border-radius: 12px;
-      padding: 2rem;
-      box-shadow: 0 10px 20px rgba(0, 0, 0, 0.08);
-      margin: 1rem;
-    }
-    
-    .testimonial-text {
-      font-style: italic;
-      margin-bottom: 1.5rem;
-      position: relative;
-    }
-    
-    .testimonial-text::before {
-      content: '"';
-      font-size: 4rem;
-      color: rgba(109, 40, 217, 0.1);
-      position: absolute;
-      top: -1rem;
-      left: -0.5rem;
-    }
-    
-    .testimonial-author {
-      display: flex;
-      align-items: center;
-    }
-    
-    .author-avatar {
-      width: 50px;
-      height: 50px;
-      border-radius: 50%;
-      object-fit: cover;
-      margin-right: 1rem;
-    }
-    
-    .author-info h5 {
-      margin: 0;
-      font-weight: 600;
-    }
-    
-    .author-info p {
-      margin: 0;
-      color: var(--gray);
-      font-size: 0.9rem;
-    }
-    
-    /* CTA Section */
-    .cta {
-      padding: 5rem 0;
-      background: linear-gradient(135deg, var(--primary) 0%, var(--primary-dark) 100%);
-      color: white;
-      text-align: center;
-    }
-    
-    .cta h2 {
-      font-weight: 700;
-      margin-bottom: 1rem;
-    }
-    
-    .cta p {
-      font-size: 1.2rem;
-      margin-bottom: 2rem;
-      opacity: 0.9;
-    }
-    
-    .cta .btn-main {
-      background-color: white;
-      color: var(--primary);
-    }
-    
-    .cta .btn-main:hover {
-      background-color: var(--light);
-      transform: translateY(-2px);
-    }
-    
-    /* Footer */
-    footer {
-      background-color: var(--dark);
-      color: white;
-      padding: 3rem 0 1.5rem;
-    }
-    
-    .footer-links h5 {
-      font-weight: 600;
-      margin-bottom: 1.5rem;
-    }
-    
-    .footer-links ul {
-      list-style: none;
-      padding: 0;
-    }
-    
-    .footer-links li {
-      margin-bottom: 0.75rem;
-    }
-    
-    .footer-links a {
-      color: rgba(255, 255, 255, 0.7);
-      text-decoration: none;
-      transition: color 0.3s;
-    }
-    
-    .footer-links a:hover {
-      color: white;
-    }
-    
-    .social-links a {
-      display: inline-flex;
-      align-items: center;
-      justify-content: center;
-      width: 40px;
-      height: 40px;
-      background-color: rgba(255, 255, 255, 0.1);
-      border-radius: 50%;
-      margin-right: 0.5rem;
-      color: white;
-      transition: all 0.3s;
-    }
-    
-    .social-links a:hover {
-      background-color: var(--primary);
-      transform: translateY(-3px);
-    }
-    
-    .copyright {
-      text-align: center;
-      padding-top: 2rem;
-      margin-top: 2rem;
-      border-top: 1px solid rgba(255, 255, 255, 0.1);
-      color: rgba(255, 255, 255, 0.6);
-    }
-    
-    /* Responsive Adjustments */
-    @media (max-width: 768px) {
-      .hero-text h1 {
-        font-size: 2.5rem;
-      }
-      
-      .hero-text p {
-        font-size: 1.1rem;
-        max-width: 100%;
-      }
-      
-      .section-title {
-        font-size: 2rem;
-      }
-    }
-  </style>
+  <link rel="stylesheet" href="css/styles.css">
 </head>
 
 <body>
@@ -389,7 +25,7 @@
   <!-- Navbar -->
   <nav class="navbar navbar-expand-lg fixed-top">
     <div class="container">
-      <a class="navbar-brand" href="index.html">
+      <a class="navbar-brand" href="index.php">
         <svg xmlns="http://www.w3.org/2000/svg" width="28" height="28" fill="currentColor" class="bi bi-book me-2"
           viewBox="0 0 16 16">
           <path
@@ -406,8 +42,27 @@
           <li class="nav-item"><a class="nav-link" href="#features">Features</a></li>
           <li class="nav-item"><a class="nav-link" href="#stories">Stories</a></li>
           <li class="nav-item"><a class="nav-link" href="#testimonials">Testimonials</a></li>
-          <li class="nav-item"><a class="nav-link" href="login.html">Login</a></li>
-          <li class="nav-item"><a class="btn btn-main ms-2" href="register.html">Sign Up</a></li>
+          
+          <?php if (isset($_SESSION['user'])): ?>
+            <!-- User is logged in - Show user dropdown -->
+            <li class="nav-item dropdown">
+              <a class="nav-link dropdown-toggle" href="#" role="button" data-bs-toggle="dropdown" aria-expanded="false">
+                <i class="fas fa-user me-1"></i>
+                <?php echo htmlspecialchars($_SESSION['user']['first_name']); ?>
+              </a>
+              <ul class="dropdown-menu">
+                <li><a class="dropdown-item" href="dashboard.php"><i class="fas fa-tachometer-alt me-2"></i>Dashboard</a></li>
+                <li><a class="dropdown-item" href="profile.html"><i class="fas fa-user me-2"></i>My Profile</a></li>
+                <li><a class="dropdown-item" href="mystories.html"><i class="fas fa-book me-2"></i>My Stories</a></li>
+                <li><hr class="dropdown-divider"></li>
+                <li><a class="dropdown-item" href="logout.php"><i class="fas fa-sign-out-alt me-2"></i>Logout</a></li>
+              </ul>
+            </li>
+          <?php else: ?>
+            <!-- User is not logged in - Show login/signup -->
+            <li class="nav-item"><a class="nav-link" href="login.html">Login</a></li>
+            <li class="nav-item"><a class="btn btn-main ms-2" href="register.html">Sign Up</a></li>
+          <?php endif; ?>
         </ul>
       </div>
     </div>
@@ -591,7 +246,7 @@
     <div class="container">
       <div class="row">
         <div class="col-lg-4 mb-4 mb-lg-0">
-          <a class="navbar-brand text-white mb-3 d-inline-block" href="index.html">
+          <a class="navbar-brand text-white mb-3 d-inline-block" href="index.php">
             <svg xmlns="http://www.w3.org/2000/svg" width="28" height="28" fill="currentColor" class="bi bi-book me-2"
               viewBox="0 0 16 16">
               <path
@@ -670,6 +325,11 @@
         navbar.style.boxShadow = '0 2px 15px rgba(0, 0, 0, 0.1)';
       }
     });
+    window.onpageshow = function(event) {
+    if (event.persisted) {
+        window.location.reload();
+    }
+};
   </script>
 </body>
 

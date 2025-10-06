@@ -1,3 +1,8 @@
+<?php
+session_start();
+require_once "includes/check-auth.php";
+$user = checkAuth(); // Ensure user is logged in
+?>
 <!DOCTYPE html>
 <html lang="en">
 
@@ -8,325 +13,7 @@
   <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.7/dist/css/bootstrap.min.css" rel="stylesheet" />
   <link href="https://cdn.quilljs.com/1.3.7/quill.snow.css" rel="stylesheet" />
   <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" />
-  <style>
-    :root {
-      --primary: #6d28d9;
-      --primary-dark: #5b21b6;
-      --secondary: #f59e0b;
-      --light: #f8fafc;
-      --dark: #1e293b;
-      --gray: #64748b;
-    }
-    
-    body {
-      font-family: 'Segoe UI', system-ui, sans-serif;
-      background-color: #f8fafc;
-      color: var(--dark);
-    }
-    
-    /* Navbar */
-    .navbar {
-      background-color: white;
-      box-shadow: 0 2px 15px rgba(0, 0, 0, 0.1);
-      padding: 1rem 0;
-    }
-    
-    .navbar-brand {
-      font-weight: 700;
-      font-size: 1.5rem;
-      color: var(--primary);
-      display: flex;
-      align-items: center;
-    }
-    
-    .navbar-brand svg {
-      color: var(--primary);
-    }
-    
-    .nav-link {
-      font-weight: 500;
-      margin: 0 0.5rem;
-      color: var(--dark);
-      transition: color 0.3s;
-    }
-    
-    .nav-link:hover, .nav-link.active {
-      color: var(--primary);
-    }
-    
-    .btn-main {
-      background-color: var(--primary);
-      color: white;
-      padding: 0.75rem 1.5rem;
-      border-radius: 8px;
-      font-weight: 600;
-      transition: all 0.3s;
-      border: none;
-    }
-    
-    .btn-main:hover {
-      background-color: var(--primary-dark);
-      transform: translateY(-2px);
-      box-shadow: 0 4px 12px rgba(109, 40, 217, 0.3);
-    }
-    
-    .btn-secondary {
-      background-color: transparent;
-      color: var(--primary);
-      border: 2px solid var(--primary);
-      padding: 0.75rem 1.5rem;
-      border-radius: 8px;
-      font-weight: 600;
-      transition: all 0.3s;
-    }
-    
-    .btn-secondary:hover {
-      background-color: rgba(109, 40, 217, 0.1);
-      transform: translateY(-2px);
-    }
-    
-    /* Page Header */
-    .page-header {
-      background: linear-gradient(135deg, var(--primary) 0%, var(--primary-dark) 100%);
-      color: white;
-      padding: 2rem 0;
-      margin-bottom: 2rem;
-    }
-    
-    .page-header h1 {
-      font-weight: 700;
-      margin-bottom: 0.5rem;
-    }
-    
-    .page-header p {
-      opacity: 0.9;
-      margin-bottom: 0;
-    }
-    
-    /* Form Section */
-    .form-section {
-      background-color: white;
-      padding: 2rem;
-      border-radius: 12px;
-      box-shadow: 0 5px 15px rgba(0, 0, 0, 0.08);
-      margin-bottom: 2rem;
-    }
-    
-    .form-label {
-      font-weight: 600;
-      margin-bottom: 0.5rem;
-      color: var(--dark);
-    }
-    
-    .form-control, .form-select {
-      border: 1px solid #e2e8f0;
-      border-radius: 8px;
-      padding: 0.75rem;
-      transition: all 0.3s;
-    }
-    
-    .form-control:focus, .form-select:focus {
-      border-color: var(--primary);
-      box-shadow: 0 0 0 3px rgba(109, 40, 217, 0.1);
-    }
-    
-    /* Genre Tags */
-    .genre-tags {
-      display: flex;
-      flex-wrap: wrap;
-      gap: 0.5rem;
-      margin-top: 0.5rem;
-    }
-    
-    .genre-tag {
-      background: rgba(109, 40, 217, 0.1);
-      color: var(--primary);
-      padding: 0.5rem 1rem;
-      border-radius: 20px;
-      font-size: 0.9rem;
-      cursor: pointer;
-      transition: all 0.3s;
-      border: 1px solid transparent;
-    }
-    
-    .genre-tag:hover, .genre-tag.active {
-      background: var(--primary);
-      color: white;
-    }
-    
-    /* Image Upload */
-    .image-upload-container {
-      border: 2px dashed #e2e8f0;
-      border-radius: 8px;
-      padding: 2rem;
-      text-align: center;
-      cursor: pointer;
-      transition: all 0.3s;
-      background-color: #f8fafc;
-    }
-    
-    .image-upload-container:hover {
-      border-color: var(--primary);
-      background-color: rgba(109, 40, 217, 0.05);
-    }
-    
-    .image-upload-icon {
-      font-size: 2.5rem;
-      color: var(--gray);
-      margin-bottom: 1rem;
-    }
-    
-    .story-img-preview {
-      max-height: 200px;
-      object-fit: cover;
-      border-radius: 8px;
-      box-shadow: 0 5px 15px rgba(0, 0, 0, 0.1);
-    }
-    
-    /* Chapters */
-    .chapter-container {
-      border: 1px solid #e2e8f0;
-      border-radius: 8px;
-      padding: 1.5rem;
-      margin-bottom: 1.5rem;
-      background-color: white;
-      transition: all 0.3s;
-    }
-    
-    .chapter-container:hover {
-      border-color: var(--primary);
-      box-shadow: 0 5px 15px rgba(0, 0, 0, 0.08);
-    }
-    
-    .chapter-header {
-      display: flex;
-      justify-content: space-between;
-      align-items: center;
-      margin-bottom: 1rem;
-    }
-    
-    .chapter-title {
-      font-weight: 600;
-      color: var(--primary);
-      margin: 0;
-    }
-    
-    .remove-chapter {
-      color: #ef4444;
-      cursor: pointer;
-      font-weight: 600;
-      transition: color 0.3s;
-    }
-    
-    .remove-chapter:hover {
-      color: #dc2626;
-    }
-    
-    /* Quill Editor Customization */
-    .ql-toolbar.ql-snow {
-      border: 1px solid #e2e8f0;
-      border-radius: 8px 8px 0 0;
-      background-color: #f8fafc;
-    }
-    
-    .ql-container.ql-snow {
-      border: 1px solid #e2e8f0;
-      border-radius: 0 0 8px 8px;
-      border-top: none;
-      font-family: inherit;
-    }
-    
-    .ql-editor {
-      min-height: 200px;
-      font-size: 1rem;
-      line-height: 1.6;
-    }
-    
-    /* Preview Section */
-    .preview-section {
-      background-color: white;
-      padding: 2rem;
-      border-radius: 12px;
-      box-shadow: 0 5px 15px rgba(0, 0, 0, 0.08);
-      position: sticky;
-      top: 2rem;
-    }
-    
-    .preview-card {
-      border: none;
-      border-radius: 12px;
-      overflow: hidden;
-      box-shadow: 0 5px 15px rgba(0, 0, 0, 0.08);
-    }
-    
-    .preview-title {
-      font-weight: 700;
-      margin-bottom: 0.5rem;
-    }
-    
-    .preview-author {
-      color: var(--gray);
-      margin-bottom: 1rem;
-    }
-    
-    .chapter-collapse {
-      margin-bottom: 1rem;
-    }
-    
-    .collapse-button {
-      background: none;
-      border: none;
-      color: var(--primary);
-      font-size: 0.8rem;
-      cursor: pointer;
-      text-decoration: underline;
-    }
-    
-    .collapse-content {
-      margin-top: 0.5rem;
-      padding: 1rem;
-      background-color: #f8fafc;
-      border-radius: 8px;
-      font-size: 0.9rem;
-      line-height: 1.5;
-    }
-    
-    /* Footer */
-    footer {
-      background-color: var(--dark);
-      color: white;
-      padding: 2rem 0 1rem;
-      margin-top: 3rem;
-    }
-    
-    .copyright {
-      text-align: center;
-      padding-top: 1.5rem;
-      margin-top: 1.5rem;
-      border-top: 1px solid rgba(255, 255, 255, 0.1);
-      color: rgba(255, 255, 255, 0.6);
-    }
-    
-    /* Responsive Adjustments */
-    @media (max-width: 768px) {
-      .page-header {
-        padding: 1.5rem 0;
-      }
-      
-      .page-header h1 {
-        font-size: 1.75rem;
-      }
-      
-      .form-section, .preview-section {
-        padding: 1.5rem;
-      }
-      
-      .preview-section {
-        position: static;
-        margin-top: 2rem;
-      }
-    }
-  </style>
+  <link rel="stylesheet" href="css/styles.css" />
 </head>
 
 <body>
@@ -334,7 +21,7 @@
   <!-- Navbar -->
   <nav class="navbar navbar-expand-lg">
     <div class="container">
-      <a class="navbar-brand" href="index.html">
+      <a class="navbar-brand" href="index.php">
         <svg xmlns="http://www.w3.org/2000/svg" width="28" height="28" fill="currentColor" class="bi bi-book me-2"
           viewBox="0 0 16 16">
           <path
@@ -350,23 +37,23 @@
 
       <div class="collapse navbar-collapse" id="navbarContent">
         <ul class="navbar-nav ms-auto align-items-center">
-          <li class="nav-item"><a class="nav-link" href="dashboard.html"><i class="fas fa-th-large me-1"></i>Dashboard</a></li>
+          <li class="nav-item"><a class="nav-link" href="dashboard.php"><i class="fas fa-th-large me-1"></i>Dashboard</a></li>
           <li class="nav-item"><a class="nav-link" href="browse.html"><i class="fas fa-compass me-1"></i>Browse</a></li>
-          <li class="nav-item"><a class="nav-link active" href="write.html"><i class="fas fa-pen me-1"></i>Write</a></li>
+          <li class="nav-item"><a class="nav-link active" href="write.php"><i class="fas fa-pen me-1"></i>Write</a></li>
           
           <!-- User dropdown -->
           <li class="nav-item dropdown ms-2">
             <a class="nav-link p-0" href="#" role="button" data-bs-toggle="dropdown" aria-expanded="false">
               <div class="rounded-circle overflow-hidden d-flex align-items-center justify-content-center" style="width: 40px; height: 40px; background: linear-gradient(135deg, var(--primary) 0%, var(--secondary) 100%); color: white; font-weight: bold;">
-                <span id="userInitial">U</span>
+                <span id="userInitial"><?php echo strtoupper(substr($_SESSION['user']['first_name'], 0, 1)); ?></span>
               </div>
             </a>
             <ul class="dropdown-menu dropdown-menu-end">
               <li><a class="dropdown-item" href="profile.html"><i class="fas fa-user me-2"></i>My Profile</a></li>
-              <li><a class="dropdown-item" href="mystories.html"><i class="fas fa-book me-2"></i>My Stories</a></li>
+              <li><a class="dropdown-item" href="mystories.php"><i class="fas fa-book me-2"></i>My Stories</a></li>
               <li><a class="dropdown-item" href="#"><i class="fas fa-cog me-2"></i>Settings</a></li>
               <li><hr class="dropdown-divider"></li>
-              <li><a class="dropdown-item" href="#" id="logoutBtn"><i class="fas fa-sign-out-alt me-2"></i>Logout</a></li>
+              <li><a class="dropdown-item" href="logout.php"><i class="fas fa-sign-out-alt me-2"></i>Logout</a></li>
             </ul>
           </li>
         </ul>
@@ -483,7 +170,7 @@
     <div class="container">
       <div class="row">
         <div class="col-md-6">
-          <a class="navbar-brand text-white mb-3 d-inline-block" href="index.html">
+          <a class="navbar-brand text-white mb-3 d-inline-block" href="index.php">
             <svg xmlns="http://www.w3.org/2000/svg" width="28" height="28" fill="currentColor" class="bi bi-book me-2"
               viewBox="0 0 16 16">
               <path
@@ -504,8 +191,8 @@
   </footer>
 
   <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.7/dist/js/bootstrap.bundle.min.js"></script>
-  <script src="https://cdn.quilljs.com/1.3.7/quill.min.js"></script>
-  <script>
+<script src="https://cdn.quilljs.com/1.3.7/quill.min.js"></script>
+<script>
     document.addEventListener("DOMContentLoaded", function () {
       // DOM Elements
       const storyTitle = document.getElementById('storyTitle');
@@ -521,28 +208,32 @@
       let quillEditors = [];
       let selectedGenres = [];
 
-      // Initialize user data
-      const currentUser = JSON.parse(localStorage.getItem("currentUser"));
-      if (currentUser && currentUser.name) {
-        document.getElementById("userInitial").textContent = currentUser.name.charAt(0).toUpperCase();
-        storyAuthor.value = currentUser.name;
-      }
+      // Set author name from session
+      storyAuthor.value = "<?php echo htmlspecialchars($_SESSION['user']['first_name'] . ' ' . $_SESSION['user']['last_name']); ?>";
 
-      // Genre selection
+      // FIXED: Genre selection - simple and working version
       genreTags.forEach(tag => {
         tag.addEventListener('click', function() {
-          this.classList.toggle('active');
-          const genre = this.dataset.genre;
+          const genre = this.getAttribute('data-genre');
           
+          // Toggle the active class
+          this.classList.toggle('active');
+          
+          // Update selected genres array
           if (this.classList.contains('active')) {
+            // Add to selected genres if not already there
             if (!selectedGenres.includes(genre)) {
               selectedGenres.push(genre);
             }
           } else {
+            // Remove from selected genres
             selectedGenres = selectedGenres.filter(g => g !== genre);
           }
           
+          // Update hidden input
           selectedGenresInput.value = selectedGenres.join(',');
+          
+          // Update preview
           updatePreview();
         });
       });
@@ -731,7 +422,7 @@
       }
 
       // Form submission
-      document.getElementById('storyForm').addEventListener('submit', (e) => {
+      document.getElementById('storyForm').addEventListener('submit', async (e) => {
         e.preventDefault();
         
         // Validate form
@@ -755,101 +446,60 @@
           return;
         }
 
-        // Check if editing existing story
-        const editIndex = localStorage.getItem('editStoryIndex');
-        const stories = JSON.parse(localStorage.getItem('userStories')) || [];
+        // Show loading state
+        const submitBtn = e.target.querySelector('button[type="submit"]');
+        const originalText = submitBtn.textContent;
+        submitBtn.textContent = 'Publishing...';
+        submitBtn.disabled = true;
 
-        const storyData = {
-          title: storyTitle.value,
-          author: storyAuthor.value,
-          genre: selectedGenres,
-          cover: document.getElementById('previewImage').src,
-          chapters: quillEditors.map((q, i) => ({
-            title: document.querySelectorAll('.chapter-title-input')[i].value || `Chapter ${i + 1}`,
-            content: q.root.innerHTML
-          })),
-          dateCreated: new Date().toISOString(),
-          reads: 0,
-          rating: 0
-        };
+        try {
+          // Prepare story data
+          const storyData = {
+            title: storyTitle.value,
+            author: storyAuthor.value,
+            genre: selectedGenres,
+            cover_image: document.getElementById('previewImage').src,
+            chapters: quillEditors.map((q, i) => ({
+              title: document.querySelectorAll('.chapter-title-input')[i].value || `Chapter ${i + 1}`,
+              content: q.root.innerHTML
+            })),
+            user_id: <?php echo $_SESSION['user']['id']; ?>
+          };
 
-        if (editIndex !== null) {
-          // Editing existing story
-          stories[editIndex] = storyData;
-          localStorage.removeItem('editStoryIndex');
-        } else {
-          // Adding new story
-          stories.push(storyData);
+          console.log('Sending story data:', storyData);
+
+          // Send to Supabase via PHP
+          const response = await fetch('save-story.php', {
+            method: 'POST',
+            headers: {
+              'Content-Type': 'application/json',
+            },
+            body: JSON.stringify(storyData)
+          });
+
+          const result = await response.json();
+          console.log('Server response:', result);
+
+          if (result.success) {
+            alert('Story published successfully!');
+            window.location.href = 'mystories.php';
+          } else {
+            alert('Error saving story: ' + (result.error || 'Unknown error'));
+          }
+
+        } catch (error) {
+          console.error('Error:', error);
+          alert('Error publishing story. Please try again.');
+        } finally {
+          // Reset button state
+          submitBtn.textContent = originalText;
+          submitBtn.disabled = false;
         }
-
-        localStorage.setItem('userStories', JSON.stringify(stories));
-        
-        // Show success message
-        alert('Story saved successfully!');
-        window.location.href = 'mystories.html';
       });
 
-      // Load story for editing if applicable
-      const editIndex = localStorage.getItem('editStoryIndex');
-      if (editIndex !== null) {
-        const userStories = JSON.parse(localStorage.getItem('userStories')) || [];
-        const story = userStories[editIndex];
-
-        if (story) {
-          storyTitle.value = story.title;
-          storyAuthor.value = story.author;
-          
-          // Set genres
-          if (Array.isArray(story.genre)) {
-            story.genre.forEach(genre => {
-              const tag = document.querySelector(`.genre-tag[data-genre="${genre}"]`);
-              if (tag) {
-                tag.classList.add('active');
-                selectedGenres.push(genre);
-              }
-            });
-          }
-          
-          selectedGenresInput.value = selectedGenres.join(',');
-          
-          // Set cover image
-          if (story.cover) {
-            document.getElementById('previewImage').src = story.cover;
-            imageUploadContainer.innerHTML = `
-              <div class="image-upload-icon text-success">
-                <i class="fas fa-check-circle"></i>
-              </div>
-              <h5>Image Uploaded</h5>
-              <p class="text-muted">Click to change image</p>
-            `;
-          }
-          
-          // Add chapters
-          if (story.chapters && story.chapters.length > 0) {
-            story.chapters.forEach(chapter => {
-              addChapter();
-              
-              // Set chapter title and content after a brief delay
-              setTimeout(() => {
-                const lastChapter = chaptersContainer.lastElementChild;
-                if (lastChapter) {
-                  const titleInput = lastChapter.querySelector('.chapter-title-input');
-                  const editor = quillEditors[quillEditors.length - 1];
-                  
-                  if (titleInput) titleInput.value = chapter.title;
-                  if (editor) editor.root.innerHTML = chapter.content;
-                }
-              }, 100);
-            });
-          }
-          
-          updatePreview();
-        }
-      } else {
-        // Add first chapter for new story
-        addChapter();
-      }
+      // Add first chapter for new story
+      addChapter();
     });
-  </script>
+</script>
 </body>
 </html>

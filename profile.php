@@ -1,3 +1,34 @@
+<?php
+session_start();
+require_once "includes/check-auth.php";
+$user = checkAuth();
+
+require_once "includes/database.php";
+
+// Get user stats and stories from database
+try {
+    $db = new Database();
+    
+    // Get user's stories count and total reads
+    $stories_result = $db->select('stories', '*', ['user_id' => $_SESSION['user']['id']]);
+    $total_stories = 0;
+    $total_reads = 0;
+    
+    if (is_array($stories_result) && !empty($stories_result)) {
+        $stories = array_values($stories_result);
+        $stories = array_filter($stories, 'is_array');
+        $total_stories = count($stories);
+        
+        foreach ($stories as $story) {
+            $total_reads += $story['reads'] ?? 0;
+        }
+    }
+    
+} catch (Exception $e) {
+    $total_stories = 0;
+    $total_reads = 0;
+}
+?>
 <!DOCTYPE html>
 <html lang="en">
 
@@ -403,7 +434,7 @@
   <!-- Navbar -->
   <nav class="navbar navbar-expand-lg">
     <div class="container">
-      <a class="navbar-brand" href="index.html">
+      <a class="navbar-brand" href="index.php">
         <svg xmlns="http://www.w3.org/2000/svg" width="28" height="28" fill="currentColor" class="bi bi-book me-2"
           viewBox="0 0 16 16">
           <path
@@ -419,25 +450,25 @@
 
       <div class="collapse navbar-collapse" id="navbarContent">
         <ul class="navbar-nav ms-auto align-items-center">
-          <li class="nav-item"><a class="nav-link" href="dashboard.html"><i class="fas fa-th-large me-1"></i>Dashboard</a></li>
-          <li class="nav-item"><a class="nav-link" href="browse.html"><i class="fas fa-compass me-1"></i>Browse</a></li>
-          <li class="nav-item"><a class="nav-link" href="write.html"><i class="fas fa-pen me-1"></i>Write</a></li>
-          <li class="nav-item"><a class="nav-link" href="mystories.html"><i class="fas fa-book me-1"></i>My Stories</a></li>
-          <li class="nav-item"><a class="nav-link active" href="profile.html"><i class="fas fa-user me-1"></i>Profile</a></li>
+          <li class="nav-item"><a class="nav-link" href="dashboard.php"><i class="fas fa-th-large me-1"></i>Dashboard</a></li>
+          <li class="nav-item"><a class="nav-link" href="browse.php"><i class="fas fa-compass me-1"></i>Browse</a></li>
+          <li class="nav-item"><a class="nav-link" href="write.php"><i class="fas fa-pen me-1"></i>Write</a></li>
+          <li class="nav-item"><a class="nav-link" href="mystories.php"><i class="fas fa-book me-1"></i>My Stories</a></li>
+          <li class="nav-item"><a class="nav-link active" href="profile.php"><i class="fas fa-user me-1"></i>Profile</a></li>
           
           <!-- User dropdown -->
           <li class="nav-item dropdown ms-2">
             <a class="nav-link p-0" href="#" role="button" data-bs-toggle="dropdown" aria-expanded="false">
               <div class="rounded-circle overflow-hidden d-flex align-items-center justify-content-center" style="width: 40px; height: 40px; background: linear-gradient(135deg, var(--primary) 0%, var(--secondary) 100%); color: white; font-weight: bold;">
-                <span id="userInitial">U</span>
+                <span id="userInitial"><?php echo strtoupper(substr($_SESSION['user']['first_name'], 0, 1)); ?></span>
               </div>
             </a>
             <ul class="dropdown-menu dropdown-menu-end">
-              <li><a class="dropdown-item" href="profile.html"><i class="fas fa-user me-2"></i>My Profile</a></li>
-              <li><a class="dropdown-item" href="mystories.html"><i class="fas fa-book me-2"></i>My Stories</a></li>
+              <li><a class="dropdown-item" href="profile.php"><i class="fas fa-user me-2"></i>My Profile</a></li>
+              <li><a class="dropdown-item" href="mystories.php"><i class="fas fa-book me-2"></i>My Stories</a></li>
               <li><a class="dropdown-item" href="#"><i class="fas fa-cog me-2"></i>Settings</a></li>
               <li><hr class="dropdown-divider"></li>
-              <li><a class="dropdown-item" href="#" id="logoutBtn"><i class="fas fa-sign-out-alt me-2"></i>Logout</a></li>
+              <li><a class="dropdown-item" href="logout.php"><i class="fas fa-sign-out-alt me-2"></i>Logout</a></li>
             </ul>
           </li>
         </ul>
@@ -459,14 +490,14 @@
           </div>
         </div>
         <div class="col-lg-9 text-center text-lg-start">
-          <h1 class="profile-name" id="profileName">David Aaron Serad</h1>
+          <h1 class="profile-name" id="profileName"><?php echo htmlspecialchars($_SESSION['user']['first_name'] . ' ' . $_SESSION['user']['last_name']); ?></h1>
           <p class="profile-bio" id="profileBio">
             Passionate storyteller and avid reader. Exploring worlds one story at a time. 
             Writing fantasy and sci-fi adventures with a touch of mystery.
           </p>
           <div class="d-flex gap-3 flex-wrap">
-            <span class="text-white-80"><i class="fas fa-map-marker-alt me-1"></i> Manila, Philippines</span>
-            <span class="text-white-80"><i class="fas fa-calendar-alt me-1"></i> Joined March 2023</span>
+            <span class="text-white-80"><i class="fas fa-envelope me-1"></i><?php echo htmlspecialchars($_SESSION['user']['email']); ?></span>
+            <span class="text-white-80"><i class="fas fa-calendar-alt me-1"></i> Joined <?php echo date('F Y'); ?></span>
             <span class="text-white-80"><i class="fas fa-user-check me-1"></i> Verified Writer</span>
           </div>
         </div>
@@ -482,28 +513,28 @@
         <div class="col-md-3 col-6">
           <div class="stat-item">
             <i class="fas fa-book-open stat-icon"></i>
-            <div class="stat-number" id="statsStories">0</div>
+            <div class="stat-number" id="statsStories"><?php echo $total_stories; ?></div>
             <div class="stat-label">Stories</div>
           </div>
         </div>
         <div class="col-md-3 col-6">
           <div class="stat-item">
             <i class="fas fa-users stat-icon"></i>
-            <div class="stat-number" id="statsFollowers">3.4k</div>
+            <div class="stat-number" id="statsFollowers">0</div>
             <div class="stat-label">Followers</div>
           </div>
         </div>
         <div class="col-md-3 col-6">
           <div class="stat-item">
             <i class="fas fa-user-plus stat-icon"></i>
-            <div class="stat-number" id="statsFollowing">1.1k</div>
+            <div class="stat-number" id="statsFollowing">0</div>
             <div class="stat-label">Following</div>
           </div>
         </div>
         <div class="col-md-3 col-6">
           <div class="stat-item">
             <i class="fas fa-eye stat-icon"></i>
-            <div class="stat-number" id="statsReads">0</div>
+            <div class="stat-number" id="statsReads"><?php echo $total_reads; ?></div>
             <div class="stat-label">Total Reads</div>
           </div>
         </div>
@@ -514,7 +545,7 @@
     <div class="stories-section">
       <h3 class="section-title">
         <span><i class="fas fa-book me-2"></i>My Stories</span>
-        <a href="write.html" class="btn btn-main btn-sm">
+        <a href="write.php" class="btn btn-main btn-sm">
           <i class="fas fa-plus me-1"></i>New Story
         </a>
       </h3>
@@ -527,7 +558,7 @@
         <i class="fas fa-book-open"></i>
         <h4>No stories yet</h4>
         <p>You haven't published any stories. Start your writing journey today!</p>
-        <a href="write.html" class="btn btn-main">Write Your First Story</a>
+        <a href="write.php" class="btn btn-main">Write Your First Story</a>
       </div>
     </div>
   </div>
@@ -537,7 +568,7 @@
     <div class="container">
       <div class="row">
         <div class="col-md-6">
-          <a class="navbar-brand text-white mb-3 d-inline-block" href="index.html">
+          <a class="navbar-brand text-white mb-3 d-inline-block" href="index.php">
             <svg xmlns="http://www.w3.org/2000/svg" width="28" height="28" fill="currentColor" class="bi bi-book me-2"
               viewBox="0 0 16 16">
               <path
@@ -579,16 +610,20 @@
               </div>
               <div class="col-md-8">
                 <div class="mb-3">
-                  <label for="editName" class="form-label">Full Name</label>
-                  <input type="text" class="form-control" id="editName" value="David Aaron Serad">
+                  <label for="editFirstName" class="form-label">First Name</label>
+                  <input type="text" class="form-control" id="editFirstName" value="<?php echo htmlspecialchars($_SESSION['user']['first_name']); ?>">
+                </div>
+                <div class="mb-3">
+                  <label for="editLastName" class="form-label">Last Name</label>
+                  <input type="text" class="form-control" id="editLastName" value="<?php echo htmlspecialchars($_SESSION['user']['last_name']); ?>">
+                </div>
+                <div class="mb-3">
+                  <label for="editEmail" class="form-label">Email</label>
+                  <input type="email" class="form-control" id="editEmail" value="<?php echo htmlspecialchars($_SESSION['user']['email']); ?>">
                 </div>
                 <div class="mb-3">
                   <label for="editBio" class="form-label">Bio</label>
                   <textarea class="form-control" id="editBio" rows="4">Passionate storyteller and avid reader. Exploring worlds one story at a time. Writing fantasy and sci-fi adventures with a touch of mystery.</textarea>
-                </div>
-                <div class="mb-3">
-                  <label for="editLocation" class="form-label">Location</label>
-                  <input type="text" class="form-control" id="editLocation" value="Manila, Philippines">
                 </div>
               </div>
             </div>
@@ -606,45 +641,25 @@
 
   <script>
     document.addEventListener("DOMContentLoaded", function () {
-      // Initialize user data
-      const currentUser = JSON.parse(localStorage.getItem("currentUser"));
-      if (currentUser && currentUser.name) {
-        document.getElementById("userInitial").textContent = currentUser.name.charAt(0).toUpperCase();
-        document.getElementById("profileName").textContent = currentUser.name;
-        document.getElementById("editName").value = currentUser.name;
-        
-        if (currentUser.bio) {
-          document.getElementById("profileBio").textContent = currentUser.bio;
-          document.getElementById("editBio").value = currentUser.bio;
-        }
-        
-        if (currentUser.location) {
-          document.getElementById("editLocation").value = currentUser.location;
-        }
-        
-        if (currentUser.avatar) {
-          document.getElementById("profileAvatar").src = currentUser.avatar;
-          document.getElementById("modalAvatar").src = currentUser.avatar;
-        }
-      }
-
       // DOM Elements
       const profileStoriesContainer = document.getElementById('profileStoriesContainer');
       const profileNoStories = document.getElementById('profileNoStories');
 
-      // Get stories from localStorage
-      function getUserStories() {
-        return JSON.parse(localStorage.getItem('userStories')) || [];
-      }
-
-      // Update profile stats
-      function updateProfileStats() {
-        const stories = getUserStories();
-        const totalStories = stories.length;
-        const totalReads = stories.reduce((sum, story) => sum + (story.reads || 0), 0);
-        
-        document.getElementById('statsStories').textContent = totalStories;
-        document.getElementById('statsReads').textContent = totalReads.toLocaleString();
+      // Load stories from database
+      async function loadUserStories() {
+        try {
+          const response = await fetch('get-my-stories.php');
+          const result = await response.json();
+          
+          if (result.success) {
+            displayStories(result.data || []);
+          } else {
+            throw new Error(result.error || 'Failed to load stories');
+          }
+        } catch (error) {
+          console.error('Error loading stories:', error);
+          displayStories([]);
+        }
       }
 
       // Genre color mapping
@@ -665,11 +680,9 @@
         return colors[genre] || 'bg-primary';
       }
 
-      // Render stories on profile page
-      function renderProfileStories() {
-        const stories = getUserStories();
+      // Display stories
+      function displayStories(stories) {
         profileStoriesContainer.innerHTML = '';
-        updateProfileStats();
 
         if (stories.length === 0) {
           profileNoStories.classList.remove('d-none');
@@ -678,7 +691,7 @@
           profileNoStories.classList.add('d-none');
         }
 
-        stories.forEach((story, index) => {
+        stories.forEach((story) => {
           const card = document.createElement('div');
           card.classList.add('story-card');
           
@@ -688,7 +701,7 @@
           const genres = Array.isArray(story.genre) ? story.genre : [story.genre];
           
           card.innerHTML = `
-            <img src="${story.cover || 'https://images.unsplash.com/photo-1455390582262-044cdead277a?ixlib=rb-4.0.3&auto=format&fit=crop&w=600&q=80'}" 
+            <img src="${story.cover_image || 'https://images.unsplash.com/photo-1455390582262-044cdead277a?ixlib=rb-4.0.3&auto=format&fit=crop&w=600&q=80'}" 
                  alt="${story.title}" class="story-image"/>
             <div class="story-content">
               <div>
@@ -705,13 +718,13 @@
                 </div>
               </div>
               <div class="action-buttons">
-                <button class="btn btn-action btn-view" onclick="viewStory(${index})">
+                <button class="btn btn-action btn-view" onclick="viewStory('${story.id}')">
                   <i class="fas fa-eye me-1"></i>View
                 </button>
-                <button class="btn btn-action btn-edit" onclick="editStory(${index})">
+                <button class="btn btn-action btn-edit" onclick="editStory('${story.id}')">
                   <i class="fas fa-edit me-1"></i>Edit
                 </button>
-                <button class="btn btn-action btn-delete" onclick="deleteStory(${index})">
+                <button class="btn btn-action btn-delete" onclick="deleteStory('${story.id}')">
                   <i class="fas fa-trash me-1"></i>Delete
                 </button>
               </div>
@@ -722,85 +735,104 @@
       }
 
       // Story actions
-      window.viewStory = function(index) {
-        localStorage.setItem('viewStoryIndex', index);
-        window.location.href = 'stories.html';
+      window.viewStory = function(storyId) {
+        window.location.href = `story.php?id=${storyId}`;
       }
 
-      window.editStory = function(index) {
-        localStorage.setItem('editStoryIndex', index);
-        window.location.href = 'write.html';
+      window.editStory = function(storyId) {
+        window.location.href = `write.php?id=${storyId}`;
       }
 
-      window.deleteStory = function(index) {
+      window.deleteStory = async function(storyId) {
         if (confirm('Are you sure you want to delete this story? This action cannot be undone.')) {
-          const stories = getUserStories();
-          stories.splice(index, 1);
-          localStorage.setItem('userStories', JSON.stringify(stories));
-          renderProfileStories();
-          
-          // Show confirmation message
-          const toast = document.createElement('div');
-          toast.className = 'alert alert-success position-fixed top-0 end-0 m-3';
-          toast.style.zIndex = '9999';
-          toast.innerHTML = `
-            <i class="fas fa-check-circle me-2"></i>
-            Story deleted successfully
-          `;
-          document.body.appendChild(toast);
-          
-          setTimeout(() => {
-            document.body.removeChild(toast);
-          }, 3000);
+          try {
+            const response = await fetch('delete-story.php', {
+              method: 'POST',
+              headers: {
+                'Content-Type': 'application/json',
+              },
+              body: JSON.stringify({ story_id: storyId })
+            });
+
+            const result = await response.json();
+            
+            if (result.success) {
+              // Reload stories
+              loadUserStories();
+              
+              // Show success message
+              showSuccess('Story deleted successfully');
+            } else {
+              throw new Error(result.error || 'Failed to delete story');
+            }
+          } catch (error) {
+            console.error('Error deleting story:', error);
+            showError('Failed to delete story. Please try again.');
+          }
         }
       }
 
       // Save profile changes
-      window.saveProfile = function() {
-        const currentUser = JSON.parse(localStorage.getItem("currentUser")) || {};
-        
-        currentUser.name = document.getElementById('editName').value;
-        currentUser.bio = document.getElementById('editBio').value;
-        currentUser.location = document.getElementById('editLocation').value;
-        
-        localStorage.setItem("currentUser", JSON.stringify(currentUser));
-        
-        // Update profile display
-        document.getElementById('profileName').textContent = currentUser.name;
-        document.getElementById('profileBio').textContent = currentUser.bio;
-        document.getElementById("userInitial").textContent = currentUser.name.charAt(0).toUpperCase();
-        
-        // Close modal
-        const modal = bootstrap.Modal.getInstance(document.getElementById('editProfileModal'));
-        modal.hide();
-        
-        // Show success message
+      window.saveProfile = async function() {
+        const formData = {
+          first_name: document.getElementById('editFirstName').value,
+          last_name: document.getElementById('editLastName').value,
+          email: document.getElementById('editEmail').value,
+          bio: document.getElementById('editBio').value
+        };
+
+        try {
+          const response = await fetch('update-profile.php', {
+            method: 'POST',
+            headers: {
+              'Content-Type': 'application/json',
+            },
+            body: JSON.stringify(formData)
+          });
+
+          const result = await response.json();
+          
+          if (result.success) {
+            // Update profile display
+            document.getElementById('profileName').textContent = `${formData.first_name} ${formData.last_name}`;
+            document.getElementById('profileBio').textContent = formData.bio;
+            document.getElementById("userInitial").textContent = formData.first_name.charAt(0).toUpperCase();
+            
+            // Close modal
+            const modal = bootstrap.Modal.getInstance(document.getElementById('editProfileModal'));
+            modal.hide();
+            
+            showSuccess('Profile updated successfully');
+          } else {
+            throw new Error(result.error || 'Failed to update profile');
+          }
+        } catch (error) {
+          console.error('Error updating profile:', error);
+          showError('Failed to update profile. Please try again.');
+        }
+      }
+
+      // Utility functions
+      function showSuccess(message) {
         const toast = document.createElement('div');
         toast.className = 'alert alert-success position-fixed top-0 end-0 m-3';
         toast.style.zIndex = '9999';
-        toast.innerHTML = `
-          <i class="fas fa-check-circle me-2"></i>
-          Profile updated successfully
-        `;
+        toast.innerHTML = `<i class="fas fa-check-circle me-2"></i>${message}`;
         document.body.appendChild(toast);
-        
-        setTimeout(() => {
-          document.body.removeChild(toast);
-        }, 3000);
+        setTimeout(() => document.body.removeChild(toast), 3000);
       }
 
-      // Logout functionality
-      const logoutBtn = document.getElementById("logoutBtn");
-      if (logoutBtn) {
-        logoutBtn.addEventListener("click", function (e) {
-          e.preventDefault();
-          localStorage.removeItem("currentUser");
-          window.location.href = "index.html";
-        });
+      function showError(message) {
+        const toast = document.createElement('div');
+        toast.className = 'alert alert-danger position-fixed top-0 end-0 m-3';
+        toast.style.zIndex = '9999';
+        toast.innerHTML = `<i class="fas fa-exclamation-circle me-2"></i>${message}`;
+        document.body.appendChild(toast);
+        setTimeout(() => document.body.removeChild(toast), 5000);
       }
 
       // Initialize
-      renderProfileStories();
+      loadUserStories();
     });
   </script>
 </body>

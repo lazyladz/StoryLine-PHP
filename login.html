@@ -15,7 +15,7 @@
 
   <nav class="navbar navbar-expand-lg">
     <div class="container">
-      <a class="navbar-brand fw-bold" href="index.html">
+      <a class="navbar-brand fw-bold" href="index.php">
         <svg xmlns="http://www.w3.org/2000/svg" width="28" height="28" fill="currentColor" class="bi bi-book me-2"
           viewBox="0 0 16 16">
           <path
@@ -36,11 +36,11 @@
               <p>Sign in to continue your reading journey</p>
             </div>
             <div class="card-body p-4 pt-0">
-              <form id="loginForm" novalidate>
+              <form id="loginForm" method="POST" action="login.php">
                 <!-- Email -->
                 <div class="mb-3">
                   <label for="email" class="form-label">Email</label>
-                  <input id="email" name="email" type="email" class="form-control" placeholder="Enter your email">
+                  <input id="email" name="email" type="email" class="form-control" placeholder="Enter your email" required>
                   <div class="invalid-feedback"></div>
                 </div>
 
@@ -48,8 +48,8 @@
                 <div class="mb-3">
                   <label for="password" class="form-label">Password</label>
                   <div class="input-group">
-                    <input id="password" name="password" type="password" class="form-control"
-                      placeholder="Enter your password">
+                    <input id="password" name="password" type="password" class="form-control" 
+                          placeholder="Enter your password" required>
                     <button type="button" class="btn btn-outline-secondary toggle-password">Show</button>
                   </div>
                   <div class="invalid-feedback"></div>
@@ -97,51 +97,64 @@
 
   <script>
     document.getElementById("loginForm").addEventListener("submit", async function(e) {
-  e.preventDefault();
+      e.preventDefault();
 
-  const emailEl = document.getElementById("email");
-  const passwordEl = document.getElementById("password");
+      const emailEl = document.getElementById("email");
+      const passwordEl = document.getElementById("password");
 
-  // Clear previous errors
-  emailEl.classList.remove("is-invalid");
-  passwordEl.classList.remove("is-invalid");
-  emailEl.nextElementSibling.textContent = "";
-  passwordEl.nextElementSibling.textContent = "";
-
-  if (!emailEl.value.trim()) {
-    emailEl.classList.add("is-invalid");
-    emailEl.nextElementSibling.textContent = "Email is required.";
-    return;
-  }
-
-  if (!passwordEl.value.trim()) {
-    passwordEl.classList.add("is-invalid");
-    passwordEl.nextElementSibling.textContent = "Password is required.";
-    return;
-  }
-
-  const formData = new FormData();
-  formData.append("email", emailEl.value.trim());
-  formData.append("password", passwordEl.value);
-
-  try {
-    const res = await fetch("login.php", { method: "POST", body: formData });
-    const data = await res.json();
-
-    if (data.success) {
-      // Redirect to dashboard
-      window.location.href = data.redirect;
-    } else {
-      emailEl.classList.add("is-invalid");
-      passwordEl.classList.add("is-invalid");
-      emailEl.nextElementSibling.textContent = data.errors[0];
+      // Clear previous errors
+      emailEl.classList.remove("is-invalid");
+      passwordEl.classList.remove("is-invalid");
+      emailEl.nextElementSibling.textContent = "";
       passwordEl.nextElementSibling.textContent = "";
-    }
-  } catch (err) {
-    console.error(err);
-  }
-});
 
+      if (!emailEl.value.trim()) {
+        emailEl.classList.add("is-invalid");
+        emailEl.nextElementSibling.textContent = "Email is required.";
+        return;
+      }
+
+      if (!passwordEl.value.trim()) {
+        passwordEl.classList.add("is-invalid");
+        passwordEl.nextElementSibling.textContent = "Password is required.";
+        return;
+      }
+
+      const formData = new FormData();
+      formData.append("email", emailEl.value.trim());
+      formData.append("password", passwordEl.value);
+
+      try {
+        const res = await fetch("login.php", { method: "POST", body: formData });
+        const data = await res.json();
+
+        if (data.success) {
+          // Redirect to dashboard
+          window.location.href = data.redirect;
+        } else {
+          emailEl.classList.add("is-invalid");
+          passwordEl.classList.add("is-invalid");
+          emailEl.nextElementSibling.textContent = data.errors[0];
+          passwordEl.nextElementSibling.textContent = "";
+        }
+      } catch (err) {
+        console.error(err);
+      }
+    });
+
+    // Toggle password visibility
+    document.querySelectorAll(".toggle-password").forEach(btn => {
+      btn.addEventListener("click", function () {
+        const input = this.previousElementSibling;
+        if (input.type === "password") {
+          input.type = "text";
+          this.textContent = "Hide";
+        } else {
+          input.type = "password";
+          this.textContent = "Show";
+        }
+      });
+    });
   </script>
 
 </body>

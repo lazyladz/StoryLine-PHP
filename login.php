@@ -1,6 +1,6 @@
 <?php
 session_start();
-require_once "config.php"; // Make sure $mysqli is defined here
+require_once "includes/database.php"; // Now using Supabase
 
 header("Content-Type: application/json");
 
@@ -24,29 +24,38 @@ if (!empty($errors)) {
     exit;
 }
 
-// Check credentials
-$stmt = $mysqli->prepare("SELECT id, first_name, last_name, email, password FROM users WHERE email = ?");
-$stmt->bind_param("s", $email);
-$stmt->execute();
-$result = $stmt->get_result();
-$user = $result->fetch_assoc();
-$stmt->close();
+try {
+    $db = new Database();
+    
+    // Check if user exists using Supabase
+    $users = $db->select('users', '*', ['email' => $email]);
+    
+    if (empty($users)) {
+        echo json_encode(["success" => false, "errors" => ["Invalid email or password."]]);
+        exit;
+    }
+    
+    $user = $users[0]; // Get first user (should be only one due to unique email)
+    
+    // Verify password
+    if (!password_verify($password, $user['password'])) {
+        echo json_encode(["success" => false, "errors" => ["Invalid email or password."]]);
+        exit;
+    }
+    
+    // ✅ Login successful: save session
+    $_SESSION['user'] = [
+        "id" => $user['id'],
+        "first_name" => $user['first_name'],
+        "last_name" => $user['last_name'],
+        "email" => $user['email']
+    ];
+    
+    // Respond with redirect
+    echo json_encode(["success" => true, "redirect" => "dashboard.php"]);
 
-if (!$user || !password_verify($password, $user['password'])) {
-    echo json_encode(["success" => false, "errors" => ["Invalid email or password."]]);
+} catch (Exception $e) {
+    echo json_encode(["success" => false, "errors" => ["Database error: " . $e->getMessage()]]);
     exit;
 }
-
-// ✅ Login successful: save session
-$_SESSION['user'] = [
-    "id" => $user['id'],
-    "first_name" => $user['first_name'],
-    "last_name" => $user['last_name'],
-    "email" => $user['email']
-];
-
-// Respond with redirect
-echo json_encode(["success" => true, "redirect" => "dashboard.html"]);
-
-$mysqli->close();
 ?>

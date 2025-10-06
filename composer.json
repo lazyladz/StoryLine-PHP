@@ -1,0 +1,11 @@
+{
+    "name": "storyline/supabase-app",
+    "description": "StoryLine Web with Supabase",
+    "type": "project",
+    "require": {},
+    "autoload": {
+        "psr-4": {
+            "App\\": "src/"
+        }
+    }
+}
