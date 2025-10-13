@@ -24,7 +24,7 @@ $user = checkAuth(); // Ensure user is logged in
                 <svg xmlns="http://www.w3.org/2000/svg" width="28" height="28" fill="currentColor" class="bi bi-book me-2"
                     viewBox="0 0 16 16">
                     <path
-                        d="M1 2.828c.885-.37 2.154-.769 3.388-.893 1.33-.134 2.458.063 3.112.752v9.746c-.935-.53-2.12-.603-3.213-.493-1.18.12-2.37.461-3.287.811V2.828zm7.5-.141c.654-.689 1.782-.886 3.112-.752 1.234.124 2.503.523 3.388.893v9.923c-.918-.35-2.107-.692-3.287-.81-1.094-.111-2.278-.039-3.213.492V2.687zM8 1.783C7.015.936 5.587.81 4.287.94c-1.514.153-3.042.672-3.994 1.105A.5.5 0 0 0 0 2.5v11a.5.5 0 0 0 .707.455c.882-.4 2.303-.881 3.68-1.02 1.409-.142 2.59.087 3.223.877a.5.5 0 0 0 .78 0c.633-.79 1.814-1.019 3.222-.877 1.378.139 2.8.62 3.681 1.02A.5.5 0 0 0 16 13.5v-11a.5.5 0 0 0 -.293-.455c-.952-.433-2.48-.952-3.994-1.105C10.413.809 8.985.936 8 1.783z" />
+                        d="M1 2.828c.885-.37 2.154-.769 3.388-.893 1.33-.134 2.458.063 3.112.752v9.746c-.935-.53-2.12-.603-3.213-.493-1.18.12-2.37.461-3.287.811V2.828zm7.5-.141c.654-.689 1.782-.886 3.112-.752 1.234.124 2.503.523 3.388.893v9.923c-.918-.35-2.107-.692-3.287-.81-1.094-.111-2.278-.039-3.213.492V2.687zM8 1.783C7.015.936 5.587.81 4.287.94c-1.514.153-3.042.672-3.994 1.105A.5.5 0 0 0 0 2.5v11a.5.5 0 0 0 .707.455c.882-.4 2.303-.881 3.68-1.02 1.409-.142 2.59.087 3.223.877a.5.5 0 0 0 .78 0c.633-.79 1.814-1.019 3.222-.877 1.378.139 2.8.62 3.681 1.02A.5.5 0 0 0 16 13.5v-11a.5.5 0 0 0-.293-.455c-.952-.433-2.48-.952-3.994-1.105C10.413.809 8.985.936 8 1.783z" />
                 </svg>
                 Storyline
             </a>
@@ -138,9 +138,9 @@ $user = checkAuth(); // Ensure user is logged in
         </div>
     </div>
 
-    <!-- Footer -->
-    <footer>
-        <div class="container">
+    <!-- Footer (Dashboard Style) -->
+    <footer class="bg-dark text-white py-4">
+        <div class="container-fluid">
             <div class="row">
                 <div class="col-md-6">
                     <a class="navbar-brand text-white mb-3 d-inline-block" href="index.php">
@@ -151,14 +151,14 @@ $user = checkAuth(); // Ensure user is logged in
                         </svg>
                         Storyline
                     </a>
-                    <p class="text-white-50">Where stories come alive. Discover new tales, write your own, and connect with readers everywhere.</p>
+                    <p class="text-white-50">
+                        Where stories come alive. Discover new tales, write your own, and connect with readers everywhere.
+                    </p>
                 </div>
                 <div class="col-md-6 text-md-end">
-                    <p class="text-white-50">&copy; 2025 Storyline. All rights reserved.</p>
+                    <p class="text-white-50 mb-1">&copy; 2025 Storyline. All rights reserved.</p>
+                    <p class="mb-0">Made with <i class="fas fa-heart text-danger"></i> for storytellers</p>
                 </div>
-            </div>
-            <div class="copyright">
-                <p class="mb-0">Made with <i class="fas fa-heart text-danger"></i> for storytellers</p>
             </div>
         </div>
     </footer>
@@ -175,6 +175,39 @@ $user = checkAuth(); // Ensure user is logged in
         let allStories = [];
 
         console.log('DOM loaded, starting script...');
+
+        // Show success message
+        function showSuccess(message) {
+            const toast = document.createElement('div');
+            toast.className = 'alert alert-success position-fixed top-0 end-0 m-3';
+            toast.style.zIndex = '9999';
+            toast.innerHTML = `
+                <i class="fas fa-check-circle me-2"></i>
+                ${message}
+            `;
+            document.body.appendChild(toast);
+            
+            setTimeout(() => {
+                document.body.removeChild(toast);
+            }, 3000);
+        }
+
+        // Show error message
+        function showError(message) {
+            console.error('Showing error:', message);
+            const toast = document.createElement('div');
+            toast.className = 'alert alert-danger position-fixed top-0 end-0 m-3';
+            toast.style.zIndex = '9999';
+            toast.innerHTML = `
+                <i class="fas fa-exclamation-circle me-2"></i>
+                ${message}
+            `;
+            document.body.appendChild(toast);
+            
+            setTimeout(() => {
+                document.body.removeChild(toast);
+            }, 5000);
+        }
 
         // Load stories from Supabase
         async function loadStoriesFromSupabase() {
@@ -209,7 +242,7 @@ $user = checkAuth(); // Ensure user is logged in
             }
         }
 
-        // Render stories - SIMPLIFIED VERSION FOR DEBUGGING
+        // Render stories
         function renderStories() {
             console.log('renderStories called with', allStories.length, 'stories');
             
@@ -262,10 +295,9 @@ $user = checkAuth(); // Ensure user is logged in
                 
                 const totalReads = story.reads || 0;
                 const rating = story.rating || 0;
-                const chapterCount = story.chapters ? story.chapters.length : 0;
-                const firstChapterTitle = story.chapters && story.chapters.length > 0 ? story.chapters[0].title : 'No chapters yet';
+                const chapterCount = story.chapter_count || 0;
+                const firstChapterTitle = story.first_chapter_title || 'No chapters yet';
                 
-                // SIMPLIFIED CARD - Remove complex genre handling for now
                 col.innerHTML = `
                     <div class="card story-card h-100">
                         <img src="${story.cover_image || 'https://images.unsplash.com/photo-1455390582262-044cdead277a?ixlib=rb-4.0.3&auto=format&fit=crop&w=600&q=80'}" 
@@ -311,7 +343,7 @@ $user = checkAuth(); // Ensure user is logged in
         // Update stats
         function updateStats(stories) {
             const totalStories = stories.length;
-            const totalChapters = stories.reduce((sum, story) => sum + (story.chapters ? story.chapters.length : 0), 0);
+            const totalChapters = stories.reduce((sum, story) => sum + (story.chapter_count || 0), 0);
             const totalReads = stories.reduce((sum, story) => sum + (story.reads || 0), 0);
             
             document.getElementById('totalStories').textContent = totalStories;
@@ -319,23 +351,6 @@ $user = checkAuth(); // Ensure user is logged in
             document.getElementById('totalReads').textContent = totalReads.toLocaleString();
             
             console.log('Stats updated:', { totalStories, totalChapters, totalReads });
-        }
-
-        // Show error message
-        function showError(message) {
-            console.error('Showing error:', message);
-            const toast = document.createElement('div');
-            toast.className = 'alert alert-danger position-fixed top-0 end-0 m-3';
-            toast.style.zIndex = '9999';
-            toast.innerHTML = `
-                <i class="fas fa-exclamation-circle me-2"></i>
-                ${message}
-            `;
-            document.body.appendChild(toast);
-            
-            setTimeout(() => {
-                document.body.removeChild(toast);
-            }, 5000);
         }
 
         // Make functions globally available
@@ -349,13 +364,38 @@ $user = checkAuth(); // Ensure user is logged in
             window.location.href = `write.php?id=${storyId}`;
         };
 
-        window.deleteStory = function(storyId) {
+        window.deleteStory = async function(storyId) {
             console.log('Delete story:', storyId);
             if (confirm('Are you sure you want to delete this story? This action cannot be undone.')) {
-                // For now, just remove from local array
-                allStories = allStories.filter(story => story.id != storyId);
-                renderStories();
-                console.log('Story removed locally:', storyId);
+                try {
+                    console.log('Sending delete request for story:', storyId);
+                    
+                    const response = await fetch('delete-story.php', {
+                        method: 'POST',
+                        headers: {
+                            'Content-Type': 'application/json',
+                        },
+                        body: JSON.stringify({
+                            story_id: storyId
+                        })
+                    });
+
+                    const result = await response.json();
+                    console.log('Delete response:', result);
+
+                    if (result.success) {
+                        // Remove from local array and re-render
+                        allStories = allStories.filter(story => story.id != storyId);
+                        renderStories();
+                        showSuccess('Story deleted successfully');
+                        console.log('Story deleted successfully:', storyId);
+                    } else {
+                        throw new Error(result.error || 'Failed to delete story');
+                    }
+                } catch (error) {
+                    console.error('Error deleting story:', error);
+                    showError('Failed to delete story: ' + error.message);
+                }
             }
         };
 

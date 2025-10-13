@@ -18,24 +18,26 @@ if (!$story_id) {
 }
 
 try {
-    // Include your custom database class
-    require_once __DIR__ . '/../includes/Database.php';
+    // Include your custom database class - FIXED PATH
+    require_once __DIR__ . '/includes/database.php';
     
     // Create database instance
     $db = new Database();
     
     // First verify the story belongs to the user
-    $verifyResult = $db->select('stories', 'id', [
+    $verifyResult = $db->select('stories', '*', [
         'id' => $story_id,
         'user_id' => $user_id
     ]);
     
-    if (isset($verifyResult['data']) && !empty($verifyResult['data'])) {
-        // Delete the story
+    // Check if story exists and belongs to user
+    if ($verifyResult && is_array($verifyResult) && count($verifyResult) > 0) {
+        // Delete the story using the correct method signature
         $deleteResult = $db->delete('stories', 'id', $story_id);
         
-        if ($deleteResult['success']) {
-            echo json_encode(['success' => true]);
+        // Check if delete was successful
+        if ($deleteResult) {
+            echo json_encode(['success' => true, 'message' => 'Story deleted successfully']);
         } else {
             throw new Exception('Failed to delete story from database');
         }

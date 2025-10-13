@@ -1,39 +1,62 @@
 <?php
 session_start();
 
-// Redirect to login if user is not logged in
 if (!isset($_SESSION['user'])) {
     header("Location: login.html");
     exit();
 }
 
-// Set cache control headers
 header("Cache-Control: no-cache, no-store, must-revalidate");
 header("Pragma: no-cache");
 header("Expires: 0");
 
-// Include database connection
 require_once "includes/database.php";
 
-// Initialize variables
 $userStories = [];
 $allStories = [];
 $continueStories = [];
 $popularGenres = ['Fantasy', 'Romance', 'Mystery', 'Horror', 'Thriller', 'Sci-Fi', 'Comedy', 'Action'];
 
-// Fetch stories directly from Supabase using your Database class
 try {
     $db = new Database();
     
-    // Fetch user's stories
     $userStories = $db->select('stories', '*', ['user_id' => $_SESSION['user']['id']]);
-    
-    // Fetch ALL stories for genre sections
     $allStories = $db->select('stories', '*', []);
     
-    // Format the stories data to match your expected structure
+    // Get reading progress for the current user - FIXED VERSION
+    $readingProgress = [];
+    try {
+        // First get all reading progress records for this user
+        $progressRecords = $db->select('reading_progress', '*', ['user_id' => $_SESSION['user']['id']]);
+        
+        if ($progressRecords) {
+            // For each progress record, get the corresponding story details
+            foreach ($progressRecords as $progress) {
+                $story = $db->select('stories', '*', ['id' => $progress['story_id']]);
+                if ($story) {
+                    $story = $story[0]; // Get first result
+                    // Merge progress data with story data
+                    $readingProgress[] = array_merge($story, [
+                        'current_chapter_index' => $progress['current_chapter_index'],
+                        'progress_percentage' => $progress['progress_percentage'],
+                        'last_read_at' => $progress['last_read_at']
+                    ]);
+                }
+            }
+            
+            // Sort by last_read_at descending
+            usort($readingProgress, function($a, $b) {
+                return strtotime($b['last_read_at']) - strtotime($a['last_read_at']);
+            });
+            
+            // Limit to 6 most recent
+            $readingProgress = array_slice($readingProgress, 0, 6);
+        }
+    } catch (Exception $e) {
+        error_log("Error fetching reading progress: " . $e->getMessage());
+    }
+    
     function formatStory($story) {
-        // Handle genre data
         $genre = [];
         if (isset($story['genre'])) {
             if (is_string($story['genre'])) {
@@ -47,7 +70,6 @@ try {
             }
         }
         
-        // Handle chapters data
         $chapters = [];
         if (isset($story['chapters'])) {
             if (is_string($story['chapters'])) {
@@ -70,20 +92,24 @@ try {
             'chapters' => $chapters,
             'reads' => $story['reads'] ?? 0,
             'rating' => $story['rating'] ?? 0,
-            'created_at' => $story['created_at'] ?? date('Y-m-d H:i:s')
+            'created_at' => $story['created_at'] ?? date('Y-m-d H:i:s'),
+            'current_chapter_index' => $story['current_chapter_index'] ?? 0,
+            'progress_percentage' => $story['progress_percentage'] ?? 0
         ];
     }
     
-    // Format all stories
     $userStories = array_map('formatStory', $userStories);
     $allStories = array_map('formatStory', $allStories);
+    
+    // Format continue reading stories with progress data
+    $continueStories = [];
+    foreach ($readingProgress as $progress) {
+        $continueStories[] = formatStory($progress);
+    }
     
 } catch (Exception $e) {
     error_log("Error fetching stories from Supabase: " . $e->getMessage());
 }
-
-// For continue reading, use user stories
-$continueStories = array_slice($userStories, 0, 6);
 
 function getGenreColor($genre) {
     $colors = [
@@ -93,7 +119,7 @@ function getGenreColor($genre) {
         'Mystery' => 'bg-info text-dark',
         'Action' => 'bg-danger',
         'Sci-Fi' => 'bg-dark',
-        'Romance' => 'bg-pink',
+        'Romance' => 'bg-danger',
         'Comedy' => 'bg-secondary',
         'Drama' => 'bg-light text-dark',
         'Adventure' => 'bg-success',
@@ -111,7 +137,6 @@ function formatReads($reads) {
     return $reads;
 }
 
-// Function to get stories by specific genre from ALL stories
 function getStoriesByGenre($stories, $genre) {
     $genreStories = [];
     foreach ($stories as $story) {
@@ -132,6 +157,44 @@ function getStoriesByGenre($stories, $genre) {
   <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.7/dist/css/bootstrap.min.css" rel="stylesheet" />
   <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" />
   <link rel="stylesheet" href="css/styles.css" />
+  <style>
+    .dashboard-content .container-fluid {
+        margin-left: 0 !important;
+        padding-left: 15px !important;
+        padding-right: 15px !important;
+        max-width: 100% !important;
+    }
+
+    .dashboard-content .row {
+        margin-left: -12px !important;
+        margin-right: -12px !important;
+    }
+
+    .dashboard-content .col-xl-2,
+    .dashboard-content .col-lg-3,
+    .dashboard-content .col-md-4,
+    .dashboard-content .col-sm-6 {
+        padding-left: 12px !important;
+        padding-right: 12px !important;
+    }
+
+    .dashboard-content .section-title {
+        justify-content: flex-start !important;
+        text-align: left !important;
+        padding-left: 0 !important;
+        margin-left: 0 !important;
+    }
+    
+    .progress-container {
+        margin-top: 8px;
+    }
+    
+    .progress-text {
+        font-size: 0.75rem;
+        color: #6c757d;
+        margin-top: 4px;
+    }
+  </style>
 </head>
 
 <body>
@@ -147,55 +210,17 @@ function getStoriesByGenre($stories, $genre) {
         Storyline
       </a>
 
-      <!-- Toggler button for mobile -->
       <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarContent"
         aria-controls="navbarContent" aria-expanded="false" aria-label="Toggle navigation">
         <span class="navbar-toggler-icon"></span>
       </button>
 
-      <!-- Desktop Search Form -->
-      <div class="d-none d-lg-flex mx-auto search-container" style="max-width: 400px; flex-grow:1;">
-        <div class="input-group">
-          <input id="searchInput" class="form-control" type="search" placeholder="Search stories..." aria-label="Search" autocomplete="off" />
-          <button class="btn btn-main" type="button">Search</button>
-        </div>
-        
-        <div class="dropdown-menu search-dropdown p-3 mt-1" aria-labelledby="searchInput">
-          <h6 class="dropdown-header">Filter by Genre</h6>
-          <div class="genre-filters">
-            <?php foreach ($popularGenres as $genre): ?>
-              <span class="genre-tag" data-genre="<?php echo htmlspecialchars($genre); ?>">
-                <?php echo htmlspecialchars($genre); ?>
-              </span>
-            <?php endforeach; ?>
-          </div>
-        </div>
-      </div>
-
-      <!-- Collapsible content -->
       <div class="collapse navbar-collapse" id="navbarContent">
-        <!-- Mobile Search Form (hidden on larger screens) -->
-        <div class="d-lg-none mt-3 mb-2 search-container">
-          <div class="input-group">
-            <input type="search" class="form-control" placeholder="Search stories..." aria-label="Search" />
-            <button class="btn btn-main" type="button">Search</button>
-          </div>
-
-          <div class="mt-2">
-            <h6>Filter by Genre</h6>
-            <div class="genre-filters">
-              <?php foreach ($popularGenres as $genre): ?>
-                <span class="genre-tag" data-genre="<?php echo htmlspecialchars($genre); ?>">
-                  <?php echo htmlspecialchars($genre); ?>
-                </span>
-              <?php endforeach; ?>
-            </div>
-          </div>
-        </div>
-
         <ul class="navbar-nav ms-auto align-items-center">
+          <li class="nav-item"><a class="nav-link active" href="dashboard.php"><i class="fas fa-th-large me-1"></i>Dashboard</a></li>
           <li class="nav-item"><a class="nav-link" href="write.php"><i class="fas fa-pen me-1"></i>Write</a></li>
           <li class="nav-item"><a class="nav-link" href="browse.php"><i class="fas fa-compass me-1"></i>Browse</a></li>
+          <li class="nav-item"><a class="nav-link" href="mystories.php"><i class="fas fa-book me-1"></i>My Stories</a></li>
           
           <li class="nav-item dropdown ms-2">
             <a class="nav-link p-0" href="#" role="button" data-bs-toggle="dropdown" aria-expanded="false">
@@ -216,221 +241,226 @@ function getStoriesByGenre($stories, $genre) {
     </div>
   </nav>
 
-  <!-- Page Content -->
-  <div class="container" style="padding-top: 20px;">
+  <div class="dashboard-content" style="padding-top: 20px;">
+    <div class="container-fluid">
 
-    <!-- My Stories -->
-    <h4 class="section-title"><i class="fas fa-bookmark"></i>My Stories</h4>
-    <div class="row g-3" id="myStories">
-      <?php if (!empty($userStories)): ?>
-        <?php foreach (array_slice($userStories, 0, 6) as $story): ?>
-          <div class="col-xl-2 col-lg-3 col-md-4 col-sm-6">
-            <div class="card h-100 story-card" data-story-id="<?php echo htmlspecialchars($story['id']); ?>">
-              <img src="<?php echo htmlspecialchars($story['cover_image']); ?>" 
-                   class="card-img-top story-img" alt="<?php echo htmlspecialchars($story['title']); ?>">
-              <div class="card-body">
-                <h6 class="card-title"><?php echo htmlspecialchars($story['title']); ?></h6>
-                <small class="text-muted">by <?php echo htmlspecialchars($story['author']); ?></small>
-                <div class="mt-2">
-                  <?php if (!empty($story['genre']) && is_array($story['genre'])): ?>
-                    <?php foreach ($story['genre'] as $genre): ?>
-                      <span class="badge <?php echo getGenreColor($genre); ?> me-1 mb-1">
-                        <?php echo htmlspecialchars($genre); ?>
-                      </span>
-                    <?php endforeach; ?>
-                  <?php endif; ?>
-                </div>
-                <div class="story-stats">
-                  <span class="reads"><?php echo formatReads($story['reads']); ?> reads</span>
-                  <span class="rating"><?php echo number_format($story['rating'], 1); ?> ★</span>
+      <h4 class="section-title"><i class="fas fa-bookmark"></i>My Stories</h4>
+      <div class="row g-3" id="myStories">
+        <?php if (!empty($userStories)): ?>
+          <?php foreach (array_slice($userStories, 0, 6) as $story): ?>
+            <div class="col-xl-2 col-lg-3 col-md-4 col-sm-6">
+              <div class="card h-100 story-card" data-story-id="<?php echo htmlspecialchars($story['id']); ?>">
+                <img src="<?php echo htmlspecialchars($story['cover_image']); ?>" 
+                     class="card-img-top story-img" alt="<?php echo htmlspecialchars($story['title']); ?>">
+                <div class="card-body">
+                  <h6 class="card-title"><?php echo htmlspecialchars($story['title']); ?></h6>
+                  <small class="text-muted">by <?php echo htmlspecialchars($story['author']); ?></small>
+                  <div class="mt-2">
+                    <?php if (!empty($story['genre']) && is_array($story['genre'])): ?>
+                      <?php foreach ($story['genre'] as $genre): ?>
+                        <span class="badge <?php echo getGenreColor($genre); ?> me-1 mb-1">
+                          <?php echo htmlspecialchars($genre); ?>
+                        </span>
+                      <?php endforeach; ?>
+                    <?php endif; ?>
+                  </div>
+                  <div class="story-stats">
+                    <span class="reads"><?php echo formatReads($story['reads']); ?> reads</span>
+                    <span class="rating"><?php echo number_format($story['rating'], 1); ?> ★</span>
+                  </div>
                 </div>
               </div>
             </div>
+          <?php endforeach; ?>
+        <?php else: ?>
+          <div class="col-12">
+            <div class="empty-state">
+              <i class="fas fa-book-open"></i>
+              <h4>No stories yet</h4>
+              <p>You haven't uploaded any stories. Start your writing journey today!</p>
+              <a href="write.php" class="btn btn-main">Write Your First Story</a>
+            </div>
           </div>
-        <?php endforeach; ?>
-      <?php else: ?>
-        <div class="col-12">
-          <div class="empty-state">
-            <i class="fas fa-book-open"></i>
-            <h4>No stories yet</h4>
-            <p>You haven't uploaded any stories. Start your writing journey today!</p>
-            <a href="write.php" class="btn btn-main">Write Your First Story</a>
-          </div>
-        </div>
-      <?php endif; ?>
-    </div>
+        <?php endif; ?>
+      </div>
 
-    <!-- Continue Reading -->
-    <h4 class="section-title"><i class="fas fa-play-circle"></i>Continue Reading</h4>
-    <div class="row g-3" id="continueReading">
-      <?php if (!empty($continueStories)): ?>
-        <?php foreach ($continueStories as $story): ?>
-          <div class="col-xl-2 col-lg-3 col-md-4 col-sm-6">
-            <div class="card h-100 story-card" data-story-id="<?php echo htmlspecialchars($story['id']); ?>">
-              <img src="<?php echo htmlspecialchars($story['cover_image']); ?>" 
-                   class="card-img-top story-img" alt="<?php echo htmlspecialchars($story['title']); ?>">
-              <div class="card-body">
-                <h6 class="card-title"><?php echo htmlspecialchars($story['title']); ?></h6>
-                <small class="text-muted">by <?php echo htmlspecialchars($story['author']); ?></small>
-                <div class="mt-2">
-                  <?php if (!empty($story['genre']) && is_array($story['genre'])): ?>
-                    <?php foreach (array_slice($story['genre'], 0, 1) as $genre): ?>
-                      <span class="badge <?php echo getGenreColor($genre); ?>">
-                        <?php echo htmlspecialchars($genre); ?>
-                      </span>
-                    <?php endforeach; ?>
-                  <?php endif; ?>
-                </div>
-                <div class="story-stats">
-                  <span class="reads"><?php echo formatReads($story['reads']); ?> reads</span>
-                  <span class="rating"><?php echo number_format($story['rating'], 1); ?> ★</span>
-                </div>
-                <div class="progress mt-2" style="height: 4px;">
-                  <div class="progress-bar" style="width: <?php echo rand(10, 80); ?>%"></div>
+      <h4 class="section-title"><i class="fas fa-play-circle"></i>Continue Reading</h4>
+      <div class="row g-3" id="continueReading">
+        <?php if (!empty($continueStories)): ?>
+          <?php foreach ($continueStories as $story): ?>
+            <div class="col-xl-2 col-lg-3 col-md-4 col-sm-6">
+              <div class="card h-100 story-card" data-story-id="<?php echo htmlspecialchars($story['id']); ?>">
+                <img src="<?php echo htmlspecialchars($story['cover_image']); ?>" 
+                     class="card-img-top story-img" alt="<?php echo htmlspecialchars($story['title']); ?>">
+                <div class="card-body">
+                  <h6 class="card-title"><?php echo htmlspecialchars($story['title']); ?></h6>
+                  <small class="text-muted">by <?php echo htmlspecialchars($story['author']); ?></small>
+                  <div class="mt-2">
+                    <?php if (!empty($story['genre']) && is_array($story['genre'])): ?>
+                      <?php foreach (array_slice($story['genre'], 0, 1) as $genre): ?>
+                        <span class="badge <?php echo getGenreColor($genre); ?>">
+                          <?php echo htmlspecialchars($genre); ?>
+                        </span>
+                      <?php endforeach; ?>
+                    <?php endif; ?>
+                  </div>
+                  <div class="story-stats">
+                    <span class="reads"><?php echo formatReads($story['reads']); ?> reads</span>
+                    <span class="rating"><?php echo number_format($story['rating'], 1); ?> ★</span>
+                  </div>
+                  <div class="progress-container">
+                    <div class="progress" style="height: 4px;">
+                      <div class="progress-bar" style="width: <?php echo $story['progress_percentage'] ?? 0; ?>%"></div>
+                    </div>
+                    <div class="progress-text">
+                      Chapter <?php echo ($story['current_chapter_index'] ?? 0) + 1; ?> • <?php echo $story['progress_percentage'] ?? 0; ?>%
+                    </div>
+                  </div>
                 </div>
               </div>
             </div>
+          <?php endforeach; ?>
+        <?php else: ?>
+          <div class="col-12">
+            <div class="empty-state">
+              <i class="fas fa-book-reader"></i>
+              <h4>No reading progress</h4>
+              <p>Start reading stories to see them here!</p>
+              <a href="browse.php" class="btn btn-main">Browse Stories</a>
+            </div>
           </div>
-        <?php endforeach; ?>
-      <?php else: ?>
-        <div class="col-12">
-          <p class="text-muted">No stories available to continue reading.</p>
-        </div>
-      <?php endif; ?>
-    </div>
+        <?php endif; ?>
+      </div>
 
-    <!-- Horror Stories -->
-    <h4 class="section-title"><i class="fas fa-ghost"></i>Horror Stories</h4>
-    <div class="row g-3">
-      <?php 
-      $horrorStories = getStoriesByGenre($allStories, 'Horror');
-      if (!empty($horrorStories)): ?>
-        <?php foreach (array_slice($horrorStories, 0, 6) as $story): ?>
-          <div class="col-xl-2 col-lg-3 col-md-4 col-sm-6">
-            <div class="card h-100 story-card" data-story-id="<?php echo htmlspecialchars($story['id']); ?>">
-              <img src="<?php echo htmlspecialchars($story['cover_image']); ?>" 
-                   class="card-img-top story-img" alt="<?php echo htmlspecialchars($story['title']); ?>">
-              <div class="card-body">
-                <h6 class="card-title"><?php echo htmlspecialchars($story['title']); ?></h6>
-                <small class="text-muted">by <?php echo htmlspecialchars($story['author']); ?></small>
-                <div class="mt-2">
-                  <span class="badge bg-warning text-dark">Horror</span>
-                </div>
-                <div class="story-stats">
-                  <span class="reads"><?php echo formatReads($story['reads']); ?> reads</span>
-                  <span class="rating"><?php echo number_format($story['rating'], 1); ?> ★</span>
+      <!-- Rest of your genre sections remain the same -->
+      <h4 class="section-title"><i class="fas fa-ghost"></i>Horror Stories</h4>
+      <div class="row g-3">
+        <?php 
+        $horrorStories = getStoriesByGenre($allStories, 'Horror');
+        if (!empty($horrorStories)): ?>
+          <?php foreach (array_slice($horrorStories, 0, 6) as $story): ?>
+            <div class="col-xl-2 col-lg-3 col-md-4 col-sm-6">
+              <div class="card h-100 story-card" data-story-id="<?php echo htmlspecialchars($story['id']); ?>">
+                <img src="<?php echo htmlspecialchars($story['cover_image']); ?>" 
+                     class="card-img-top story-img" alt="<?php echo htmlspecialchars($story['title']); ?>">
+                <div class="card-body">
+                  <h6 class="card-title"><?php echo htmlspecialchars($story['title']); ?></h6>
+                  <small class="text-muted">by <?php echo htmlspecialchars($story['author']); ?></small>
+                  <div class="mt-2">
+                    <span class="badge bg-warning text-dark">Horror</span>
+                  </div>
+                  <div class="story-stats">
+                    <span class="reads"><?php echo formatReads($story['reads']); ?> reads</span>
+                    <span class="rating"><?php echo number_format($story['rating'], 1); ?> ★</span>
+                  </div>
                 </div>
               </div>
             </div>
+          <?php endforeach; ?>
+        <?php else: ?>
+          <div class="col-12">
+            <p class="text-muted">No horror stories available yet.</p>
           </div>
-        <?php endforeach; ?>
-      <?php else: ?>
-        <div class="col-12">
-          <p class="text-muted">No horror stories available yet.</p>
-        </div>
-      <?php endif; ?>
-    </div>
+        <?php endif; ?>
+      </div>
 
-    <!-- Thriller Stories -->
-    <h4 class="section-title"><i class="fas fa-user-secret"></i>Thriller Stories</h4>
-    <div class="row g-3">
-      <?php 
-      $thrillerStories = getStoriesByGenre($allStories, 'Thriller');
-      if (!empty($thrillerStories)): ?>
-        <?php foreach (array_slice($thrillerStories, 0, 6) as $story): ?>
-          <div class="col-xl-2 col-lg-3 col-md-4 col-sm-6">
-            <div class="card h-100 story-card" data-story-id="<?php echo htmlspecialchars($story['id']); ?>">
-              <img src="<?php echo htmlspecialchars($story['cover_image']); ?>" 
-                   class="card-img-top story-img" alt="<?php echo htmlspecialchars($story['title']); ?>">
-              <div class="card-body">
-                <h6 class="card-title"><?php echo htmlspecialchars($story['title']); ?></h6>
-                <small class="text-muted">by <?php echo htmlspecialchars($story['author']); ?></small>
-                <div class="mt-2">
-                  <span class="badge bg-success">Thriller</span>
-                </div>
-                <div class="story-stats">
-                  <span class="reads"><?php echo formatReads($story['reads']); ?> reads</span>
-                  <span class="rating"><?php echo number_format($story['rating'], 1); ?> ★</span>
+      <h4 class="section-title"><i class="fas fa-user-secret"></i>Thriller Stories</h4>
+      <div class="row g-3">
+        <?php 
+        $thrillerStories = getStoriesByGenre($allStories, 'Thriller');
+        if (!empty($thrillerStories)): ?>
+          <?php foreach (array_slice($thrillerStories, 0, 6) as $story): ?>
+            <div class="col-xl-2 col-lg-3 col-md-4 col-sm-6">
+              <div class="card h-100 story-card" data-story-id="<?php echo htmlspecialchars($story['id']); ?>">
+                <img src="<?php echo htmlspecialchars($story['cover_image']); ?>" 
+                     class="card-img-top story-img" alt="<?php echo htmlspecialchars($story['title']); ?>">
+                <div class="card-body">
+                  <h6 class="card-title"><?php echo htmlspecialchars($story['title']); ?></h6>
+                  <small class="text-muted">by <?php echo htmlspecialchars($story['author']); ?></small>
+                  <div class="mt-2">
+                    <span class="badge bg-success">Thriller</span>
+                  </div>
+                  <div class="story-stats">
+                    <span class="reads"><?php echo formatReads($story['reads']); ?> reads</span>
+                    <span class="rating"><?php echo number_format($story['rating'], 1); ?> ★</span>
+                  </div>
                 </div>
               </div>
             </div>
+          <?php endforeach; ?>
+        <?php else: ?>
+          <div class="col-12">
+            <p class="text-muted">No thriller stories available yet.</p>
           </div>
-        <?php endforeach; ?>
-      <?php else: ?>
-        <div class="col-12">
-          <p class="text-muted">No thriller stories available yet.</p>
-        </div>
-      <?php endif; ?>
-    </div>
+        <?php endif; ?>
+      </div>
 
-    <!-- Romance Stories -->
-    <h4 class="section-title"><i class="fas fa-heart"></i>Romance Stories</h4>
-    <div class="row g-3">
-      <?php 
-      $romanceStories = getStoriesByGenre($allStories, 'Romance');
-      if (!empty($romanceStories)): ?>
-        <?php foreach (array_slice($romanceStories, 0, 6) as $story): ?>
-          <div class="col-xl-2 col-lg-3 col-md-4 col-sm-6">
-            <div class="card h-100 story-card" data-story-id="<?php echo htmlspecialchars($story['id']); ?>">
-              <img src="<?php echo htmlspecialchars($story['cover_image']); ?>" 
-                   class="card-img-top story-img" alt="<?php echo htmlspecialchars($story['title']); ?>">
-              <div class="card-body">
-                <h6 class="card-title"><?php echo htmlspecialchars($story['title']); ?></h6>
-                <small class="text-muted">by <?php echo htmlspecialchars($story['author']); ?></small>
-                <div class="mt-2">
-                  <span class="badge bg-pink">Romance</span>
-                </div>
-                <div class="story-stats">
-                  <span class="reads"><?php echo formatReads($story['reads']); ?> reads</span>
-                  <span class="rating"><?php echo number_format($story['rating'], 1); ?> ★</span>
+      <h4 class="section-title"><i class="fas fa-heart"></i>Romance Stories</h4>
+      <div class="row g-3">
+        <?php 
+        $romanceStories = getStoriesByGenre($allStories, 'Romance');
+        if (!empty($romanceStories)): ?>
+          <?php foreach (array_slice($romanceStories, 0, 6) as $story): ?>
+            <div class="col-xl-2 col-lg-3 col-md-4 col-sm-6">
+              <div class="card h-100 story-card" data-story-id="<?php echo htmlspecialchars($story['id']); ?>">
+                <img src="<?php echo htmlspecialchars($story['cover_image']); ?>" 
+                     class="card-img-top story-img" alt="<?php echo htmlspecialchars($story['title']); ?>">
+                <div class="card-body">
+                  <h6 class="card-title"><?php echo htmlspecialchars($story['title']); ?></h6>
+                  <small class="text-muted">by <?php echo htmlspecialchars($story['author']); ?></small>
+                  <div class="mt-2">
+                    <span class="badge bg-pink">Romance</span>
+                  </div>
+                  <div class="story-stats">
+                    <span class="reads"><?php echo formatReads($story['reads']); ?> reads</span>
+                    <span class="rating"><?php echo number_format($story['rating'], 1); ?> ★</span>
+                  </div>
                 </div>
               </div>
             </div>
+          <?php endforeach; ?>
+        <?php else: ?>
+          <div class="col-12">
+            <p class="text-muted">No romance stories available yet.</p>
           </div>
-        <?php endforeach; ?>
-      <?php else: ?>
-        <div class="col-12">
-          <p class="text-muted">No romance stories available yet.</p>
-        </div>
-      <?php endif; ?>
-    </div>
+        <?php endif; ?>
+      </div>
 
-    <!-- Comedy Stories -->
-    <h4 class="section-title"><i class="fas fa-laugh"></i>Comedy Stories</h4>
-    <div class="row g-3">
-      <?php 
-      $comedyStories = getStoriesByGenre($allStories, 'Comedy');
-      if (!empty($comedyStories)): ?>
-        <?php foreach (array_slice($comedyStories, 0, 6) as $story): ?>
-          <div class="col-xl-2 col-lg-3 col-md-4 col-sm-6">
-            <div class="card h-100 story-card" data-story-id="<?php echo htmlspecialchars($story['id']); ?>">
-              <img src="<?php echo htmlspecialchars($story['cover_image']); ?>" 
-                   class="card-img-top story-img" alt="<?php echo htmlspecialchars($story['title']); ?>">
-              <div class="card-body">
-                <h6 class="card-title"><?php echo htmlspecialchars($story['title']); ?></h6>
-                <small class="text-muted">by <?php echo htmlspecialchars($story['author']); ?></small>
-                <div class="mt-2">
-                  <span class="badge bg-secondary">Comedy</span>
-                </div>
-                <div class="story-stats">
-                  <span class="reads"><?php echo formatReads($story['reads']); ?> reads</span>
-                  <span class="rating"><?php echo number_format($story['rating'], 1); ?> ★</span>
+      <h4 class="section-title"><i class="fas fa-laugh"></i>Comedy Stories</h4>
+      <div class="row g-3">
+        <?php 
+        $comedyStories = getStoriesByGenre($allStories, 'Comedy');
+        if (!empty($comedyStories)): ?>
+          <?php foreach (array_slice($comedyStories, 0, 6) as $story): ?>
+            <div class="col-xl-2 col-lg-3 col-md-4 col-sm-6">
+              <div class="card h-100 story-card" data-story-id="<?php echo htmlspecialchars($story['id']); ?>">
+                <img src="<?php echo htmlspecialchars($story['cover_image']); ?>" 
+                     class="card-img-top story-img" alt="<?php echo htmlspecialchars($story['title']); ?>">
+                <div class="card-body">
+                  <h6 class="card-title"><?php echo htmlspecialchars($story['title']); ?></h6>
+                  <small class="text-muted">by <?php echo htmlspecialchars($story['author']); ?></small>
+                  <div class="mt-2">
+                    <span class="badge bg-secondary">Comedy</span>
+                  </div>
+                  <div class="story-stats">
+                    <span class="reads"><?php echo formatReads($story['reads']); ?> reads</span>
+                    <span class="rating"><?php echo number_format($story['rating'], 1); ?> ★</span>
+                  </div>
                 </div>
               </div>
             </div>
+          <?php endforeach; ?>
+        <?php else: ?>
+          <div class="col-12">
+            <p class="text-muted">No comedy stories available yet.</p>
           </div>
-        <?php endforeach; ?>
-      <?php else: ?>
-        <div class="col-12">
-          <p class="text-muted">No comedy stories available yet.</p>
-        </div>
-      <?php endif; ?>
-    </div>
+        <?php endif; ?>
+      </div>
 
+    </div>
   </div>
 
-  <!-- Footer -->
-  <footer class="bg-dark text-white py-4">
+   <footer class="bg-dark text-white py-4">
     <div class="container-fluid">
       <div class="row">
         <div class="col-md-6">
@@ -458,11 +488,9 @@ function getStoriesByGenre($stories, $genre) {
 
   <script>
     document.addEventListener("DOMContentLoaded", function () {
-      // Make all story cards clickable and redirect to stories.php
       document.querySelectorAll('.story-card').forEach(card => {
         card.style.cursor = 'pointer';
         card.addEventListener('click', function(e) {
-          // Don't redirect if clicking on buttons or links inside the card
           if (e.target.tagName === 'BUTTON' || e.target.tagName === 'A' || e.target.closest('button') || e.target.closest('a')) {
             return;
           }
@@ -473,47 +501,6 @@ function getStoriesByGenre($stories, $genre) {
           }
         });
       });
-
-      // Genre filter functionality
-      document.querySelectorAll('.genre-tag').forEach(tag => {
-        tag.addEventListener('click', function() {
-          document.querySelectorAll('.genre-tag').forEach(t => t.classList.remove('active'));
-          this.classList.add('active');
-          const genre = this.dataset.genre;
-          filterStoriesByGenre(genre);
-        });
-      });
-
-      // Search functionality
-      const searchInput = document.getElementById('searchInput');
-      if (searchInput) {
-        searchInput.addEventListener('input', function() {
-          const searchTerm = this.value.toLowerCase();
-          filterStoriesBySearch(searchTerm);
-        });
-      }
-
-      function filterStoriesByGenre(genre) {
-        document.querySelectorAll('.story-card').forEach(card => {
-          const cardGenres = card.querySelectorAll('.badge');
-          let hasGenre = false;
-          cardGenres.forEach(badge => {
-            if (badge.textContent.trim() === genre) {
-              hasGenre = true;
-            }
-          });
-          card.closest('.col-xl-2').style.display = hasGenre ? 'block' : 'none';
-        });
-      }
-
-      function filterStoriesBySearch(searchTerm) {
-        document.querySelectorAll('.story-card').forEach(card => {
-          const title = card.querySelector('.card-title').textContent.toLowerCase();
-          const author = card.querySelector('.text-muted').textContent.toLowerCase();
-          const isVisible = title.includes(searchTerm) || author.includes(searchTerm);
-          card.closest('.col-xl-2').style.display = isVisible ? 'block' : 'none';
-        });
-      }
     });
   </script>
 </body>

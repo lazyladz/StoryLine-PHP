@@ -8,14 +8,16 @@
 
   <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.7/dist/css/bootstrap.min.css" rel="stylesheet"
     integrity="sha384-LN+7fdVzj6u52u30Kp6M/trliBMCMKTyK833zpbD+pXdCLuTusPj697FH4R/5mcr" crossorigin="anonymous">
-
-  <link rel="stylesheet" href="css/styles.css">
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+  <link rel="stylesheet" href="css/login&register.css">
 </head>
 
 <body>
-  <nav class="navbar navbar-expand-lg">
+  <div id="alertContainer" class="position-fixed top-0 end-0 p-3" style="z-index:1050;"></div>
+
+  <nav class="navbar">
     <div class="container">
-      <a class="navbar-brand fw-bold" href="index.php">
+      <a class="navbar-brand" href="index.php">
         <svg xmlns="http://www.w3.org/2000/svg" width="28" height="28" fill="currentColor" class="bi bi-book me-2"
           viewBox="0 0 16 16">
           <path
@@ -23,88 +25,83 @@
         </svg>
         Storyline
       </a>
-      <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNav"
-        aria-controls="navbarNav" aria-expanded="false" aria-label="Toggle navigation">
-        <span class="navbar-toggler-icon"></span>
-      </button>
-      <div class="collapse navbar-collapse" id="navbarNav">
-        <ul class="navbar-nav ms-auto">
-          <li class="nav-item"><a class="nav-link" href="index.php">Home</a></li>
-          <li class="nav-item"><a class="nav-link" href="about.html">About</a></li>
-          <li class="nav-item"><a class="nav-link active" href="login.html">Login</a></li>
-        </ul>
-      </div>
     </div>
   </nav>
 
   <section class="auth-container">
     <div class="container">
       <div class="row justify-content-center">
-        <div class="col-md-8 col-lg-6">
-          <div class="auth-card card">
-            <div class="card-body p-5">
-              <div class="auth-header">
-                <h2>Create Your Account</h2>
-                <p>Join Storyline to start your reading journey</p>
-              </div>
+        <div class="col-12">
+          <div class="auth-card card mx-auto">
+            <div class="auth-header">
+              <h2>Create Your Account</h2>
+              <p>Join Storyline to start your reading journey</p>
+            </div>
+            <div class="card-body">
+              <form id="signupForm" method="POST" action="register.php">
+                <div class="row">
+                  <div class="col-md-6">
+                    <div class="mb-3">
+                      <label for="firstName" class="form-label">First Name</label>
+                      <input id="firstName" name="firstName" type="text" class="form-control" placeholder="Enter your first name" required>
+                      <div class="invalid-feedback"></div>
+                    </div>
+                  </div>
+                  <div class="col-md-6">
+                    <div class="mb-3">
+                      <label for="lastName" class="form-label">Last Name</label>
+                      <input id="lastName" name="lastName" type="text" class="form-control" placeholder="Enter your last name" required>
+                      <div class="invalid-feedback"></div>
+                    </div>
+                  </div>
+                </div>
 
-              <form id="signupForm" class="needs-validation" novalidate method="POST" action="register.php">
-  <div class="row">
-    <div class="col-md-6">
-      <div class="mb-3">
-        <label for="firstName" class="form-label">First Name</label>
-        <input id="firstName" name="firstName" type="text" class="form-control">
-        <div class="invalid-feedback"></div>
-      </div>
-    </div>
-    <div class="col-md-6">
-      <div class="mb-3">
-        <label for="lastName" class="form-label">Last Name</label>
-        <input id="lastName" name="lastName" type="text" class="form-control">
-        <div class="invalid-feedback"></div>
-      </div>
-    </div>
-  </div>
+                <div class="mb-3">
+                  <label for="email" class="form-label">Email</label>
+                  <input id="email" name="email" type="email" class="form-control" placeholder="Enter your email" required>
+                  <div class="invalid-feedback"></div>
+                </div>
 
-  <div class="mb-3">
-    <label for="email" class="form-label">Email</label>
-    <input id="email" name="email" type="email" class="form-control">
-    <div class="invalid-feedback"></div>
-  </div>
+                <div class="mb-3">
+                  <label for="password" class="form-label">Password</label>
+                  <div class="input-group">
+                    <input id="password" name="password" type="password" class="form-control" placeholder="Create a password" required>
+                    <button type="button" class="btn btn-outline-secondary toggle-password">
+                      <i class="fas fa-eye"></i>
+                    </button>
+                  </div>
+                  <div class="invalid-feedback"></div>
+                  <div class="form-text">Must be at least 8 characters</div>
+                </div>
 
-  <div class="mb-3">
-    <label for="password" class="form-label">Password</label>
-    <div class="input-group">
-      <input id="password" name="password" type="password" class="form-control">
-      <button type="button" class="btn btn-outline-secondary toggle-password">Show</button>
-    </div>
-    <div class="invalid-feedback"></div>
-    <div class="form-text">Must be at least 8 characters</div>
-  </div>
+                <div class="mb-3">
+                  <label for="confirmPassword" class="form-label">Confirm Password</label>
+                  <div class="input-group">
+                    <input id="confirmPassword" name="confirmPassword" type="password" class="form-control" placeholder="Confirm your password" required>
+                    <button type="button" class="btn btn-outline-secondary toggle-password">
+                      <i class="fas fa-eye"></i>
+                    </button>
+                  </div>
+                  <div class="invalid-feedback"></div>
+                </div>
 
-  <div class="mb-4">
-    <label for="confirmPassword" class="form-label">Confirm Password</label>
-    <div class="input-group">
-      <input id="confirmPassword" name="confirmPassword" type="password" class="form-control">
-      <button type="button" class="btn btn-outline-secondary toggle-password">Show</button>
-    </div>
-    <div class="invalid-feedback"></div>
-  </div>
+                <div class="mb-3 d-flex justify-content-between align-items-center">
+                  <div class="form-check">
+                    <input class="form-check-input" type="checkbox" id="termsAgreement" name="termsAgreement" required>
+                    <label class="form-check-label" for="termsAgreement">
+                      I agree to the <a href="#" class="text-decoration-none">Terms of Service</a> and <a href="#" class="text-decoration-none">Privacy Policy</a>
+                    </label>
+                    <div class="invalid-feedback">You must agree before continuing.</div>
+                  </div>
+                </div>
 
-  <div class="mb-4 form-check">
-    <input class="form-check-input" type="checkbox" id="termsAgreement" name="termsAgreement">
-    <label class="form-check-label" for="termsAgreement">
-      I agree to the <a href="#">Terms of Service</a> and <a href="#">Privacy Policy</a>
-    </label>
-    <div class="invalid-feedback"></div>
-  </div>
-
-  <button type="submit" class="btn btn-main w-100 mb-3">Create Account</button>
-</form>
+                <button type="submit" class="btn btn-main w-100 mb-3">Create Account</button>
+              </form>
 
               <hr class="my-4">
+
               <p class="text-center mb-0">
-                Already have an account? <a href="login.html" class="text-decoration-none">Sign in</a>
+                Already have an account? <a href="login.html" class="text-decoration-none fw-semibold">Sign in</a>
               </p>
             </div>
           </div>
@@ -113,7 +110,7 @@
     </div>
   </section>
 
-  <footer class="mt-5">
+  <footer>
     <div class="container">
       <p>© 2023 Storyline. All rights reserved.</p>
     </div>
@@ -124,88 +121,86 @@
     crossorigin="anonymous"></script>
 
   <script>
-  document.getElementById("signupForm").addEventListener("submit", function (e) {
-    const firstNameEl = document.getElementById("firstName");
-    const lastNameEl = document.getElementById("lastName");
-    const emailEl = document.getElementById("email");
-    const passwordEl = document.getElementById("password");
-    const confirmPasswordEl = document.getElementById("confirmPassword");
-    const termsEl = document.getElementById("termsAgreement");
+    document.getElementById("signupForm").addEventListener("submit", function (e) {
+      const firstNameEl = document.getElementById("firstName");
+      const lastNameEl = document.getElementById("lastName");
+      const emailEl = document.getElementById("email");
+      const passwordEl = document.getElementById("password");
+      const confirmPasswordEl = document.getElementById("confirmPassword");
+      const termsEl = document.getElementById("termsAgreement");
 
-    let valid = true;
+      let valid = true;
 
-    // Clear old errors
-    [firstNameEl, lastNameEl, emailEl, passwordEl, confirmPasswordEl].forEach(el => {
-      el.classList.remove("is-invalid");
-      if (el.nextElementSibling) el.nextElementSibling.textContent = "";
-    });
-    termsEl.classList.remove("is-invalid");
-    termsEl.parentElement.querySelector(".invalid-feedback").textContent = "";
+      // Clear old errors
+      [firstNameEl, lastNameEl, emailEl, passwordEl, confirmPasswordEl].forEach(el => {
+        el.classList.remove("is-invalid");
+        if (el.nextElementSibling) el.nextElementSibling.textContent = "";
+      });
+      termsEl.classList.remove("is-invalid");
 
-    // Validation
-    if (!firstNameEl.value.trim()) {
-      firstNameEl.classList.add("is-invalid");
-      firstNameEl.nextElementSibling.textContent = "First name is required.";
-      valid = false;
-    }
+      // Validation
+      if (!firstNameEl.value.trim()) {
+        firstNameEl.classList.add("is-invalid");
+        firstNameEl.nextElementSibling.textContent = "First name is required.";
+        valid = false;
+      }
 
-    if (!lastNameEl.value.trim()) {
-      lastNameEl.classList.add("is-invalid");
-      lastNameEl.nextElementSibling.textContent = "Last name is required.";
-      valid = false;
-    }
+      if (!lastNameEl.value.trim()) {
+        lastNameEl.classList.add("is-invalid");
+        lastNameEl.nextElementSibling.textContent = "Last name is required.";
+        valid = false;
+      }
 
-    const emailPattern = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
-    if (!emailEl.value.trim()) {
-      emailEl.classList.add("is-invalid");
-      emailEl.nextElementSibling.textContent = "Email is required.";
-      valid = false;
-    } else if (!emailPattern.test(emailEl.value.trim())) {
-      emailEl.classList.add("is-invalid");
-      emailEl.nextElementSibling.textContent = "Please enter a valid email.";
-      valid = false;
-    }
+      const emailPattern = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+      if (!emailEl.value.trim()) {
+        emailEl.classList.add("is-invalid");
+        emailEl.nextElementSibling.textContent = "Email is required.";
+        valid = false;
+      } else if (!emailPattern.test(emailEl.value.trim())) {
+        emailEl.classList.add("is-invalid");
+        emailEl.nextElementSibling.textContent = "Please enter a valid email.";
+        valid = false;
+      }
 
-    if (passwordEl.value.length < 8) {
-      passwordEl.classList.add("is-invalid");
-      passwordEl.parentElement.nextElementSibling.textContent = "Password must be at least 8 characters.";
-      valid = false;
-    }
+      if (passwordEl.value.length < 8) {
+        passwordEl.classList.add("is-invalid");
+        passwordEl.nextElementSibling.textContent = "Password must be at least 8 characters.";
+        valid = false;
+      }
 
-    if (confirmPasswordEl.value !== passwordEl.value) {
-      confirmPasswordEl.classList.add("is-invalid");
-      confirmPasswordEl.nextElementSibling.textContent = "Passwords do not match.";
-      valid = false;
-    }
+      if (confirmPasswordEl.value !== passwordEl.value) {
+        confirmPasswordEl.classList.add("is-invalid");
+        confirmPasswordEl.nextElementSibling.textContent = "Passwords do not match.";
+        valid = false;
+      }
 
-    if (!termsEl.checked) {
-      termsEl.classList.add("is-invalid");
-      termsEl.parentElement.querySelector(".invalid-feedback").textContent = "You must agree before continuing.";
-      valid = false;
-    }
+      if (!termsEl.checked) {
+        termsEl.classList.add("is-invalid");
+        valid = false;
+      }
 
-    // If valid, allow normal form submission (PHP redirect will work)
-    if (!valid) {
-      e.preventDefault(); // prevent only if invalid
-    }
-  });
-
-  // Toggle password visibility
-  document.querySelectorAll(".toggle-password").forEach(btn => {
-    btn.addEventListener("click", function () {
-      const input = this.previousElementSibling;
-      if (input.type === "password") {
-        input.type = "text";
-        this.textContent = "Hide";
-      } else {
-        input.type = "password";
-        this.textContent = "Show";
+      if (!valid) {
+        e.preventDefault();
       }
     });
-  });
-</script>
 
-  
+    // Toggle password visibility
+    document.querySelectorAll(".toggle-password").forEach(btn => {
+      btn.addEventListener("click", function () {
+        const input = this.previousElementSibling;
+        const icon = this.querySelector("i");
+        
+        if (input.type === "password") {
+          input.type = "text";
+          icon.classList.remove("fa-eye");
+          icon.classList.add("fa-eye-slash");
+        } else {
+          input.type = "password";
+          icon.classList.remove("fa-eye-slash");
+          icon.classList.add("fa-eye");
+        }
+      });
+    });
+  </script>
 </body>
-
 </html>

@@ -1,26 +1,20 @@
 <?php
 session_start();
 
-// Set cache control headers
 header("Cache-Control: no-cache, no-store, must-revalidate");
 header("Pragma: no-cache");
 header("Expires: 0");
 
-// Include database connection
 require_once "includes/database.php";
 
-// Initialize variables
 $allStories = [];
 $popularGenres = ['Fantasy', 'Romance', 'Mystery', 'Horror', 'Thriller', 'Sci-Fi', 'Comedy', 'Action'];
 
-// Fetch all stories from database
 try {
     $db = new Database();
     $allStories = $db->select('stories', '*', []);
     
-    // Format the stories data
     function formatStory($story) {
-        // Handle genre data
         $genre = [];
         if (isset($story['genre'])) {
             if (is_string($story['genre'])) {
@@ -34,7 +28,6 @@ try {
             }
         }
         
-        // Handle chapters data
         $chapters = [];
         if (isset($story['chapters'])) {
             if (is_string($story['chapters'])) {
@@ -62,7 +55,6 @@ try {
         ];
     }
     
-    // Format all stories
     $allStories = array_map('formatStory', $allStories);
     
 } catch (Exception $e) {
@@ -112,7 +104,6 @@ function formatReads($reads) {
 
 <body>
 
-  <!-- Navbar -->
   <nav class="navbar navbar-expand-lg fixed-top">
     <div class="container">
       <a class="navbar-brand" href="index.php">
@@ -128,39 +119,36 @@ function formatReads($reads) {
         <span class="navbar-toggler-icon"></span>
       </button>
       <div class="collapse navbar-collapse" id="navbarNav">
-        <ul class="navbar-nav ms-auto">
+        <ul class="navbar-nav ms-auto align-items-center">
           <li class="nav-item"><a class="nav-link" href="index.php#features">Features</a></li>
           <li class="nav-item"><a class="nav-link" href="index.php#stories">Stories</a></li>
           <li class="nav-item"><a class="nav-link" href="index.php#testimonials">Testimonials</a></li>
           
           <?php if (isset($_SESSION['user'])): ?>
-            <!-- User is logged in - Show user dropdown -->
-            <li class="nav-item dropdown">
-              <a class="nav-link dropdown-toggle" href="#" role="button" data-bs-toggle="dropdown" aria-expanded="false">
-                <i class="fas fa-user me-1"></i>
-                <?php echo htmlspecialchars($_SESSION['user']['first_name']); ?>
-              </a>
-              <ul class="dropdown-menu">
-                <li><a class="dropdown-item" href="dashboard.php"><i class="fas fa-tachometer-alt me-2"></i>Dashboard</a></li>
-                <li><a class="dropdown-item" href="browse.php"><i class="fas fa-compass me-2"></i>Browse</a></li>
-                <li><a class="dropdown-item" href="profile.php"><i class="fas fa-user me-2"></i>My Profile</a></li>
-                <li><a class="dropdown-item" href="mystories.php"><i class="fas fa-book me-2"></i>My Stories</a></li>
-                <li><hr class="dropdown-divider"></li>
-                <li><a class="dropdown-item" href="logout.php"><i class="fas fa-sign-out-alt me-2"></i>Logout</a></li>
-              </ul>
-            </li>
-          <?php else: ?>
-            <!-- User is not logged in - Show login/signup/browse -->
-            <li class="nav-item"><a class="nav-link active" href="browse.php">Browse</a></li>
-            <li class="nav-item"><a class="nav-link" href="login.html">Login</a></li>
-            <li class="nav-item"><a class="btn btn-main ms-2" href="register.html">Sign Up</a></li>
-          <?php endif; ?>
+    <li class="nav-item dropdown ms-2">
+        <a class="nav-link p-0" href="#" role="button" data-bs-toggle="dropdown" aria-expanded="false">
+            <div class="rounded-circle overflow-hidden d-flex align-items-center justify-content-center" style="width: 40px; height: 40px; background: linear-gradient(135deg, var(--primary) 0%, var(--secondary) 100%); color: white; font-weight: bold;">
+                <span id="userInitial"><?php echo strtoupper(substr($_SESSION['user']['first_name'], 0, 1)); ?></span>
+            </div>
+        </a>
+        <ul class="dropdown-menu dropdown-menu-end">
+            <li><a class="dropdown-item" href="profile.php"><i class="fas fa-user me-2"></i>My Profile</a></li>
+            <li><a class="dropdown-item" href="mystories.php"><i class="fas fa-book me-2"></i>My Stories</a></li>
+            <li><a class="dropdown-item" href="#"><i class="fas fa-cog me-2"></i>Settings</a></li>
+            <li><hr class="dropdown-divider"></li>
+            <li><a class="dropdown-item" href="logout.php"><i class="fas fa-sign-out-alt me-2"></i>Logout</a></li>
+        </ul>
+    </li>
+<?php else: ?>
+    <li class="nav-item"><a class="nav-link active" href="browse.php">Browse</a></li>
+    <li class="nav-item"><a class="nav-link" href="login.html">Login</a></li>
+    <li class="nav-item"><a class="btn btn-main ms-2" href="register.html">Sign Up</a></li>
+<?php endif; ?>
         </ul>
       </div>
     </div>
   </nav>
 
-  <!-- Browse Section -->
   <div class="container-fluid" style="padding-top: 100px;">
     <div class="container">
       <h2 class="mb-3">Browse Stories</h2>
@@ -176,7 +164,6 @@ function formatReads($reads) {
         </div>
       <?php endif; ?>
 
-      <!-- Search and Filter Section -->
       <div class="row mb-4">
         <div class="col-md-8">
           <div class="input-group">
@@ -196,7 +183,6 @@ function formatReads($reads) {
         </div>
       </div>
 
-      <!-- Stories Grid -->
       <div class="row g-4" id="storiesGrid">
         <?php if (!empty($allStories)): ?>
           <?php foreach ($allStories as $story): ?>
@@ -263,11 +249,10 @@ function formatReads($reads) {
     </div>
   </div>
 
-  <!-- Footer -->
-  <footer>
-    <div class="container">
+  <footer class="bg-dark text-white py-4">
+    <div class="container-fluid">
       <div class="row">
-        <div class="col-lg-4 mb-4 mb-lg-0">
+        <div class="col-md-6">
           <a class="navbar-brand text-white mb-3 d-inline-block" href="index.php">
             <svg xmlns="http://www.w3.org/2000/svg" width="28" height="28" fill="currentColor" class="bi bi-book me-2"
               viewBox="0 0 16 16">
@@ -276,73 +261,24 @@ function formatReads($reads) {
             </svg>
             Storyline
           </a>
-          <p class="text-white-50">Where stories come alive. Discover new tales, write your own, and connect with readers everywhere.</p>
-          <div class="social-links mt-3">
-            <a href="#"><i class="fab fa-facebook-f"></i></a>
-            <a href="#"><i class="fab fa-twitter"></i></a>
-            <a href="#"><i class="fab fa-instagram"></i></a>
-            <a href="#"><i class="fab fa-linkedin-in"></i></a>
-          </div>
+          <p class="text-white-50">
+            Where stories come alive. Discover new tales, write your own, and connect with readers everywhere.
+          </p>
         </div>
-        <div class="col-lg-2 col-md-4 mb-4 mb-md-0">
-          <div class="footer-links">
-            <h5>Explore</h5>
-            <ul>
-              <li><a href="browse.php">All Genres</a></li>
-              <li><a href="browse.php">Popular Stories</a></li>
-              <li><a href="browse.php">New Releases</a></li>
-              <li><a href="browse.php">Featured Authors</a></li>
-            </ul>
-          </div>
+        <div class="col-md-6 text-md-end">
+          <p class="text-white-50 mb-1">&copy; 2025 Storyline. All rights reserved.</p>
+          <p class="mb-0">Made with <i class="fas fa-heart text-danger"></i> for storytellers</p>
         </div>
-        <div class="col-lg-2 col-md-4 mb-4 mb-md-0">
-          <div class="footer-links">
-            <h5>Write</h5>
-            <ul>
-              <li><a href="write.php">Start Writing</a></li>
-              <li><a href="#">Writing Tips</a></li>
-              <li><a href="#">Community Guidelines</a></li>
-              <li><a href="#">Author Resources</a></li>
-            </ul>
-          </div>
-        </div>
-        <div class="col-lg-2 col-md-4">
-          <div class="footer-links">
-            <h5>Company</h5>
-            <ul>
-              <li><a href="#">About Us</a></li>
-              <li><a href="#">Careers</a></li>
-              <li><a href="#">Contact</a></li>
-              <li><a href="#">Help Center</a></li>
-            </ul>
-          </div>
-        </div>
-        <div class="col-lg-2 col-md-4">
-          <div class="footer-links">
-            <h5>Legal</h5>
-            <ul>
-              <li><a href="#">Terms of Service</a></li>
-              <li><a href="#">Privacy Policy</a></li>
-              <li><a href="#">Cookie Policy</a></li>
-            </ul>
-          </div>
-        </div>
-      </div>
-      <div class="copyright">
-        &copy; 2025 Storyline. All rights reserved.
       </div>
     </div>
   </footer>
 
   <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.7/dist/js/bootstrap.bundle.min.js"></script>
   <script>
-    // Make story cards clickable
     document.addEventListener('DOMContentLoaded', function() {
-      // Make entire story card clickable
       document.querySelectorAll('.story-card').forEach(card => {
         card.style.cursor = 'pointer';
         card.addEventListener('click', function(e) {
-          // Don't redirect if clicking on buttons or links
           if (e.target.tagName === 'BUTTON' || e.target.tagName === 'A' || 
               e.target.closest('button') || e.target.closest('a')) {
             return;
@@ -355,7 +291,6 @@ function formatReads($reads) {
         });
       });
 
-      // Search functionality
       const searchInput = document.getElementById('searchInput');
       const searchButton = document.getElementById('searchButton');
       const genreFilter = document.getElementById('genreFilter');
@@ -381,12 +316,10 @@ function formatReads($reads) {
       if (genreFilter) genreFilter.addEventListener('change', filterStories);
     });
 
-    // Function to view story
     function viewStory(storyId) {
       window.location.href = `stories.php?id=${storyId}`;
     }
 
-    // Navbar scroll effect
     window.addEventListener('scroll', function() {
       const navbar = document.querySelector('.navbar');
       if (window.scrollY > 50) {
@@ -398,7 +331,6 @@ function formatReads($reads) {
       }
     });
 
-    // Page reload for cache control
     window.onpageshow = function(event) {
       if (event.persisted) {
         window.location.reload();

@@ -32,9 +32,10 @@ try {
     $storyData = [
         'title' => $input['title'],
         'author' => $input['author'],
-        'genre' => json_encode($input['genre']), // Store as JSON array
+        'description' => $input['description'] ?? '', // ADD THIS LINE for the description
+        'genre' => json_encode($input['genre'], JSON_UNESCAPED_UNICODE), // Store as JSON array
+'chapters' => json_encode($input['chapters'], JSON_UNESCAPED_UNICODE), // Store chapters as JSON
         'cover_image' => $input['cover_image'] ?? 'https://images.unsplash.com/photo-1455390582262-044cdead277a?ixlib=rb-4.0.3&auto=format&fit=crop&w=600&q=80',
-        'chapters' => json_encode($input['chapters']), // Store chapters as JSON
         'user_id' => $_SESSION['user']['id'],
         'created_at' => date('Y-m-d H:i:s')
     ];
@@ -42,6 +43,7 @@ try {
     // Debug: Log the data being sent
     error_log("Attempting to save story: " . $input['title']);
     error_log("User ID: " . $_SESSION['user']['id']);
+    error_log("Description length: " . strlen($input['description'] ?? ''));
     
     // Insert into stories table
     $result = $db->insert('stories', $storyData);

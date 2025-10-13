@@ -2,6 +2,45 @@
 session_start();
 require_once "includes/check-auth.php";
 $user = checkAuth(); // Ensure user is logged in
+
+// Check if we're editing an existing story
+$isEditMode = false;
+$existingStory = null;
+$storyId = null;
+
+if (isset($_GET['id']) && !empty($_GET['id'])) {
+    $storyId = intval($_GET['id']);
+    $isEditMode = true;
+    
+    // Fetch existing story data
+    try {
+        require_once "includes/database.php";
+        $db = new Database();
+        $result = $db->select('stories', '*', ['id' => $storyId, 'user_id' => $_SESSION['user']['id']]);
+        if ($result && is_array($result) && count($result) > 0) {
+            $existingStory = $result[0];
+            
+            // Decode JSON fields
+            if (isset($existingStory['genre'])) {
+                $existingStory['genre'] = json_decode($existingStory['genre'], true) ?? [];
+            }
+            if (isset($existingStory['chapters'])) {
+                $existingStory['chapters'] = json_decode($existingStory['chapters'], true) ?? [];
+            }
+            if (isset($existingStory['description'])) {
+                $existingStory['description'] = $existingStory['description'];
+            }
+        } else {
+            // Story not found or doesn't belong to user
+            $isEditMode = false;
+            $existingStory = null;
+        }
+    } catch (Exception $e) {
+        error_log("Error loading story for editing: " . $e->getMessage());
+        $isEditMode = false;
+        $existingStory = null;
+    }
+}
 ?>
 <!DOCTYPE html>
 <html lang="en">
@@ -9,7 +48,7 @@ $user = checkAuth(); // Ensure user is logged in
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1" />
-  <title>Write a Story - Storyline</title>
+  <title><?php echo $isEditMode ? 'Edit Story' : 'Write a Story'; ?> - Storyline</title>
   <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.7/dist/css/bootstrap.min.css" rel="stylesheet" />
   <link href="https://cdn.quilljs.com/1.3.7/quill.snow.css" rel="stylesheet" />
   <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" />
@@ -38,7 +77,7 @@ $user = checkAuth(); // Ensure user is logged in
       <div class="collapse navbar-collapse" id="navbarContent">
         <ul class="navbar-nav ms-auto align-items-center">
           <li class="nav-item"><a class="nav-link" href="dashboard.php"><i class="fas fa-th-large me-1"></i>Dashboard</a></li>
-          <li class="nav-item"><a class="nav-link" href="browse.html"><i class="fas fa-compass me-1"></i>Browse</a></li>
+          <li class="nav-item"><a class="nav-link" href="browse.php"><i class="fas fa-compass me-1"></i>Browse</a></li>
           <li class="nav-item"><a class="nav-link active" href="write.php"><i class="fas fa-pen me-1"></i>Write</a></li>
           
           <!-- User dropdown -->
@@ -49,7 +88,7 @@ $user = checkAuth(); // Ensure user is logged in
               </div>
             </a>
             <ul class="dropdown-menu dropdown-menu-end">
-              <li><a class="dropdown-item" href="profile.html"><i class="fas fa-user me-2"></i>My Profile</a></li>
+              <li><a class="dropdown-item" href="profile.php"><i class="fas fa-user me-2"></i>My Profile</a></li>
               <li><a class="dropdown-item" href="mystories.php"><i class="fas fa-book me-2"></i>My Stories</a></li>
               <li><a class="dropdown-item" href="#"><i class="fas fa-cog me-2"></i>Settings</a></li>
               <li><hr class="dropdown-divider"></li>
@@ -64,8 +103,8 @@ $user = checkAuth(); // Ensure user is logged in
   <!-- Page Header -->
   <div class="page-header">
     <div class="container">
-      <h1><i class="fas fa-pen-fancy me-2"></i>Write a New Story</h1>
-      <p>Create your masterpiece and share it with the world</p>
+      <h1><i class="fas fa-pen-fancy me-2"></i><?php echo $isEditMode ? 'Edit Story' : 'Write a New Story'; ?></h1>
+      <p><?php echo $isEditMode ? 'Update your story and make it even better' : 'Create your masterpiece and share it with the world'; ?></p>
     </div>
   </div>
 
@@ -76,16 +115,31 @@ $user = checkAuth(); // Ensure user is logged in
       <div class="col-lg-7">
         <div class="form-section">
           <form id="storyForm">
+            <!-- Hidden field for story ID in edit mode -->
+            <?php if ($isEditMode): ?>
+            <input type="hidden" id="storyId" value="<?php echo $storyId; ?>">
+            <?php endif; ?>
+
             <!-- Story Title -->
             <div class="mb-4">
               <label for="storyTitle" class="form-label">Story Title</label>
-              <input type="text" class="form-control" id="storyTitle" placeholder="Enter your captivating story title" required>
+              <input type="text" class="form-control" id="storyTitle" placeholder="Enter your captivating story title" 
+                     value="<?php echo $isEditMode && isset($existingStory['title']) ? htmlspecialchars($existingStory['title']) : ''; ?>" required>
             </div>
 
             <!-- Author Name -->
             <div class="mb-4">
               <label for="storyAuthor" class="form-label">Author Name</label>
               <input type="text" class="form-control" id="storyAuthor" placeholder="Your pen name or real name" required>
+            </div>
+
+            <!-- Story Description -->
+            <div class="mb-4">
+              <label for="storyDescription" class="form-label">Story Description</label>
+              <textarea class="form-control" id="storyDescription" rows="4" placeholder="Write a brief description of your story to captivate readers..." maxlength="500"><?php echo $isEditMode && isset($existingStory['description']) ? htmlspecialchars($existingStory['description']) : ''; ?></textarea>
+              <div class="form-text text-end">
+                <span id="descriptionCount">0</span>/500 characters
+              </div>
             </div>
 
             <!-- Genre Selection -->
@@ -104,7 +158,7 @@ $user = checkAuth(); // Ensure user is logged in
                 <span class="genre-tag" data-genre="Adventure">Adventure</span>
                 <span class="genre-tag" data-genre="Historical">Historical</span>
               </div>
-              <input type="hidden" id="selectedGenres" name="selectedGenres">
+              <input type="hidden" id="selectedGenres" name="selectedGenres" value="<?php echo $isEditMode && isset($existingStory['genre']) ? htmlspecialchars(implode(',', $existingStory['genre'])) : ''; ?>">
               <small class="form-text text-muted">Click to select one or more genres for your story.</small>
             </div>
 
@@ -112,11 +166,15 @@ $user = checkAuth(); // Ensure user is logged in
             <div class="mb-4">
               <label class="form-label">Cover Image</label>
               <div class="image-upload-container" id="imageUploadContainer">
-                <div class="image-upload-icon">
-                  <i class="fas fa-cloud-upload-alt"></i>
-                </div>
-                <h5>Upload Cover Image</h5>
-                <p class="text-muted">Drag & drop or click to browse</p>
+                <?php if ($isEditMode && isset($existingStory['cover_image'])): ?>
+                  <img src="<?php echo htmlspecialchars($existingStory['cover_image']); ?>" id="existingCoverImage" style="max-width: 100%; max-height: 200px; margin-bottom: 10px;">
+                <?php else: ?>
+                  <div class="image-upload-icon">
+                    <i class="fas fa-cloud-upload-alt"></i>
+                  </div>
+                  <h5>Upload Cover Image</h5>
+                  <p class="text-muted">Drag & drop or click to browse</p>
+                <?php endif; ?>
                 <input class="d-none" type="file" id="storyImage" accept="image/*">
               </div>
             </div>
@@ -135,8 +193,10 @@ $user = checkAuth(); // Ensure user is logged in
 
             <!-- Form Actions -->
             <div class="d-flex justify-content-between mt-4">
-              <button type="reset" class="btn btn-secondary"><i class="fas fa-eraser me-1"></i>Clear All</button>
-              <button type="submit" class="btn btn-main"><i class="fas fa-save me-1"></i>Publish Story</button>
+              <a href="mystories.php" class="btn btn-secondary"><i class="fas fa-arrow-left me-1"></i>Back to Stories</a>
+              <button type="submit" class="btn btn-main">
+                <i class="fas fa-save me-1"></i><?php echo $isEditMode ? 'Update Story' : 'Publish Story'; ?>
+              </button>
             </div>
           </form>
         </div>
@@ -147,13 +207,22 @@ $user = checkAuth(); // Ensure user is logged in
         <div class="preview-section">
           <h4 class="mb-3"><i class="fas fa-eye me-2"></i>Story Preview</h4>
           <div class="card preview-card">
-            <img src="https://images.unsplash.com/photo-1455390582262-044cdead277a?ixlib=rb-4.0.3&auto=format&fit=crop&w=600&q=80" 
+            <img src="<?php echo $isEditMode && isset($existingStory['cover_image']) ? htmlspecialchars($existingStory['cover_image']) : 'https://images.unsplash.com/photo-1455390582262-044cdead277a?ixlib=rb-4.0.3&auto=format&fit=crop&w=600&q=80'; ?>" 
                  class="card-img-top story-img-preview" id="previewImage" alt="Cover Preview">
             <div class="card-body">
-              <h5 class="preview-title" id="previewTitle">Your Story Title</h5>
+              <h5 class="preview-title" id="previewTitle"><?php echo $isEditMode && isset($existingStory['title']) ? htmlspecialchars($existingStory['title']) : 'Your Story Title'; ?></h5>
               <p class="preview-author" id="previewAuthor">by Author Name</p>
+              <p class="preview-description text-muted mb-3" id="previewDescription">
+                <?php echo $isEditMode && isset($existingStory['description']) ? htmlspecialchars($existingStory['description']) : 'Your story description will appear here...'; ?>
+              </p>
               <div id="previewGenre" class="mb-3">
-                <span class="badge bg-primary">Genre</span>
+                <?php if ($isEditMode && isset($existingStory['genre']) && is_array($existingStory['genre'])): ?>
+                  <?php foreach ($existingStory['genre'] as $genre): ?>
+                    <span class="badge bg-primary me-1"><?php echo htmlspecialchars($genre); ?></span>
+                  <?php endforeach; ?>
+                <?php else: ?>
+                  <span class="badge bg-primary">Genre</span>
+                <?php endif; ?>
               </div>
               <div id="previewChapters">
                 <p class="text-muted">Chapters will appear here as you add them...</p>
@@ -165,9 +234,9 @@ $user = checkAuth(); // Ensure user is logged in
     </div>
   </div>
 
-  <!-- Footer -->
-  <footer>
-    <div class="container">
+  <!-- Footer (Dashboard Style) -->
+  <footer class="bg-dark text-white py-4">
+    <div class="container-fluid">
       <div class="row">
         <div class="col-md-6">
           <a class="navbar-brand text-white mb-3 d-inline-block" href="index.php">
@@ -178,25 +247,27 @@ $user = checkAuth(); // Ensure user is logged in
             </svg>
             Storyline
           </a>
-          <p class="text-white-50">Where stories come alive. Discover new tales, write your own, and connect with readers everywhere.</p>
+          <p class="text-white-50">
+            Where stories come alive. Discover new tales, write your own, and connect with readers everywhere.
+          </p>
         </div>
         <div class="col-md-6 text-md-end">
-          <p class="text-white-50">&copy; 2025 Storyline. All rights reserved.</p>
+          <p class="text-white-50 mb-1">&copy; 2025 Storyline. All rights reserved.</p>
+          <p class="mb-0">Made with <i class="fas fa-heart text-danger"></i> for storytellers</p>
         </div>
-      </div>
-      <div class="copyright">
-        <p class="mb-0">Made with <i class="fas fa-heart text-danger"></i> for storytellers</p>
       </div>
     </div>
   </footer>
 
   <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.7/dist/js/bootstrap.bundle.min.js"></script>
-<script src="https://cdn.quilljs.com/1.3.7/quill.min.js"></script>
-<script>
+  <script src="https://cdn.quilljs.com/1.3.7/quill.min.js"></script>
+  <script>
     document.addEventListener("DOMContentLoaded", function () {
       // DOM Elements
       const storyTitle = document.getElementById('storyTitle');
       const storyAuthor = document.getElementById('storyAuthor');
+      const storyDescription = document.getElementById('storyDescription');
+      const descriptionCount = document.getElementById('descriptionCount');
       const storyImage = document.getElementById('storyImage');
       const imageUploadContainer = document.getElementById('imageUploadContainer');
       const chaptersContainer = document.getElementById('chaptersContainer');
@@ -208,10 +279,30 @@ $user = checkAuth(); // Ensure user is logged in
       let quillEditors = [];
       let selectedGenres = [];
 
+      // Check if we're in edit mode
+      const isEditMode = <?php echo $isEditMode ? 'true' : 'false'; ?>;
+      const existingStory = <?php echo $isEditMode && $existingStory ? json_encode($existingStory) : 'null'; ?>;
+
       // Set author name from session
       storyAuthor.value = "<?php echo htmlspecialchars($_SESSION['user']['first_name'] . ' ' . $_SESSION['user']['last_name']); ?>";
 
-      // FIXED: Genre selection - simple and working version
+      // If editing, pre-select genres
+      if (isEditMode && existingStory && existingStory.genre) {
+        selectedGenres = Array.isArray(existingStory.genre) ? existingStory.genre : [existingStory.genre];
+        selectedGenresInput.value = selectedGenres.join(',');
+        
+        // Activate genre tags
+        genreTags.forEach(tag => {
+          if (selectedGenres.includes(tag.getAttribute('data-genre'))) {
+            tag.classList.add('active');
+          }
+        });
+      }
+
+      // Initialize description count
+      updateDescriptionCount();
+
+      // Genre selection
       genreTags.forEach(tag => {
         tag.addEventListener('click', function() {
           const genre = this.getAttribute('data-genre');
@@ -221,12 +312,10 @@ $user = checkAuth(); // Ensure user is logged in
           
           // Update selected genres array
           if (this.classList.contains('active')) {
-            // Add to selected genres if not already there
             if (!selectedGenres.includes(genre)) {
               selectedGenres.push(genre);
             }
           } else {
-            // Remove from selected genres
             selectedGenres = selectedGenres.filter(g => g !== genre);
           }
           
@@ -237,6 +326,24 @@ $user = checkAuth(); // Ensure user is logged in
           updatePreview();
         });
       });
+
+      // Description character count
+      storyDescription.addEventListener('input', updateDescriptionCount);
+      storyDescription.addEventListener('input', updatePreview);
+
+      function updateDescriptionCount() {
+        const count = storyDescription.value.length;
+        descriptionCount.textContent = count;
+        
+        // Change color when approaching limit
+        if (count > 450) {
+          descriptionCount.classList.add('text-warning');
+        } else if (count > 490) {
+          descriptionCount.classList.add('text-danger');
+        } else {
+          descriptionCount.classList.remove('text-warning', 'text-danger');
+        }
+      }
 
       // Image upload handling
       imageUploadContainer.addEventListener('click', () => {
@@ -276,13 +383,23 @@ $user = checkAuth(); // Ensure user is logged in
           const reader = new FileReader();
           reader.onload = function(e) {
             document.getElementById('previewImage').src = e.target.result;
+            // Remove existing image and show upload success
+            const existingImage = document.getElementById('existingCoverImage');
+            if (existingImage) {
+              existingImage.remove();
+            }
             imageUploadContainer.innerHTML = `
               <div class="image-upload-icon text-success">
                 <i class="fas fa-check-circle"></i>
               </div>
               <h5>Image Uploaded</h5>
               <p class="text-muted">Click to change image</p>
+              <input class="d-none" type="file" id="storyImage" accept="image/*">
             `;
+            // Re-attach event listeners
+            imageUploadContainer.addEventListener('click', () => {
+              storyImage.click();
+            });
           };
           reader.readAsDataURL(file);
         }
@@ -291,7 +408,7 @@ $user = checkAuth(); // Ensure user is logged in
       // Add Chapter Button
       document.getElementById('addChapterBtn').addEventListener('click', addChapter);
 
-      function addChapter() {
+      function addChapter(title = '', content = '') {
         chapterCount++;
         const chapterDiv = document.createElement('div');
         chapterDiv.classList.add('chapter-container');
@@ -302,7 +419,7 @@ $user = checkAuth(); // Ensure user is logged in
           </div>
           <div class="mb-3">
             <label class="form-label">Chapter Title</label>
-            <input type="text" class="form-control chapter-title-input" placeholder="Enter chapter title" required>
+            <input type="text" class="form-control chapter-title-input" placeholder="Enter chapter title" value="${title}" required>
           </div>
           <div class="mb-3">
             <label class="form-label">Chapter Content</label>
@@ -326,6 +443,11 @@ $user = checkAuth(); // Ensure user is logged in
           }
         });
         
+        // Set content if provided
+        if (content) {
+          quill.root.innerHTML = content;
+        }
+        
         quillEditors.push(quill);
 
         // Remove chapter functionality
@@ -347,6 +469,16 @@ $user = checkAuth(); // Ensure user is logged in
         updatePreview();
       }
 
+      // Load existing chapters if in edit mode
+      if (isEditMode && existingStory && existingStory.chapters) {
+        existingStory.chapters.forEach((chapter, index) => {
+          addChapter(chapter.title || `Chapter ${index + 1}`, chapter.content || '');
+        });
+      } else {
+        // Add first chapter for new story
+        addChapter();
+      }
+
       // Preview updates
       storyTitle.addEventListener('input', updatePreview);
       storyAuthor.addEventListener('input', updatePreview);
@@ -354,6 +486,16 @@ $user = checkAuth(); // Ensure user is logged in
       function updatePreview() {
         document.getElementById('previewTitle').textContent = storyTitle.value || 'Your Story Title';
         document.getElementById('previewAuthor').textContent = storyAuthor.value ? `by ${storyAuthor.value}` : 'by Author Name';
+
+        // Update description preview
+        const previewDescription = document.getElementById('previewDescription');
+        if (storyDescription.value.trim()) {
+          previewDescription.textContent = storyDescription.value;
+          previewDescription.classList.remove('text-muted');
+        } else {
+          previewDescription.textContent = 'Your story description will appear here...';
+          previewDescription.classList.add('text-muted');
+        }
 
         // Update genre badges
         const previewGenre = document.getElementById('previewGenre');
@@ -412,7 +554,7 @@ $user = checkAuth(); // Ensure user is logged in
           'Mystery': 'bg-info text-dark',
           'Action': 'bg-danger',
           'Sci-Fi': 'bg-dark',
-          'Romance': 'bg-pink',
+          'Romance': 'bg-danger',
           'Comedy': 'bg-secondary',
           'Drama': 'bg-light text-dark',
           'Adventure': 'bg-success',
@@ -449,7 +591,7 @@ $user = checkAuth(); // Ensure user is logged in
         // Show loading state
         const submitBtn = e.target.querySelector('button[type="submit"]');
         const originalText = submitBtn.textContent;
-        submitBtn.textContent = 'Publishing...';
+        submitBtn.textContent = isEditMode ? 'Updating...' : 'Publishing...';
         submitBtn.disabled = true;
 
         try {
@@ -457,6 +599,7 @@ $user = checkAuth(); // Ensure user is logged in
           const storyData = {
             title: storyTitle.value,
             author: storyAuthor.value,
+            description: storyDescription.value,
             genre: selectedGenres,
             cover_image: document.getElementById('previewImage').src,
             chapters: quillEditors.map((q, i) => ({
@@ -466,10 +609,18 @@ $user = checkAuth(); // Ensure user is logged in
             user_id: <?php echo $_SESSION['user']['id']; ?>
           };
 
+          // Add story ID if in edit mode
+          if (isEditMode) {
+            storyData.id = document.getElementById('storyId').value;
+          }
+
           console.log('Sending story data:', storyData);
 
+          // Determine the endpoint based on mode
+          const endpoint = isEditMode ? 'update-story.php' : 'save-story.php';
+
           // Send to Supabase via PHP
-          const response = await fetch('save-story.php', {
+          const response = await fetch(endpoint, {
             method: 'POST',
             headers: {
               'Content-Type': 'application/json',
@@ -481,25 +632,22 @@ $user = checkAuth(); // Ensure user is logged in
           console.log('Server response:', result);
 
           if (result.success) {
-            alert('Story published successfully!');
+            alert(isEditMode ? 'Story updated successfully!' : 'Story published successfully!');
             window.location.href = 'mystories.php';
           } else {
-            alert('Error saving story: ' + (result.error || 'Unknown error'));
+            alert('Error ' + (isEditMode ? 'updating' : 'saving') + ' story: ' + (result.error || 'Unknown error'));
           }
 
         } catch (error) {
           console.error('Error:', error);
-          alert('Error publishing story. Please try again.');
+          alert('Error ' + (isEditMode ? 'updating' : 'publishing') + ' story. Please try again.');
         } finally {
           // Reset button state
           submitBtn.textContent = originalText;
           submitBtn.disabled = false;
         }
       });
-
-      // Add first chapter for new story
-      addChapter();
     });
-</script>
+  </script>
 </body>
 </html>

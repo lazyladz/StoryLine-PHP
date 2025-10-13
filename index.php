@@ -20,7 +20,7 @@ header("Expires: 0");
   <link rel="stylesheet" href="css/styles.css">
 </head>
 
-<body>
+<body class="with-fixed-navbar">
 
   <!-- Navbar -->
   <nav class="navbar navbar-expand-lg fixed-top">
@@ -44,27 +44,25 @@ header("Expires: 0");
   <li class="nav-item"><a class="nav-link" href="#testimonials">Testimonials</a></li>
   
   <?php if (isset($_SESSION['user'])): ?>
-    <!-- User is logged in - Show user dropdown -->
-    <li class="nav-item dropdown">
-      <a class="nav-link dropdown-toggle" href="#" role="button" data-bs-toggle="dropdown" aria-expanded="false">
-        <i class="fas fa-user me-1"></i>
-        <?php echo htmlspecialchars($_SESSION['user']['first_name']); ?>
-      </a>
-      <ul class="dropdown-menu">
-        <li><a class="dropdown-item" href="dashboard.php"><i class="fas fa-tachometer-alt me-2"></i>Dashboard</a></li>
-        <li><a class="dropdown-item" href="browse.php"><i class="fas fa-compass me-2"></i>Browse</a></li>
-        <li><a class="dropdown-item" href="profile.php"><i class="fas fa-user me-2"></i>My Profile</a></li>
-        <li><a class="dropdown-item" href="mystories.php"><i class="fas fa-book me-2"></i>My Stories</a></li>
-        <li><hr class="dropdown-divider"></li>
-        <li><a class="dropdown-item" href="logout.php"><i class="fas fa-sign-out-alt me-2"></i>Logout</a></li>
-      </ul>
+    <li class="nav-item dropdown ms-2">
+        <a class="nav-link p-0" href="#" role="button" data-bs-toggle="dropdown" aria-expanded="false">
+            <div class="rounded-circle overflow-hidden d-flex align-items-center justify-content-center" style="width: 40px; height: 40px; background: linear-gradient(135deg, var(--primary) 0%, var(--secondary) 100%); color: white; font-weight: bold;">
+                <span id="userInitial"><?php echo strtoupper(substr($_SESSION['user']['first_name'], 0, 1)); ?></span>
+            </div>
+        </a>
+        <ul class="dropdown-menu dropdown-menu-end">
+            <li><a class="dropdown-item" href="profile.php"><i class="fas fa-user me-2"></i>My Profile</a></li>
+            <li><a class="dropdown-item" href="mystories.php"><i class="fas fa-book me-2"></i>My Stories</a></li>
+            <li><a class="dropdown-item" href="#"><i class="fas fa-cog me-2"></i>Settings</a></li>
+            <li><hr class="dropdown-divider"></li>
+            <li><a class="dropdown-item" href="logout.php"><i class="fas fa-sign-out-alt me-2"></i>Logout</a></li>
+        </ul>
     </li>
-  <?php else: ?>
-    <!-- User is not logged in - Show login/signup/browse -->
-    <li class="nav-item"><a class="nav-link" href="browse.php">Browse</a></li>
+<?php else: ?>
+    <li class="nav-item"><a class="nav-link active" href="browse.php">Browse</a></li>
     <li class="nav-item"><a class="nav-link" href="login.html">Login</a></li>
     <li class="nav-item"><a class="btn btn-main ms-2" href="register.html">Sign Up</a></li>
-  <?php endif; ?>
+<?php endif; ?>
 </ul>
       </div>
     </div>
@@ -182,7 +180,7 @@ header("Expires: 0");
       </div>
     </div>
     <div class="text-center mt-5">
-      <a href="#" class="btn btn-secondary">Browse All Stories</a>
+      <a href="browse.php" class="btn btn-secondary">Browse All Stories</a>
     </div>
   </section>
 
@@ -272,10 +270,10 @@ header("Expires: 0");
           <div class="footer-links">
             <h5>Explore</h5>
             <ul>
-              <li><a href="#">Genres</a></li>
-              <li><a href="#">Popular Stories</a></li>
-              <li><a href="#">New Releases</a></li>
-              <li><a href="#">Authors</a></li>
+              <li><a href="browse.php">Genres</a></li>
+              <li><a href="browse.php">Popular Stories</a></li>
+              <li><a href="browse.php">New Releases</a></li>
+              <li><a href="browse.php">Authors</a></li>
             </ul>
           </div>
         </div>
@@ -283,7 +281,7 @@ header("Expires: 0");
           <div class="footer-links">
             <h5>Write</h5>
             <ul>
-              <li><a href="#">Start Writing</a></li>
+              <li><a href="write.php">Start Writing</a></li>
               <li><a href="#">Writing Tips</a></li>
               <li><a href="#">Community Guidelines</a></li>
               <li><a href="#">Author Resources</a></li>
@@ -331,12 +329,12 @@ header("Expires: 0");
         navbar.style.boxShadow = '0 2px 15px rgba(0, 0, 0, 0.1)';
       }
     });
+    
     window.onpageshow = function(event) {
-    if (event.persisted) {
+      if (event.persisted) {
         window.location.reload();
-    }
-};
+      }
+    };
   </script>
 </body>
-
 </html>

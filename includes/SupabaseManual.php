@@ -86,6 +86,22 @@ class SupabaseManual {
         return $this->makeRequest($endpoint, 'PATCH', $data);
     }
     
+    // NEW METHOD: UPDATE with multiple conditions
+    public function updateWithConditions($table, $data, $conditions) {
+        if (empty($conditions)) {
+            throw new Exception('No conditions provided for update');
+        }
+        
+        // Build the filter query for multiple conditions
+        $queryParams = [];
+        foreach ($conditions as $column => $value) {
+            $queryParams[] = $column . '=eq.' . urlencode($value);
+        }
+        
+        $endpoint = $table . '?' . implode('&', $queryParams);
+        return $this->makeRequest($endpoint, 'PATCH', $data);
+    }
+    
     // DELETE data from table
     public function delete($table, $column, $value) {
         $endpoint = $table . '?' . $column . '=eq.' . urlencode($value);
@@ -103,11 +119,37 @@ class SupabaseManual {
         }
     }
 
-    // Add this method to the SupabaseManual class:
-public function createTable($tableName, $columns) {
-    // Note: Table creation via API is limited in Supabase
-    // You need to create tables in the Supabase dashboard
-    return "Please create table '$tableName' in Supabase Dashboard > Table Editor";
+    // Add this to SupabaseManual.php
+public function selectWithJoin($table, $columns = '*', $filters = [], $joins = []) {
+    $endpoint = $table . '?select=' . urlencode($columns);
+    
+    // Add filters if provided
+    if (!empty($filters)) {
+        $queryParams = [];
+        foreach ($filters as $column => $value) {
+            $queryParams[] = $column . '=eq.' . urlencode($value);
+        }
+        $endpoint .= '&' . implode('&', $queryParams);
+    }
+    
+    // Add order if needed
+    if (isset($filters['_order'])) {
+        $endpoint .= '&order=' . $filters['_order'];
+    }
+    
+    // Add limit if needed
+    if (isset($filters['_limit'])) {
+        $endpoint .= '&limit=' . $filters['_limit'];
+    }
+    
+    return $this->makeRequest($endpoint, 'GET');
 }
+
+    // Add this method to the SupabaseManual class:
+    public function createTable($tableName, $columns) {
+        // Note: Table creation via API is limited in Supabase
+        // You need to create tables in the Supabase dashboard
+        return "Please create table '$tableName' in Supabase Dashboard > Table Editor";
+    }
 }
 ?>

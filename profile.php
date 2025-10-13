@@ -453,8 +453,6 @@ try {
           <li class="nav-item"><a class="nav-link" href="dashboard.php"><i class="fas fa-th-large me-1"></i>Dashboard</a></li>
           <li class="nav-item"><a class="nav-link" href="browse.php"><i class="fas fa-compass me-1"></i>Browse</a></li>
           <li class="nav-item"><a class="nav-link" href="write.php"><i class="fas fa-pen me-1"></i>Write</a></li>
-          <li class="nav-item"><a class="nav-link" href="mystories.php"><i class="fas fa-book me-1"></i>My Stories</a></li>
-          <li class="nav-item"><a class="nav-link active" href="profile.php"><i class="fas fa-user me-1"></i>Profile</a></li>
           
           <!-- User dropdown -->
           <li class="nav-item dropdown ms-2">
@@ -498,7 +496,6 @@ try {
           <div class="d-flex gap-3 flex-wrap">
             <span class="text-white-80"><i class="fas fa-envelope me-1"></i><?php echo htmlspecialchars($_SESSION['user']['email']); ?></span>
             <span class="text-white-80"><i class="fas fa-calendar-alt me-1"></i> Joined <?php echo date('F Y'); ?></span>
-            <span class="text-white-80"><i class="fas fa-user-check me-1"></i> Verified Writer</span>
           </div>
         </div>
       </div>
@@ -510,32 +507,25 @@ try {
     <!-- Stats Section -->
     <div class="stats-section">
       <div class="row">
-        <div class="col-md-3 col-6">
+        <div class="col-md-4 col-6">
           <div class="stat-item">
             <i class="fas fa-book-open stat-icon"></i>
             <div class="stat-number" id="statsStories"><?php echo $total_stories; ?></div>
             <div class="stat-label">Stories</div>
           </div>
         </div>
-        <div class="col-md-3 col-6">
-          <div class="stat-item">
-            <i class="fas fa-users stat-icon"></i>
-            <div class="stat-number" id="statsFollowers">0</div>
-            <div class="stat-label">Followers</div>
-          </div>
-        </div>
-        <div class="col-md-3 col-6">
-          <div class="stat-item">
-            <i class="fas fa-user-plus stat-icon"></i>
-            <div class="stat-number" id="statsFollowing">0</div>
-            <div class="stat-label">Following</div>
-          </div>
-        </div>
-        <div class="col-md-3 col-6">
+        <div class="col-md-4 col-6">
           <div class="stat-item">
             <i class="fas fa-eye stat-icon"></i>
             <div class="stat-number" id="statsReads"><?php echo $total_reads; ?></div>
             <div class="stat-label">Total Reads</div>
+          </div>
+        </div>
+        <div class="col-md-4 col-6">
+          <div class="stat-item">
+            <i class="fas fa-star stat-icon"></i>
+            <div class="stat-number" id="statsRating">0</div>
+            <div class="stat-label">Avg. Rating</div>
           </div>
         </div>
       </div>
@@ -563,9 +553,9 @@ try {
     </div>
   </div>
 
-  <!-- Footer -->
-  <footer>
-    <div class="container">
+  <!-- Footer (Dashboard Style) -->
+  <footer class="bg-dark text-white py-4">
+    <div class="container-fluid">
       <div class="row">
         <div class="col-md-6">
           <a class="navbar-brand text-white mb-3 d-inline-block" href="index.php">
@@ -576,14 +566,14 @@ try {
             </svg>
             Storyline
           </a>
-          <p class="text-white-50">Where stories come alive. Discover new tales, write your own, and connect with readers everywhere.</p>
+          <p class="text-white-50">
+            Where stories come alive. Discover new tales, write your own, and connect with readers everywhere.
+          </p>
         </div>
         <div class="col-md-6 text-md-end">
-          <p class="text-white-50">&copy; 2025 Storyline. All rights reserved.</p>
+          <p class="text-white-50 mb-1">&copy; 2025 Storyline. All rights reserved.</p>
+          <p class="mb-0">Made with <i class="fas fa-heart text-danger"></i> for storytellers</p>
         </div>
-      </div>
-      <div class="copyright">
-        <p class="mb-0">Made with <i class="fas fa-heart text-danger"></i> for storytellers</p>
       </div>
     </div>
   </footer>

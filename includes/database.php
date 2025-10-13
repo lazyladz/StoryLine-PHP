@@ -12,11 +12,17 @@ class Database {
         
         $this->supabase = new SupabaseManual($url, $key);
     }
+
+    
     
     public function testConnection() {
         return $this->supabase->testConnection();
     }
     
+public function selectWithJoin($table, $columns = '*', $filters = [], $joins = []) {
+    return $this->supabase->selectWithJoin($table, $columns, $filters, $joins);
+}
+
     public function select($table, $columns = '*', $filters = []) {
         return $this->supabase->select($table, $columns, $filters);
     }
@@ -27,6 +33,11 @@ class Database {
     
     public function update($table, $data, $column, $value) {
         return $this->supabase->update($table, $data, $column, $value);
+    }
+    
+    // NEW METHOD: Update with multiple conditions
+    public function updateWithConditions($table, $data, $conditions) {
+        return $this->supabase->updateWithConditions($table, $data, $conditions);
     }
     
     public function delete($table, $column, $value) {
