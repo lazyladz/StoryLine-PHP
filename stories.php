@@ -1,15 +1,22 @@
 <?php
 session_start();
-require_once "includes/check-auth.php";
-$user = checkAuth();
+
+// Set cache control headers
+header("Cache-Control: no-cache, no-store, must-revalidate");
+header("Pragma: no-cache");
+header("Expires: 0");
 
 // Get story ID from URL
 $story_id = isset($_GET['id']) ? intval($_GET['id']) : 0;
 
 if (!$story_id) {
-    header("Location: mystories.php");
+    // Redirect to browse instead of mystories for guests
+    header("Location: browse.php");
     exit;
 }
+
+// Check if user is logged in, but don't require it
+$user = isset($_SESSION['user']) ? $_SESSION['user'] : null;
 ?>
 <!DOCTYPE html>
 <html lang="en">
@@ -49,26 +56,34 @@ if (!$story_id) {
 
       <div class="collapse navbar-collapse" id="navbarContent">
         <ul class="navbar-nav ms-auto align-items-center">
-          <li class="nav-item"><a class="nav-link" href="dashboard.php"><i class="fas fa-th-large me-1"></i>Dashboard</a></li>
+          <?php if (isset($_SESSION['user'])): ?>
+            <li class="nav-item"><a class="nav-link" href="dashboard.php"><i class="fas fa-th-large me-1"></i>Dashboard</a></li>
+            <li class="nav-item"><a class="nav-link" href="write.php"><i class="fas fa-pen me-1"></i>Write</a></li>
+            <li class="nav-item"><a class="nav-link" href="mystories.php"><i class="fas fa-book me-1"></i>My Stories</a></li>
+          <?php endif; ?>
           <li class="nav-item"><a class="nav-link" href="browse.php"><i class="fas fa-compass me-1"></i>Browse</a></li>
-          <li class="nav-item"><a class="nav-link" href="write.php"><i class="fas fa-pen me-1"></i>Write</a></li>
-          <li class="nav-item"><a class="nav-link" href="mystories.php"><i class="fas fa-book me-1"></i>My Stories</a></li>
           
-          <!-- User dropdown -->
-          <li class="nav-item dropdown ms-2">
-            <a class="nav-link p-0" href="#" role="button" data-bs-toggle="dropdown" aria-expanded="false">
-              <div class="rounded-circle overflow-hidden d-flex align-items-center justify-content-center" style="width: 40px; height: 40px; background: linear-gradient(135deg, var(--primary) 0%, var(--secondary) 100%); color: white; font-weight: bold;">
-                <span id="userInitial"><?php echo strtoupper(substr($_SESSION['user']['first_name'], 0, 1)); ?></span>
-              </div>
-            </a>
-            <ul class="dropdown-menu dropdown-menu-end">
-              <li><a class="dropdown-item" href="profile.php"><i class="fas fa-user me-2"></i>My Profile</a></li>
-              <li><a class="dropdown-item" href="mystories.php"><i class="fas fa-book me-2"></i>My Stories</a></li>
-              <li><a class="dropdown-item" href="#"><i class="fas fa-cog me-2"></i>Settings</a></li>
-              <li><hr class="dropdown-divider"></li>
-              <li><a class="dropdown-item" href="logout.php"><i class="fas fa-sign-out-alt me-2"></i>Logout</a></li>
-            </ul>
-          </li>
+          <?php if (isset($_SESSION['user'])): ?>
+            <!-- User dropdown for logged in users -->
+            <li class="nav-item dropdown ms-2">
+              <a class="nav-link p-0" href="#" role="button" data-bs-toggle="dropdown" aria-expanded="false">
+                <div class="rounded-circle overflow-hidden d-flex align-items-center justify-content-center" style="width: 40px; height: 40px; background: linear-gradient(135deg, var(--primary) 0%, var(--secondary) 100%); color: white; font-weight: bold;">
+                  <span id="userInitial"><?php echo strtoupper(substr($_SESSION['user']['first_name'], 0, 1)); ?></span>
+                </div>
+              </a>
+              <ul class="dropdown-menu dropdown-menu-end">
+                <li><a class="dropdown-item" href="profile.php"><i class="fas fa-user me-2"></i>My Profile</a></li>
+                <li><a class="dropdown-item" href="mystories.php"><i class="fas fa-book me-2"></i>My Stories</a></li>
+                <li><a class="dropdown-item" href="#"><i class="fas fa-cog me-2"></i>Settings</a></li>
+                <li><hr class="dropdown-divider"></li>
+                <li><a class="dropdown-item" href="logout.php"><i class="fas fa-sign-out-alt me-2"></i>Logout</a></li>
+              </ul>
+            </li>
+          <?php else: ?>
+            <!-- Login/Signup buttons for guests -->
+            <li class="nav-item"><a class="nav-link" href="login.html"><i class="fas fa-sign-in-alt me-1"></i>Login</a></li>
+            <li class="nav-item"><a class="btn btn-main ms-2" href="register.html"><i class="fas fa-user-plus me-1"></i>Sign Up</a></li>
+          <?php endif; ?>
         </ul>
       </div>
     </div>
@@ -106,8 +121,8 @@ if (!$story_id) {
             <button class="btn btn-main" onclick="startReading()">
               <i class="fas fa-play me-1"></i>Start Reading
             </button>
-            <a href="mystories.php" class="btn btn-secondary">
-              <i class="fas fa-arrow-left me-1"></i>Back to My Stories
+            <a href="<?php echo isset($_SESSION['user']) ? 'mystories.php' : 'browse.php'; ?>" class="btn btn-secondary">
+              <i class="fas fa-arrow-left me-1"></i>Back to <?php echo isset($_SESSION['user']) ? 'My Stories' : 'Browse'; ?>
             </a>
           </div>
         </div>
@@ -156,6 +171,7 @@ if (!$story_id) {
       <h3 class="section-title"><i class="fas fa-comments me-2"></i>Comments</h3>
       
       <!-- Comment Form -->
+      <?php if (isset($_SESSION['user'])): ?>
       <div class="comment-form">
         <div class="mb-3">
           <label for="commentText" class="form-label">Add a Comment</label>
@@ -165,6 +181,14 @@ if (!$story_id) {
           <i class="fas fa-paper-plane me-1"></i>Post Comment
         </button>
       </div>
+      <?php else: ?>
+      <div class="comment-form">
+        <div class="alert alert-info">
+          <i class="fas fa-info-circle me-2"></i>
+          Please <a href="login.html" class="alert-link">login</a> or <a href="register.html" class="alert-link">sign up</a> to leave comments on this story.
+        </div>
+      </div>
+      <?php endif; ?>
       
       <!-- Comments List -->
       <ul class="comment-list" id="storyComments">
@@ -226,7 +250,7 @@ if (!$story_id) {
             } catch (error) {
                 console.error('Error loading story:', error);
                 alert('Failed to load story. Please try again.');
-                window.location.href = 'mystories.php';
+                window.location.href = '<?php echo isset($_SESSION['user']) ? 'mystories.php' : 'browse.php'; ?>';
             }
         }
 
@@ -348,6 +372,11 @@ if (!$story_id) {
         }
 
         window.addComment = async function () {
+            <?php if (!isset($_SESSION['user'])): ?>
+                alert('Please login or sign up to leave comments.');
+                return;
+            <?php endif; ?>
+            
             const commentText = document.getElementById('commentText').value.trim();
             
             if (!commentText) {

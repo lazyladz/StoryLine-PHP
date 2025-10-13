@@ -39,31 +39,33 @@ header("Expires: 0");
       </button>
       <div class="collapse navbar-collapse" id="navbarNav">
         <ul class="navbar-nav ms-auto">
-          <li class="nav-item"><a class="nav-link" href="#features">Features</a></li>
-          <li class="nav-item"><a class="nav-link" href="#stories">Stories</a></li>
-          <li class="nav-item"><a class="nav-link" href="#testimonials">Testimonials</a></li>
-          
-          <?php if (isset($_SESSION['user'])): ?>
-            <!-- User is logged in - Show user dropdown -->
-            <li class="nav-item dropdown">
-              <a class="nav-link dropdown-toggle" href="#" role="button" data-bs-toggle="dropdown" aria-expanded="false">
-                <i class="fas fa-user me-1"></i>
-                <?php echo htmlspecialchars($_SESSION['user']['first_name']); ?>
-              </a>
-              <ul class="dropdown-menu">
-                <li><a class="dropdown-item" href="dashboard.php"><i class="fas fa-tachometer-alt me-2"></i>Dashboard</a></li>
-                <li><a class="dropdown-item" href="profile.html"><i class="fas fa-user me-2"></i>My Profile</a></li>
-                <li><a class="dropdown-item" href="mystories.html"><i class="fas fa-book me-2"></i>My Stories</a></li>
-                <li><hr class="dropdown-divider"></li>
-                <li><a class="dropdown-item" href="logout.php"><i class="fas fa-sign-out-alt me-2"></i>Logout</a></li>
-              </ul>
-            </li>
-          <?php else: ?>
-            <!-- User is not logged in - Show login/signup -->
-            <li class="nav-item"><a class="nav-link" href="login.html">Login</a></li>
-            <li class="nav-item"><a class="btn btn-main ms-2" href="register.html">Sign Up</a></li>
-          <?php endif; ?>
-        </ul>
+  <li class="nav-item"><a class="nav-link" href="#features">Features</a></li>
+  <li class="nav-item"><a class="nav-link" href="#stories">Stories</a></li>
+  <li class="nav-item"><a class="nav-link" href="#testimonials">Testimonials</a></li>
+  
+  <?php if (isset($_SESSION['user'])): ?>
+    <!-- User is logged in - Show user dropdown -->
+    <li class="nav-item dropdown">
+      <a class="nav-link dropdown-toggle" href="#" role="button" data-bs-toggle="dropdown" aria-expanded="false">
+        <i class="fas fa-user me-1"></i>
+        <?php echo htmlspecialchars($_SESSION['user']['first_name']); ?>
+      </a>
+      <ul class="dropdown-menu">
+        <li><a class="dropdown-item" href="dashboard.php"><i class="fas fa-tachometer-alt me-2"></i>Dashboard</a></li>
+        <li><a class="dropdown-item" href="browse.php"><i class="fas fa-compass me-2"></i>Browse</a></li>
+        <li><a class="dropdown-item" href="profile.php"><i class="fas fa-user me-2"></i>My Profile</a></li>
+        <li><a class="dropdown-item" href="mystories.php"><i class="fas fa-book me-2"></i>My Stories</a></li>
+        <li><hr class="dropdown-divider"></li>
+        <li><a class="dropdown-item" href="logout.php"><i class="fas fa-sign-out-alt me-2"></i>Logout</a></li>
+      </ul>
+    </li>
+  <?php else: ?>
+    <!-- User is not logged in - Show login/signup/browse -->
+    <li class="nav-item"><a class="nav-link" href="browse.php">Browse</a></li>
+    <li class="nav-item"><a class="nav-link" href="login.html">Login</a></li>
+    <li class="nav-item"><a class="btn btn-main ms-2" href="register.html">Sign Up</a></li>
+  <?php endif; ?>
+</ul>
       </div>
     </div>
   </nav>
@@ -77,9 +79,13 @@ header("Expires: 0");
             <h1>Where Stories Come Alive</h1>
             <p>Discover captivating tales, share your own narratives, and connect with a global community of readers and writers. Your next favorite story is just a click away.</p>
             <div class="hero-buttons mt-4">
-              <a href="dashboard.html" class="btn btn-main me-3">Start Reading</a>
-              <a href="register.html" class="btn btn-secondary">Start Writing</a>
-            </div>
+  <?php if (isset($_SESSION['user'])): ?>
+    <a href="dashboard.php" class="btn btn-main me-3">Go to Dashboard</a>
+  <?php else: ?>
+    <a href="browse.php" class="btn btn-main me-3">Browse Stories</a>
+  <?php endif; ?>
+  <a href="register.html" class="btn btn-secondary">Start Writing</a>
+</div>
           </div>
         </div>
         <div class="col-lg-6">
