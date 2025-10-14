@@ -8,7 +8,7 @@ header("Expires: 0");
 require_once "includes/database.php";
 
 $allStories = [];
-$popularGenres = ['Fantasy', 'Romance', 'Mystery', 'Horror', 'Thriller', 'Sci-Fi', 'Comedy', 'Action'];
+$popularGenres = ['Fantasy', 'Romance', 'Mystery', 'Horror', 'Thriller', 'Sci-Fi', 'Comedy', 'Action', 'Drama', 'Adventure', 'Historical'];
 
 try {
     $db = new Database();
@@ -302,7 +302,13 @@ function formatReads($reads) {
         document.querySelectorAll('.story-card').forEach(card => {
           const title = card.querySelector('.card-title').textContent.toLowerCase();
           const author = card.querySelector('.text-muted').textContent.toLowerCase();
-          const genres = Array.from(card.querySelectorAll('.badge')).map(badge => badge.textContent);
+          
+          // Get only genre badges (exclude "+X more" badges)
+          const genreBadges = Array.from(card.querySelectorAll('.badge')).filter(badge => {
+            const text = badge.textContent.trim();
+            return !text.startsWith('+') && !text.includes('more');
+          });
+          const genres = genreBadges.map(badge => badge.textContent.trim());
           
           const matchesSearch = title.includes(searchTerm) || author.includes(searchTerm);
           const matchesGenre = !selectedGenre || genres.includes(selectedGenre);

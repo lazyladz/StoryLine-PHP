@@ -5,11 +5,11 @@ $user = checkAuth();
 
 require_once "includes/database.php";
 
-// Get user stats and stories from database
+
 try {
     $db = new Database();
     
-    // Get user's stories count and total reads
+    
     $stories_result = $db->select('stories', '*', ['user_id' => $_SESSION['user']['id']]);
     $total_stories = 0;
     $total_reads = 0;
