@@ -5,11 +5,19 @@ $user = checkAuth();
 
 require_once "includes/database.php";
 
-
+// Get user stats and stories from database
 try {
     $db = new Database();
     
+    // Get user data including profile image
+    $user_data = $db->select('users', '*', ['id' => $_SESSION['user']['id']]);
+    $profile_image = 'https://images.unsplash.com/photo-1472099645785-5658abf4ff4e?ixlib=rb-4.0.3&auto=format&fit=crop&w=400&q=80';
     
+    if (is_array($user_data) && !empty($user_data) && isset($user_data[0]['profile_image'])) {
+        $profile_image = $user_data[0]['profile_image'];
+    }
+    
+    // Get user's stories count and total reads
     $stories_result = $db->select('stories', '*', ['user_id' => $_SESSION['user']['id']]);
     $total_stories = 0;
     $total_reads = 0;
@@ -27,6 +35,7 @@ try {
 } catch (Exception $e) {
     $total_stories = 0;
     $total_reads = 0;
+    $profile_image = 'https://images.unsplash.com/photo-1472099645785-5658abf4ff4e?ixlib=rb-4.0.3&auto=format&fit=crop&w=400&q=80';
 }
 ?>
 <!DOCTYPE html>
@@ -479,7 +488,7 @@ try {
     <div class="container">
       <div class="row align-items-center">
         <div class="col-lg-3 text-center text-lg-start mb-4 mb-lg-0">
-          <img src="https://images.unsplash.com/photo-1472099645785-5658abf4ff4e?ixlib=rb-4.0.3&auto=format&fit=crop&w=400&q=80" 
+          <img src="<?php echo htmlspecialchars($profile_image); ?>" 
                alt="User Avatar" class="profile-avatar" id="profileAvatar">
           <div class="mt-3">
             <button class="btn btn-main" data-bs-toggle="modal" data-bs-target="#editProfileModal">
@@ -590,10 +599,11 @@ try {
           <form id="editProfileForm">
             <div class="row">
               <div class="col-md-4 text-center mb-3">
-                <img src="https://images.unsplash.com/photo-1472099645785-5658abf4ff4e?ixlib=rb-4.0.3&auto=format&fit=crop&w=400&q=80" 
+                <img src="<?php echo htmlspecialchars($profile_image); ?>" 
                      alt="User Avatar" class="profile-avatar mb-3" id="modalAvatar">
                 <div>
-                  <button type="button" class="btn btn-secondary btn-sm">
+                  <input type="file" id="profileImageInput" accept="image/*" style="display: none;">
+                  <button type="button" class="btn btn-secondary btn-sm" onclick="document.getElementById('profileImageInput').click()">
                     <i class="fas fa-camera me-1"></i>Change Photo
                   </button>
                 </div>
@@ -621,7 +631,7 @@ try {
         </div>
         <div class="modal-footer">
           <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancel</button>
-          <button type="button" class="btn btn-main" onclick="saveProfile()">Save Changes</button>
+          <button type="button" class="btn btn-main" onclick="saveProfile()" id="saveProfileBtn">Save Changes</button>
         </div>
       </div>
     </div>
@@ -631,9 +641,59 @@ try {
 
   <script>
     document.addEventListener("DOMContentLoaded", function () {
+      console.log('Profile page loaded');
+      
       // DOM Elements
       const profileStoriesContainer = document.getElementById('profileStoriesContainer');
       const profileNoStories = document.getElementById('profileNoStories');
+      
+      // Test if modal elements exist
+      const editModal = document.getElementById('editProfileModal');
+      const saveBtn = document.getElementById('saveProfileBtn');
+      console.log('Modal found:', !!editModal);
+      console.log('Save button found:', !!saveBtn);
+      
+      // Add click event listener as backup
+      if (saveBtn) {
+        saveBtn.addEventListener('click', function() {
+          console.log('Save button clicked via event listener');
+          saveProfile();
+        });
+      }
+
+      // Photo upload functionality
+      const profileImageInput = document.getElementById('profileImageInput');
+      const modalAvatar = document.getElementById('modalAvatar');
+      const profileAvatar = document.getElementById('profileAvatar');
+      
+      if (profileImageInput) {
+        profileImageInput.addEventListener('change', function(e) {
+          const file = e.target.files[0];
+          if (file) {
+            // Validate file type
+            if (!file.type.startsWith('image/')) {
+              showError('Please select a valid image file');
+              return;
+            }
+            
+            // Validate file size (max 5MB)
+            if (file.size > 5 * 1024 * 1024) {
+              showError('Image size should be less than 5MB');
+              return;
+            }
+            
+            // Create preview
+            const reader = new FileReader();
+            reader.onload = function(e) {
+              const imageUrl = e.target.result;
+              modalAvatar.src = imageUrl;
+              profileAvatar.src = imageUrl;
+              console.log('Image preview updated');
+            };
+            reader.readAsDataURL(file);
+          }
+        });
+      }
 
       // Load stories from database
       async function loadUserStories() {
@@ -726,7 +786,7 @@ try {
 
       // Story actions
       window.viewStory = function(storyId) {
-        window.location.href = `story.php?id=${storyId}`;
+        window.location.href = `stories.php?id=${storyId}`;
       }
 
       window.editStory = function(storyId) {
@@ -764,6 +824,8 @@ try {
 
       // Save profile changes
       window.saveProfile = async function() {
+        console.log('Save profile function called');
+        
         const formData = {
           first_name: document.getElementById('editFirstName').value,
           last_name: document.getElementById('editLastName').value,
@@ -771,7 +833,25 @@ try {
           bio: document.getElementById('editBio').value
         };
 
+        // Add profile image if changed
+        const profileImageInput = document.getElementById('profileImageInput');
+        if (profileImageInput.files && profileImageInput.files[0]) {
+          const reader = new FileReader();
+          reader.onload = function(e) {
+            formData.profile_image = e.target.result;
+            sendProfileUpdate(formData);
+          };
+          reader.readAsDataURL(profileImageInput.files[0]);
+        } else {
+          sendProfileUpdate(formData);
+        }
+      }
+
+      async function sendProfileUpdate(formData) {
+        console.log('Form data:', formData);
+
         try {
+          console.log('Sending request to update-profile.php');
           const response = await fetch('update-profile.php', {
             method: 'POST',
             headers: {
@@ -780,7 +860,20 @@ try {
             body: JSON.stringify(formData)
           });
 
-          const result = await response.json();
+          console.log('Response status:', response.status);
+          
+          // Check if response is JSON
+          const responseText = await response.text();
+          console.log('Raw response:', responseText);
+          
+          let result;
+          try {
+            result = JSON.parse(responseText);
+          } catch (e) {
+            throw new Error('Server returned invalid JSON: ' + responseText.substring(0, 100));
+          }
+          
+          console.log('Response result:', result);
           
           if (result.success) {
             // Update profile display
@@ -788,9 +881,17 @@ try {
             document.getElementById('profileBio').textContent = formData.bio;
             document.getElementById("userInitial").textContent = formData.first_name.charAt(0).toUpperCase();
             
+            // Clear the file input
+            const profileImageInput = document.getElementById('profileImageInput');
+            if (profileImageInput) {
+              profileImageInput.value = '';
+            }
+            
             // Close modal
             const modal = bootstrap.Modal.getInstance(document.getElementById('editProfileModal'));
-            modal.hide();
+            if (modal) {
+              modal.hide();
+            }
             
             showSuccess('Profile updated successfully');
           } else {
@@ -798,7 +899,7 @@ try {
           }
         } catch (error) {
           console.error('Error updating profile:', error);
-          showError('Failed to update profile. Please try again.');
+          showError('Failed to update profile: ' + error.message);
         }
       }
 
