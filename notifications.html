@@ -1,0 +1,326 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Notifications - StoryLine</title>
+  <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+  <!-- Font Awesome for icons -->
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+  <style>
+    body {
+      background-color: #f8f9fb;
+    }
+    .sidebar {
+      min-height: 100vh;
+      background-color: #0d1321;
+      color: #fff;
+    }
+    .sidebar a {
+      color: #adb5bd;
+      text-decoration: none;
+      display: block;
+      padding: .75rem 1rem;
+      border-radius: .375rem;
+      transition: all 0.3s ease;
+    }
+    .sidebar a:hover, .sidebar a.active {
+      background-color: #1c2333;
+      color: #fff;
+    }
+    .notification-item {
+      border-left: 4px solid #0d6efd;
+      padding: 1rem;
+      margin-bottom: 1rem;
+      background: white;
+      border-radius: .5rem;
+      box-shadow: 0 2px 8px rgba(0,0,0,.08);
+    }
+    .notification-unread {
+      background: #e7f1ff;
+    }
+    .notification-icon {
+      width: 40px;
+      height: 40px;
+      border-radius: 50%;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      margin-right: 15px;
+      flex-shrink: 0;
+    }
+    .notification-content {
+      flex-grow: 1;
+    }
+    .notification-time {
+      color: #6c757d;
+      font-size: 0.875rem;
+    }
+    /* Removed the notification-badge style */
+  </style>
+</head>
+<body>
+<div class="container-fluid">
+  <div class="row">
+    <!-- Sidebar -->
+    <nav class="col-md-3 col-lg-2 d-md-block sidebar p-3">
+      <h4 class="text-white mb-4">StoryLine</h4>
+      <ul class="nav flex-column mt-4">
+        <li class="nav-item"><a href="index.html" class="nav-link"><i class="fas fa-chart-bar me-2"></i>Dashboard</a></li>
+        <li class="nav-item"><a href="manageUser.html" class="nav-link"><i class="fas fa-users me-2"></i>Manage Users</a></li>
+        <li class="nav-item"><a href="manageStories.html" class="nav-link"><i class="fas fa-book me-2"></i>Manage Stories</a></li>
+        <li class="nav-item"><a href="notifications.html" class="nav-link active text-white"><i class="fas fa-bell me-2"></i>Notifications</a></li>
+        <li class="nav-item"><a href="settings.html" class="nav-link"><i class="fas fa-cog me-2"></i>Settings</a></li>
+        <li class="nav-item"><a href="#" class="nav-link" id="logoutLink"><i class="fas fa-sign-out-alt me-2"></i>Log Out</a></li>
+      </ul>
+      <div class="mt-auto pt-3">
+        <!-- Button trigger modal -->
+        <button type="button" class="btn btn-outline-light w-100" data-bs-toggle="modal" data-bs-target="#userProfileModal">
+          <strong id="sidebarUserName">Loading...</strong><br>
+          <small id="sidebarUserEmail">Loading...</small>
+        </button>
+      </div>
+    </nav>
+
+    <!-- User Profile Modal -->
+    <div class="modal fade" id="userProfileModal" tabindex="-1" aria-labelledby="userProfileLabel" aria-hidden="true">
+      <div class="modal-dialog modal-dialog-centered">
+        <div class="modal-content">
+          <div class="modal-header">
+            <h5 class="modal-title" id="userProfileLabel">User Profile</h5>
+            <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+          </div>
+          <div class="modal-body text-center">
+            <img src="https://via.placeholder.com/100" class="rounded-circle mb-3" alt="Profile Picture" id="profilePicture">
+            <h5 id="modalUserName">Loading...</h5>
+            <p class="text-muted" id="modalUserEmail">Loading...</p>
+            <hr>
+            <p><strong>Role:</strong> <span id="modalUserRole" class="fw-bold text-primary">Administrator</span></p>
+            <p><strong>Joined:</strong> <span id="modalUserJoined">Loading...</span></p>
+          </div>
+          <div class="modal-footer">
+            <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
+            <button type="button" class="btn btn-primary" id="editProfileBtn">Edit Profile</button>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Edit Profile Modal -->
+    <div class="modal fade" id="editProfileModal" tabindex="-1" aria-labelledby="editProfileLabel" aria-hidden="true">
+      <div class="modal-dialog modal-dialog-centered">
+        <div class="modal-content">
+          <div class="modal-header">
+            <h5 class="modal-title" id="editProfileLabel"><i class="fas fa-user-edit me-2"></i>Edit Profile</h5>
+            <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+          </div>
+          <div class="modal-body">
+            <div class="text-center mb-3">
+              <img src="https://via.placeholder.com/100" class="rounded-circle mb-2" alt="Profile Picture" id="editProfilePicture">
+              <br>
+              <button type="button" class="btn btn-outline-secondary btn-sm" onclick="changeProfilePicture()"><i class="fas fa-camera me-1"></i>Change Picture</button>
+            </div>
+            <div class="mb-3">
+              <label class="form-label"><i class="fas fa-user me-1"></i>Username</label>
+              <input type="text" class="form-control" id="editUsername" placeholder="Enter username">
+            </div>
+            <div class="mb-3">
+              <label class="form-label"><i class="fas fa-envelope me-1"></i>Email</label>
+              <input type="email" class="form-control" id="editEmail" placeholder="Enter email">
+            </div>
+            <div class="mb-3">
+              <label class="form-label"><i class="fas fa-info-circle me-1"></i>Bio</label>
+              <textarea class="form-control" id="editBio" rows="3" placeholder="Tell us about yourself..."></textarea>
+            </div>
+          </div>
+          <div class="modal-footer">
+            <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancel</button>
+            <button type="button" class="btn btn-primary" onclick="saveProfileChanges()"><i class="fas fa-save me-1"></i>Save Changes</button>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Main Content -->
+    <main class="col-md-9 ms-sm-auto col-lg-10 px-md-4 py-4">
+      <div class="d-flex justify-content-between align-items-center mb-4">
+        <h2><i class="fas fa-bell me-2"></i>Notifications</h2>
+        <div>
+          <button class="btn btn-outline-primary me-2" onclick="markAllAsRead()">
+            <i class="fas fa-check-double me-1"></i>Mark All as Read
+          </button>
+          <button class="btn btn-outline-secondary" onclick="clearAllNotifications()">
+            <i class="fas fa-trash me-1"></i>Clear All
+          </button>
+        </div>
+      </div>
+      
+      <div class="card shadow-sm">
+        <div class="card-body">
+          <div class="notification-item notification-unread d-flex align-items-start">
+            <div class="notification-icon bg-primary text-white">
+              <i class="fas fa-user-plus"></i>
+            </div>
+            <div class="notification-content">
+              <h6>New User Registration</h6>
+              <p class="text-muted mb-1">User "Sophia Williams" just registered on the platform.</p>
+              <small class="notification-time">2 minutes ago</small>
+            </div>
+            <button class="btn btn-sm btn-outline-secondary" onclick="markAsRead(this)">Mark as Read</button>
+          </div>
+          
+          <div class="notification-item d-flex align-items-start">
+            <div class="notification-icon bg-success text-white">
+              <i class="fas fa-book"></i>
+            </div>
+            <div class="notification-content">
+              <h6>Story Submission</h6>
+              <p class="text-muted mb-1">New story "The Lost Kingdom" submitted by Liam Brown.</p>
+              <small class="notification-time">1 hour ago</small>
+            </div>
+            <button class="btn btn-sm btn-outline-secondary" onclick="markAsRead(this)">Mark as Read</button>
+          </div>
+          
+          <div class="notification-item d-flex align-items-start">
+            <div class="notification-icon bg-warning text-white">
+              <i class="fas fa-exclamation-triangle"></i>
+            </div>
+            <div class="notification-content">
+              <h6>System Update</h6>
+              <p class="text-muted mb-1">System maintenance scheduled for tonight at 2:00 AM.</p>
+              <small class="notification-time">3 hours ago</small>
+            </div>
+            <button class="btn btn-sm btn-outline-secondary" onclick="markAsRead(this)">Mark as Read</button>
+          </div>
+          
+          <div class="notification-item d-flex align-items-start">
+            <div class="notification-icon bg-info text-white">
+              <i class="fas fa-check-circle"></i>
+            </div>
+            <div class="notification-content">
+              <h6>Story Approved</h6>
+              <p class="text-muted mb-1">Your story "Midnight Whispers" has been approved and published.</p>
+              <small class="notification-time">5 hours ago</small>
+            </div>
+            <button class="btn btn-sm btn-outline-secondary" onclick="markAsRead(this)">Mark as Read</button>
+          </div>
+          
+          <div class="notification-item d-flex align-items-start">
+            <div class="notification-icon bg-danger text-white">
+              <i class="fas fa-times-circle"></i>
+            </div>
+            <div class="notification-content">
+              <h6>Story Rejected</h6>
+              <p class="text-muted mb-1">Your story "Summer Dreams" needs revision before it can be published.</p>
+              <small class="notification-time">1 day ago</small>
+            </div>
+            <button class="btn btn-sm btn-outline-secondary" onclick="markAsRead(this)">Mark as Read</button>
+          </div>
+        </div>
+      </div>
+    </main>
+  </div>
+</div>
+
+<!-- Bootstrap JS -->
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+
+<script>
+  document.addEventListener('DOMContentLoaded', function() {
+    const currentUser = JSON.parse(localStorage.getItem('currentUser'));
+    if (!currentUser) {
+      window.location.href = 'login.html';
+      return;
+    }
+    
+    // Update sidebar user info
+    document.getElementById('sidebarUserName').textContent = currentUser.username || currentUser.name;
+    document.getElementById('sidebarUserEmail').textContent = currentUser.email;
+    
+    // Update modal user info
+    document.getElementById('modalUserName').textContent = currentUser.username || currentUser.name;
+    document.getElementById('modalUserEmail').textContent = currentUser.email;
+    document.getElementById('modalUserRole').textContent = "Administrator";
+    document.getElementById('modalUserJoined').textContent = currentUser.joined || "January 2023";
+    
+    // Populate edit form
+    document.getElementById('editUsername').value = currentUser.username || currentUser.name;
+    document.getElementById('editEmail').value = currentUser.email;
+    document.getElementById('editBio').value = currentUser.bio || "No bio yet...";
+    
+    // Edit profile button
+    document.getElementById('editProfileBtn').addEventListener('click', function() {
+      bootstrap.Modal.getInstance(document.getElementById('userProfileModal')).hide();
+      new bootstrap.Modal(document.getElementById('editProfileModal')).show();
+    });
+    
+    // Logout
+    document.getElementById('logoutLink').addEventListener('click', function(e) {
+      e.preventDefault();
+      if (confirm('Are you sure you want to log out?')) {
+        localStorage.removeItem('currentUser');
+        alert('You have been logged out successfully.');
+        window.location.href = 'login.html';
+      }
+    });
+  });
+
+  function changeProfilePicture() {
+    alert('Change Profile Picture\n\nThis would open a file picker to upload a new profile picture.');
+  }
+
+  function saveProfileChanges() {
+    const newUsername = document.getElementById('editUsername').value;
+    const newEmail = document.getElementById('editEmail').value;
+    const newBio = document.getElementById('editBio').value;
+    
+    if (!newUsername || !newEmail) {
+      alert('Please fill in all required fields.');
+      return;
+    }
+    
+    const currentUser = JSON.parse(localStorage.getItem('currentUser'));
+    currentUser.username = newUsername;
+    currentUser.name = newUsername;
+    currentUser.email = newEmail;
+    currentUser.bio = newBio;
+    
+    localStorage.setItem('currentUser', JSON.stringify(currentUser));
+    
+    document.getElementById('sidebarUserName').textContent = newUsername;
+    document.getElementById('modalUserName').textContent = newUsername;
+    document.getElementById('modalUserEmail').textContent = newEmail;
+    document.getElementById('sidebarUserEmail').textContent = newEmail;
+    
+    alert('Profile updated successfully!');
+    bootstrap.Modal.getInstance(document.getElementById('editProfileModal')).hide();
+  }
+
+  function markAsRead(button) {
+    const notificationItem = button.closest('.notification-item');
+    notificationItem.classList.remove('notification-unread');
+    button.disabled = true;
+    button.textContent = 'Read';
+  }
+
+  function markAllAsRead() {
+    const unreadNotifications = document.querySelectorAll('.notification-unread');
+    unreadNotifications.forEach(notification => {
+      notification.classList.remove('notification-unread');
+      const button = notification.querySelector('button');
+      if (button) {
+        button.disabled = true;
+        button.textContent = 'Read';
+      }
+    });
+  }
+
+  function clearAllNotifications() {
+    if (confirm('Are you sure you want to clear all notifications?')) {
+      const notificationContainer = document.querySelector('.card-body');
+      notificationContainer.innerHTML = '<p class="text-muted text-center py-4">No notifications to display</p>';
+    }
+  }
+</script>
+</body>
+</html>

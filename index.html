@@ -1,0 +1,409 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Leaderboard Dashboard</title>
+  <!-- Bootstrap 5 CDN -->
+  <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+  <!-- Font Awesome for icons -->
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+  <style>
+    body {
+      background-color: #eef1f6;
+    }
+    .sidebar {
+      min-height: 100vh;
+      background-color: #0d1321;
+      color: #fff;
+    }
+    .sidebar a {
+      color: #adb5bd;
+      text-decoration: none;
+      display: block;
+      padding: .75rem 1rem;
+      border-radius: .375rem;
+      transition: all 0.3s ease;
+    }
+    .sidebar a:hover, .sidebar a.active {
+      background-color: #1c2333;
+      color: #fff;
+    }
+    .top-card, .list-card {
+      background: #ffffff;
+      border-radius: .75rem;
+      box-shadow: 0 4px 12px rgba(0,0,0,.08);
+      padding: 1.5rem;
+    }
+    .points {
+      font-size: 1.5rem;
+      font-weight: bold;
+      color: #0d1321; 
+    }
+    .progress {
+      background-color: #e6e9f0; 
+      border-radius: 10px;
+      overflow: hidden;
+    }
+    .progress-bar {
+      border-radius: 10px;
+    }
+    .stat-icon {
+      font-size: 2rem;
+      margin-bottom: 10px;
+    }
+    .genre-icon {
+      margin-right: 8px;
+      width: 20px;
+      text-align: center;
+    }
+  </style>
+</head>
+<body>
+<div class="container-fluid">
+  <div class="row">
+    <!-- Sidebar -->
+    <nav class="col-md-3 col-lg-2 d-md-block sidebar p-3">
+      <h4 class="text-white mb-4">StoryLine</h4>
+      <ul class="nav flex-column mt-4">
+        <li class="nav-item"><a href="index.html" class="nav-link active"><i class="fas fa-chart-bar me-2"></i>Dashboard</a></li>
+        <li class="nav-item"><a href="manageUser.html" class="nav-link"><i class="fas fa-users me-2"></i>Manage Users</a></li>
+        <li class="nav-item"><a href="manageStories.html" class="nav-link"><i class="fas fa-book me-2"></i>Manage Stories</a></li>
+        <li class="nav-item"><a href="notifications.html" class="nav-link"><i class="fas fa-bell me-2"></i>Notifications</a></li>
+        <li class="nav-item"><a href="settings.html" class="nav-link"><i class="fas fa-cog me-2"></i>Settings</a></li>
+        <li class="nav-item"><a href="#" class="nav-link" id="logoutLink"><i class="fas fa-sign-out-alt me-2"></i>Log Out</a></li>
+      </ul>
+      <div class="mt-auto pt-3">
+        <!-- Button trigger modal -->
+        <button type="button" class="btn btn-outline-light w-100" data-bs-toggle="modal" data-bs-target="#userProfileModal">
+          <strong id="sidebarUserName">Loading...</strong><br>
+          <small id="sidebarUserEmail">Loading...</small>
+        </button>
+      </div>
+    </nav>
+      
+    <!-- User Profile Modal -->
+    <div class="modal fade" id="userProfileModal" tabindex="-1" aria-labelledby="userProfileLabel" aria-hidden="true">
+      <div class="modal-dialog modal-dialog-centered">
+        <div class="modal-content">
+          <div class="modal-header">
+            <h5 class="modal-title" id="userProfileLabel">User Profile</h5>
+            <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+          </div>
+          <div class="modal-body text-center">
+            <img src="https://via.placeholder.com/100" class="rounded-circle mb-3" alt="Profile Picture" id="profilePicture">
+            <h5 id="modalUserName">Loading...</h5>
+            <p class="text-muted" id="modalUserEmail">Loading...</p>
+            <hr>
+            <p><strong>Role:</strong> <span id="modalUserRole" class="fw-bold text-primary">Administrator</span></p>
+            <p><strong>Joined:</strong> <span id="modalUserJoined">Loading...</span></p>
+          </div>
+          <div class="modal-footer">
+            <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
+            <button type="button" class="btn btn-primary" id="editProfileBtn">Edit Profile</button>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Edit Profile Modal -->
+    <div class="modal fade" id="editProfileModal" tabindex="-1" aria-labelledby="editProfileLabel" aria-hidden="true">
+      <div class="modal-dialog modal-dialog-centered">
+        <div class="modal-content">
+          <div class="modal-header">
+            <h5 class="modal-title" id="editProfileLabel"><i class="fas fa-user-edit me-2"></i>Edit Profile</h5>
+            <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+          </div>
+          <div class="modal-body">
+            <div class="text-center mb-3">
+              <img src="https://via.placeholder.com/100" class="rounded-circle mb-2" alt="Profile Picture" id="editProfilePicture">
+              <br>
+              <button type="button" class="btn btn-outline-secondary btn-sm" onclick="changeProfilePicture()"><i class="fas fa-camera me-1"></i>Change Picture</button>
+            </div>
+            <div class="mb-3">
+              <label class="form-label"><i class="fas fa-user me-1"></i>Username</label>
+              <input type="text" class="form-control" id="editUsername" placeholder="Enter username">
+            </div>
+            <div class="mb-3">
+              <label class="form-label"><i class="fas fa-envelope me-1"></i>Email</label>
+              <input type="email" class="form-control" id="editEmail" placeholder="Enter email">
+            </div>
+            <div class="mb-3">
+              <label class="form-label"><i class="fas fa-info-circle me-1"></i>Bio</label>
+              <textarea class="form-control" id="editBio" rows="3" placeholder="Tell us about yourself..."></textarea>
+            </div>
+          </div>
+          <div class="modal-footer">
+            <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancel</button>
+            <button type="button" class="btn btn-primary" onclick="saveProfileChanges()"><i class="fas fa-save me-1"></i>Save Changes</button>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Story Detail Modal -->
+    <div class="modal fade" id="storyDetailModal" tabindex="-1" aria-labelledby="storyDetailLabel" aria-hidden="true">
+      <div class="modal-dialog modal-dialog-centered modal-lg">
+        <div class="modal-content">
+          <div class="modal-header">
+            <h5 class="modal-title" id="storyDetailLabel">Story Details</h5>
+            <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+          </div>
+          <div class="modal-body">
+            <h4 id="detailTitle" class="mb-3"></h4>
+            <div class="row mb-3">
+              <div class="col-md-6">
+                <p><strong>Author:</strong> <span id="detailAuthor"></span></p>
+                <p><strong>Genre:</strong> <span id="detailGenre"></span></p>
+              </div>
+              <div class="col-md-6">
+                <p><strong>Status:</strong> <span id="detailStatus"></span></p>
+                <p><strong>Date Submitted:</strong> <span id="detailDate"></span></p>
+              </div>
+            </div>
+            <div class="mb-3">
+              <h6>Synopsis</h6>
+              <p id="detailSynopsis" class="text-muted"></p>
+            </div>
+            <div class="mb-3">
+              <h6>Content Preview</h6>
+              <div id="detailContent" class="bg-light p-3 rounded" style="max-height: 200px; overflow-y: auto;"></div>
+            </div>
+          </div>
+          <div class="modal-footer">
+            <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Main content -->
+    <main class="col-md-9 ms-sm-auto col-lg-10 px-md-4 py-4">
+      <div class="d-flex justify-content-between align-items-center mb-3">
+        <h2><i class="fas fa-chart-line me-2"></i>Dashboard</h2>
+      </div>
+
+      <!-- Top stats -->
+      <div class="row g-3 mb-4">
+        <div class="col-md-4">
+          <div class="top-card text-center">
+            <div class="stat-icon text-primary">
+              <i class="fas fa-users"></i>
+            </div>
+            <h5>Total Users</h5>
+            <div class="points">50</div>
+          </div>
+        </div>
+        <div class="col-md-4">
+          <div class="top-card text-center">
+            <div class="stat-icon text-success">
+              <i class="fas fa-book"></i>
+            </div>
+            <h5>Total Stories</h5>
+            <div class="points">15</div>
+          </div>
+        </div>
+        <div class="col-md-4">
+          <div class="top-card text-center">
+            <div class="stat-icon text-warning">
+              <i class="fas fa-clock"></i>
+            </div>
+            <h5>Pending Stories</h5>
+            <div class="points">14</div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Genre Statistics -->
+      <div class="row mb-4">
+        <div class="col-12">
+          <div class="list-card">
+            <h5 class="mb-4"><i class="fas fa-chart-pie me-2"></i>Stories by Genre</h5>
+
+            <!-- Horror -->
+            <div class="mb-3">
+              <div class="d-flex justify-content-between">
+                <span><i class="fas fa-ghost genre-icon text-danger"></i>Horror</span>
+                <span class="fw-bold">5</span>
+              </div>
+              <div class="progress" style="height: 18px;">
+                <div class="progress-bar bg-danger" role="progressbar" style="width: 33%;" aria-valuenow="5" aria-valuemin="0" aria-valuemax="15"></div>
+              </div>
+            </div>
+
+            <!-- Romance -->
+            <div class="mb-3">
+              <div class="d-flex justify-content-between">
+                <span><i class="fas fa-heart genre-icon" style="color:#e83e8c;"></i>Romance</span>
+                <span class="fw-bold">3</span>
+              </div>
+              <div class="progress" style="height: 18px;">
+                <div class="progress-bar" role="progressbar" style="width: 20%; background-color:#e83e8c;" aria-valuenow="3" aria-valuemin="0" aria-valuemax="15"></div>
+              </div>
+            </div>
+
+            <!-- Fantasy -->
+            <div class="mb-3">
+              <div class="d-flex justify-content-between">
+                <span><i class="fas fa-dragon genre-icon" style="color:#6f42c1;"></i>Fantasy</span>
+                <span class="fw-bold">4</span>
+              </div>
+              <div class="progress" style="height: 18px;">
+                <div class="progress-bar" role="progressbar" style="width: 27%; background-color:#6f42c1;" aria-valuenow="4" aria-valuemin="0" aria-valuemax="15"></div>
+              </div>
+            </div>
+
+            <!-- Drama -->
+            <div class="mb-3">
+              <div class="d-flex justify-content-between">
+                <span><i class="fas fa-theater-masks genre-icon text-warning"></i>Drama</span>
+                <span class="fw-bold">2</span>
+              </div>
+              <div class="progress" style="height: 18px;">
+                <div class="progress-bar bg-warning" role="progressbar" style="width: 13%;" aria-valuenow="2" aria-valuemin="0" aria-valuemax="15"></div>
+              </div>
+            </div>
+
+            <!-- Comedy -->
+            <div class="mb-3">
+              <div class="d-flex justify-content-between">
+                <span><i class="fas fa-laugh genre-icon text-success"></i>Comedy</span>
+                <span class="fw-bold">1</span>
+              </div>
+              <div class="progress" style="height: 18px;">
+                <div class="progress-bar bg-success" role="progressbar" style="width: 7%;" aria-valuenow="1" aria-valuemin="0" aria-valuemax="15"></div>
+              </div>
+            </div>
+
+            <!-- Total -->
+            <div class="mt-4 text-end">
+              <span class="fw-bold"><i class="fas fa-calculator me-1"></i>Total Stories: 15</span>
+            </div>
+          </div>
+        </div>
+      </div>
+      
+      <!-- Recent Activity Section -->
+      <div class="row">
+        <div class="col-12">
+          <div class="list-card">
+            <h5 class="mb-4"><i class="fas fa-history me-2"></i>Recent Activity</h5>
+            <div class="list-group list-group-flush">
+              <div class="list-group-item d-flex align-items-center">
+                <i class="fas fa-user-plus text-success me-3"></i>
+                <div>
+                  <span class="fw-bold">New user registered</span>
+                  <small class="text-muted d-block">JohnDoe joined StoryLine</small>
+                </div>
+                <small class="text-muted ms-auto">2 hours ago</small>
+              </div>
+              <div class="list-group-item d-flex align-items-center">
+                <i class="fas fa-book text-primary me-3"></i>
+                <div>
+                  <span class="fw-bold">New story submitted</span>
+                  <small class="text-muted d-block">"The Lost Kingdom" by SarahM</small>
+                </div>
+                <small class="text-muted ms-auto">5 hours ago</small>
+              </div>
+              <div class="list-group-item d-flex align-items-center">
+                <i class="fas fa-check-circle text-success me-3"></i>
+                <div>
+                  <span class="fw-bold">Story approved</span>
+                  <small class="text-muted d-block">"Midnight Whispers" published</small>
+                </div>
+                <small class="text-muted ms-auto">Yesterday</small>
+              </div>
+              <div class="list-group-item d-flex align-items-center">
+                <i class="fas fa-times-circle text-danger me-3"></i>
+                <div>
+                  <span class="fw-bold">Story rejected</span>
+                  <small class="text-muted d-block">"Summer Dreams" needs revision</small>
+                </div>
+                <small class="text-muted ms-auto">2 days ago</small>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </main>
+  </div>
+</div>
+
+<!-- Bootstrap JS -->
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+
+<script>
+  // Authentication and logout functionality
+  document.addEventListener('DOMContentLoaded', function() {
+    const currentUser = JSON.parse(localStorage.getItem('currentUser'));
+    
+    if (!currentUser) {
+      window.location.href = 'login.html';
+      return;
+    }
+    
+    // Update sidebar user info
+    document.getElementById('sidebarUserName').textContent = currentUser.username || currentUser.name;
+    document.getElementById('sidebarUserEmail').textContent = currentUser.email;
+    
+    // Update modal user info
+    document.getElementById('modalUserName').textContent = currentUser.username || currentUser.name;
+    document.getElementById('modalUserEmail').textContent = currentUser.email;
+    document.getElementById('modalUserRole').textContent = "Administrator";
+    document.getElementById('modalUserJoined').textContent = currentUser.joined;
+    
+    // Populate edit form
+    document.getElementById('editUsername').value = currentUser.username || currentUser.name;
+    document.getElementById('editEmail').value = currentUser.email;
+    document.getElementById('editBio').value = currentUser.bio || "No bio yet...";
+    
+    // Edit profile button
+    document.getElementById('editProfileBtn').addEventListener('click', function() {
+      bootstrap.Modal.getInstance(document.getElementById('userProfileModal')).hide();
+      new bootstrap.Modal(document.getElementById('editProfileModal')).show();
+    });
+    
+    // Logout
+    document.getElementById('logoutLink').addEventListener('click', function(e) {
+      e.preventDefault();
+      if (confirm('Are you sure you want to log out?')) {
+        localStorage.removeItem('currentUser');
+        alert('You have been logged out successfully.');
+        window.location.href = 'login.html';
+      }
+    });
+  });
+
+  function changeProfilePicture() {
+    alert('Change Profile Picture\n\nThis would open a file picker to upload a new profile picture.');
+  }
+
+  function saveProfileChanges() {
+    const newUsername = document.getElementById('editUsername').value;
+    const newEmail = document.getElementById('editEmail').value;
+    const newBio = document.getElementById('editBio').value;
+    
+    if (!newUsername || !newEmail) {
+      alert('Please fill in all required fields.');
+      return;
+    }
+    
+    const currentUser = JSON.parse(localStorage.getItem('currentUser'));
+    currentUser.username = newUsername;
+    currentUser.name = newUsername;
+    currentUser.email = newEmail;
+    currentUser.bio = newBio;
+    
+    localStorage.setItem('currentUser', JSON.stringify(currentUser));
+    
+    document.getElementById('sidebarUserName').textContent = newUsername;
+    document.getElementById('modalUserName').textContent = newUsername;
+    document.getElementById('modalUserEmail').textContent = newEmail;
+    document.getElementById('sidebarUserEmail').textContent = newEmail;
+    
+    alert('Profile updated successfully!');
+    bootstrap.Modal.getInstance(document.getElementById('editProfileModal')).hide();
+  }
+</script>
+</body>
+</html>

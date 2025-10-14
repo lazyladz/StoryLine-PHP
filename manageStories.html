@@ -1,0 +1,674 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Manage Stories - StoryLine</title>
+  <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+  <style>
+    body {
+      background-color: #f8f9fb;
+      font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+    }
+    .sidebar {
+      min-height: 100vh;
+      background-color: #0d1321;
+      color: #fff;
+    }
+    .sidebar a {
+      color: #adb5bd;
+      text-decoration: none;
+      display: block;
+      padding: .75rem 1rem;
+      border-radius: .375rem;
+      transition: all 0.3s ease;
+    }
+    .sidebar a:hover, .sidebar a.active {
+      background-color: #1c2333;
+      color: #fff;
+    }
+    .story-card {
+      background: #ffffff;
+      border-radius: .75rem;
+      box-shadow: 0 4px 12px rgba(0,0,0,.08);
+      padding: 1.5rem;
+      margin-bottom: 1rem;
+      border-left: 4px solid #0d6efd;
+      transition: transform 0.2s ease;
+    }
+    .story-card:hover {
+      transform: translateY(-2px);
+    }
+    .story-card.pending {
+      border-left-color: #ffc107;
+    }
+    .story-card.published {
+      border-left-color: #198754;
+    }
+    .story-card.rejected {
+      border-left-color: #dc3545;
+    }
+    .top-card {
+      background: #ffffff;
+      border-radius: .75rem;
+      box-shadow: 0 4px 12px rgba(0,0,0,.08);
+      padding: 1.5rem;
+    }
+    .points {
+      font-size: 1.5rem;
+      font-weight: bold;
+      color: #0d1321; 
+    }
+    .welcome-text {
+      font-size: 1.1rem;
+    }
+    .search-box {
+      border-radius: 50px;
+      padding: 10px 20px;
+      border: 1px solid #e0e0e0;
+    }
+    .filter-btn {
+      border-radius: 50px;
+    }
+    .action-btn {
+      margin-right: 5px;
+      margin-bottom: 5px;
+    }
+  </style>
+</head>
+<body>
+<div class="container-fluid">
+  <div class="row">
+    <!-- Sidebar -->
+    <nav class="col-md-3 col-lg-2 d-md-block sidebar p-3">
+      <h4 class="text-white mb-4">StoryLine</h4>
+      <ul class="nav flex-column mt-4">
+        <li class="nav-item"><a href="index.html" class="nav-link"><i class="fas fa-chart-bar me-2"></i>Dashboard</a></li>
+        <li class="nav-item"><a href="manageUser.html" class="nav-link"><i class="fas fa-users me-2"></i>Manage Users</a></li>
+        <li class="nav-item"><a href="manageStories.html" class="nav-link active"><i class="fas fa-book me-2"></i>Manage Stories</a></li>
+        <li class="nav-item"><a href="notifications.html" class="nav-link"><i class="fas fa-bell me-2"></i>Notifications</a></li>
+        <li class="nav-item"><a href="settings.html" class="nav-link"><i class="fas fa-cog me-2"></i>Settings</a></li>
+        <li class="nav-item"><a href="#" class="nav-link" id="logoutLink"><i class="fas fa-sign-out-alt me-2"></i>Log Out</a></li>
+      </ul>
+      <div class="mt-auto pt-3">
+        <button type="button" class="btn btn-outline-light w-100" data-bs-toggle="modal" data-bs-target="#userProfileModal">
+          <strong id="sidebarUserName">Loading...</strong><br>
+          <small id="sidebarUserEmail">Loading...</small>
+        </button>
+      </div>
+    </nav>
+
+    <!-- User Profile Modal -->
+    <div class="modal fade" id="userProfileModal" tabindex="-1" aria-labelledby="userProfileLabel" aria-hidden="true">
+      <div class="modal-dialog modal-dialog-centered">
+        <div class="modal-content">
+          <div class="modal-header">
+            <h5 class="modal-title" id="userProfileLabel">User Profile</h5>
+            <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+          </div>
+          <div class="modal-body text-center">
+            <img src="https://via.placeholder.com/100" class="rounded-circle mb-3" alt="Profile Picture" id="profilePicture">
+            <h5 id="modalUserName">Loading...</h5>
+            <p class="text-muted" id="modalUserEmail">Loading...</p>
+            <hr>
+            <p><strong>Role:</strong> <span id="modalUserRole" class="fw-bold text-primary">Administrator</span></p>
+            <p><strong>Joined:</strong> <span id="modalUserJoined">Loading...</span></p>
+          </div>
+          <div class="modal-footer">
+            <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
+            <button type="button" class="btn btn-primary" id="editProfileBtn">Edit Profile</button>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Edit Profile Modal -->
+    <div class="modal fade" id="editProfileModal" tabindex="-1" aria-labelledby="editProfileLabel" aria-hidden="true">
+      <div class="modal-dialog modal-dialog-centered">
+        <div class="modal-content">
+          <div class="modal-header">
+            <h5 class="modal-title" id="editProfileLabel"><i class="fas fa-user-edit me-2"></i>Edit Profile</h5>
+            <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+          </div>
+          <div class="modal-body">
+            <div class="text-center mb-3">
+              <img src="https://via.placeholder.com/100" class="rounded-circle mb-2" alt="Profile Picture" id="editProfilePicture">
+              <br>
+              <button type="button" class="btn btn-outline-secondary btn-sm" onclick="changeProfilePicture()"><i class="fas fa-camera me-1"></i>Change Picture</button>
+            </div>
+            <div class="mb-3">
+              <label class="form-label"><i class="fas fa-user me-1"></i>Username</label>
+              <input type="text" class="form-control" id="editUsername" placeholder="Enter username">
+            </div>
+            <div class="mb-3">
+              <label class="form-label"><i class="fas fa-envelope me-1"></i>Email</label>
+              <input type="email" class="form-control" id="editEmail" placeholder="Enter email">
+            </div>
+            <div class="mb-3">
+              <label class="form-label"><i class="fas fa-info-circle me-1"></i>Bio</label>
+              <textarea class="form-control" id="editBio" rows="3" placeholder="Tell us about yourself..."></textarea>
+            </div>
+          </div>
+          <div class="modal-footer">
+            <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancel</button>
+            <button type="button" class="btn btn-primary" onclick="saveProfileChanges()"><i class="fas fa-save me-1"></i>Save Changes</button>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Story Detail Modal -->
+    <div class="modal fade" id="storyDetailModal" tabindex="-1" aria-labelledby="storyDetailLabel" aria-hidden="true">
+      <div class="modal-dialog modal-dialog-centered modal-lg">
+        <div class="modal-content">
+          <div class="modal-header">
+            <h5 class="modal-title" id="storyDetailLabel">Story Details</h5>
+            <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+          </div>
+          <div class="modal-body">
+            <h4 id="detailTitle" class="mb-3"></h4>
+            <div class="row mb-3">
+              <div class="col-md-6">
+                <p><strong>Author:</strong> <span id="detailAuthor"></span></p>
+                <p><strong>Genre:</strong> <span id="detailGenre"></span></p>
+              </div>
+              <div class="col-md-6">
+                <p><strong>Status:</strong> <span id="detailStatus"></span></p>
+                <p><strong>Date Submitted:</strong> <span id="detailDate"></span></p>
+              </div>
+            </div>
+            <div class="mb-3">
+              <h6>Synopsis</h6>
+              <p id="detailSynopsis" class="text-muted"></p>
+            </div>
+            <div class="mb-3">
+              <h6>Content Preview</h6>
+              <div id="detailContent" class="bg-light p-3 rounded" style="max-height: 200px; overflow-y: auto;"></div>
+            </div>
+          </div>
+          <div class="modal-footer">
+            <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Main Content -->
+    <main class="col-md-9 ms-sm-auto col-lg-10 px-md-4 py-4">
+      <div class="d-flex justify-content-between align-items-center mb-4">
+        <h2 class="text-dark">Manage Stories</h2>
+      </div>
+      
+      <!-- Stats Cards -->
+      <div class="row g-3 mb-4">
+        <div class="col-md-3">
+          <div class="top-card text-center">
+            <h5 class="text-muted">Total Stories</h5>
+            <div class="points text-primary">156</div>
+          </div>
+        </div>
+        <div class="col-md-3">
+          <div class="top-card text-center">
+            <h5 class="text-muted">Pending Review</h5>
+            <div class="points text-warning">23</div>
+          </div>
+        </div>
+        <div class="col-md-3">
+          <div class="top-card text-center">
+            <h5 class="text-muted">Published</h5>
+            <div class="points text-success">120</div>
+          </div>
+        </div>
+        <div class="col-md-3">
+          <div class="top-card text-center">
+            <h5 class="text-muted">Rejected</h5>
+            <div class="points text-danger">13</div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Search and Filter Section -->
+      <div class="card shadow-sm border-0 mb-4">
+        <div class="card-body">
+          <div class="row">
+            <div class="col-md-8">
+              <div class="input-group">
+                <input type="text" class="form-control search-box" placeholder="Search stories by title, author, or genre..." id="searchInput">
+                <button class="btn btn-primary filter-btn" type="button" onclick="searchStories()">
+                  <i class="fas fa-search"></i> Search
+                </button>
+              </div>
+            </div>
+            <div class="col-md-4">
+              <div class="d-flex justify-content-end">
+                <select class="form-select filter-btn me-2" id="statusFilter" onchange="filterStories()">
+                  <option value="all">All Status</option>
+                  <option value="pending">Pending</option>
+                  <option value="published">Published</option>
+                  <option value="rejected">Rejected</option>
+                </select>
+                <select class="form-select filter-btn" id="genreFilter" onchange="filterStories()">
+                  <option value="all">All Genres</option>
+                  <option value="fantasy">Fantasy</option>
+                  <option value="sci-fi">Sci-Fi</option>
+                  <option value="horror">Horror</option>
+                  <option value="romance">Romance</option>
+                  <option value="drama">Drama</option>
+                  <option value="comedy">Comedy</option>
+                </select>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Story Management -->
+      <div class="card shadow-sm border-0">
+        <div class="card-body">
+          <h5 class="card-title mb-4 text-dark">Story Management</h5>
+          
+          <div id="storiesContainer">
+            <!-- Stories will be loaded here by JavaScript -->
+          </div>
+
+          <!-- Pagination -->
+          <nav aria-label="Story pagination" class="mt-4">
+            <ul class="pagination justify-content-center" id="pagination">
+              <!-- Pagination will be generated by JavaScript -->
+            </ul>
+          </nav>
+        </div>
+      </div>
+    </main>
+  </div>
+</div>
+
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+<script>
+// Sample stories data
+const stories = [
+  {
+    id: 1,
+    title: "The Midnight Library",
+    author: "Emma Johnson",
+    genre: "Fantasy",
+    status: "pending",
+    date: "2023-10-15",
+    synopsis: "A library that opens only at midnight, where each book contains a different version of your life. What if you could undo your regrets?",
+    content: "The clock struck midnight, and the library appeared as if from nowhere. Nora stood before the towering shelves, each book representing a life she could have lived. The librarian, a mysterious figure with knowing eyes, gestured to the endless possibilities..."
+  },
+  {
+    id: 2,
+    title: "Echoes of Tomorrow",
+    author: "Liam Smith",
+    genre: "Sci-Fi",
+    status: "published",
+    date: "2023-09-22",
+    synopsis: "A time traveler discovers that changing the past has unexpected consequences for the future. How much would you sacrifice to fix yesterday?",
+    content: "The temporal displacement field hummed around Alex as the years rewound. 2045 became 2020 in a dizzying rush. But the past wasn't as malleable as the theories suggested. Every change created ripples, and some ripples became tidal waves..."
+  },
+  {
+    id: 3,
+    title: "Whispers in the Dark",
+    author: "Sophia Chen",
+    genre: "Horror",
+    status: "pending",
+    date: "2023-10-18",
+    synopsis: "An ancient house holds secrets that whisper in the night. But some secrets should never be heard.",
+    content: "The old Victorian stood silent against the moonlit sky, but inside, the whispers never ceased. They called to Sarah, promising answers to questions she'd never dared to ask. But the house demanded payment for its secrets, and the price was always higher than expected..."
+  },
+  {
+    id: 4,
+    title: "The Last Summer",
+    author: "Noah Williams",
+    genre: "Romance",
+    status: "published",
+    date: "2023-08-05",
+    synopsis: "A summer romance that was supposed to last forever, until life got in the way. Can first love survive adulthood?",
+    content: "The salt air tasted of forever that summer. Maya and Leo spent their days on the beach, their nights under the stars, believing nothing could ever change. But summer always ends, and forever is shorter than they imagined..."
+  },
+  {
+    id: 5,
+    title: "Crimson Heir",
+    author: "Isabella Rossi",
+    genre: "Fantasy",
+    status: "rejected",
+    date: "2023-10-10",
+    synopsis: "A reluctant princess must reclaim her throne from a usurper with dark magic, but the cost of victory may be her humanity.",
+    content: "The crown felt heavier than Elara remembered. It wasn't the gold and jewels that weighed her down, but the bloodline they represented. Her ancestors had ruled with fire and shadow, and now that legacy was hers to bear, whether she wanted it or not..."
+  },
+  {
+    id: 6,
+    title: "Quantum Shadows",
+    author: "Marcus Reed",
+    genre: "Sci-Fi",
+    status: "published",
+    date: "2023-07-30",
+    synopsis: "In a future where consciousness can be digitized, a detective must solve a murder in both the physical and virtual worlds.",
+    content: "The crime scene existed in two places at once. In the real world, a body lay cold in a sterile apartment. In the virtual realm, digital ghosts whispered of corruption and conspiracy. Detective Kaito moved between both, hunting a killer who understood that reality was just another variable to manipulate..."
+  }
+];
+
+// Add more sample stories
+for (let i = 7; i <= 25; i++) {
+  const genres = ["Fantasy", "Sci-Fi", "Horror", "Romance", "Drama", "Comedy"];
+  const statuses = ["pending", "published", "rejected"];
+  const authors = ["Alex Morgan", "Taylor Kim", "Jordan Lee", "Riley Patel", "Casey Zhang", "Morgan Wells"];
+  
+  stories.push({
+    id: i,
+    title: `Story Title ${i}`,
+    author: authors[Math.floor(Math.random() * authors.length)],
+    genre: genres[Math.floor(Math.random() * genres.length)],
+    status: statuses[Math.floor(Math.random() * statuses.length)],
+    date: `2023-${Math.floor(Math.random() * 12) + 1}-${Math.floor(Math.random() * 28) + 1}`,
+    synopsis: `This is a sample synopsis for story ${i}. It describes what the story is about in a brief paragraph.`,
+    content: `This is the beginning of story ${i}. The content would continue for many paragraphs, but this is just a preview to show how the story starts.`
+  });
+}
+
+// Pagination variables
+const storiesPerPage = 5;
+let currentPage = 1;
+let filteredStories = [...stories];
+
+// Authentication and functionality
+document.addEventListener('DOMContentLoaded', function() {
+  const currentUser = JSON.parse(localStorage.getItem('currentUser'));
+  
+  if (!currentUser) {
+    // If no user is logged in, redirect to login page
+    window.location.href = 'login.html';
+    return;
+  }
+  
+  // Update user info
+  document.getElementById('sidebarUserName').textContent = currentUser.username || currentUser.name;
+  document.getElementById('sidebarUserEmail').textContent = currentUser.email;
+  document.getElementById('modalUserName').textContent = currentUser.username || currentUser.name;
+  document.getElementById('modalUserEmail').textContent = currentUser.email;
+  document.getElementById('modalUserRole').textContent = "Administrator";
+  document.getElementById('modalUserJoined').textContent = currentUser.joined;
+  
+  // Edit Profile Button
+  document.getElementById('editProfileBtn').addEventListener('click', function() {
+    bootstrap.Modal.getInstance(document.getElementById('userProfileModal')).hide();
+    new bootstrap.Modal(document.getElementById('editProfileModal')).show();
+  });
+  
+  // Logout functionality
+  document.getElementById('logoutLink').addEventListener('click', function(e) {
+    e.preventDefault();
+    if (confirm('Are you sure you want to log out?')) {
+      localStorage.removeItem('currentUser');
+      alert('You have been logged out successfully.');
+      window.location.href = 'login.html';
+    }
+  });
+
+  // Force navigation for all sidebar links
+  document.querySelectorAll('.sidebar a[href]').forEach(link => {
+    if (link.getAttribute('href') !== '#' && !link.classList.contains('active')) {
+      link.addEventListener('click', function(e) {
+        e.preventDefault();
+        const targetPage = this.getAttribute('href');
+        console.log('Navigating to:', targetPage);
+        window.location.href = targetPage;
+      });
+    }
+  });
+
+  // Initialize the stories display
+  displayStories();
+  setupPagination();
+});
+
+// Display stories based on current page and filters
+function displayStories() {
+  const container = document.getElementById('storiesContainer');
+  container.innerHTML = '';
+  
+  const startIndex = (currentPage - 1) * storiesPerPage;
+  const endIndex = startIndex + storiesPerPage;
+  const storiesToShow = filteredStories.slice(startIndex, endIndex);
+  
+  if (storiesToShow.length === 0) {
+    container.innerHTML = '<div class="text-center py-4"><p class="text-muted">No stories found matching your criteria.</p></div>';
+    return;
+  }
+  
+  storiesToShow.forEach(story => {
+    const statusClass = `story-card ${story.status}`;
+    const statusBadge = getStatusBadge(story.status);
+    
+    // Determine which buttons to show based on status
+    let buttonsHTML = '';
+    
+    if (story.status === 'published') {
+      buttonsHTML = `
+        <button class="btn btn-sm btn-danger action-btn" onclick="deleteStory(${story.id})"><i class="fas fa-trash me-1"></i>Delete</button>
+        <button class="btn btn-sm btn-primary action-btn" onclick="editStory(${story.id})"><i class="fas fa-edit me-1"></i>Edit</button>
+        <button class="btn btn-sm btn-info action-btn" onclick="viewStory(${story.id})"><i class="fas fa-eye me-1"></i>Preview</button>
+      `;
+    } else if (story.status === 'rejected') {
+      buttonsHTML = `
+        <button class="btn btn-sm btn-info action-btn" onclick="viewStory(${story.id})"><i class="fas fa-eye me-1"></i>Preview</button>
+      `;
+    } else {
+      // For pending and other statuses, show all buttons
+      buttonsHTML = `
+        <button class="btn btn-sm btn-success action-btn" onclick="approveStory(${story.id})"><i class="fas fa-check me-1"></i>Approve</button>
+        <button class="btn btn-sm btn-danger action-btn" onclick="rejectStory(${story.id})"><i class="fas fa-times me-1"></i>Reject</button>
+        <button class="btn btn-sm btn-primary action-btn" onclick="editStory(${story.id})"><i class="fas fa-edit me-1"></i>Edit</button>
+        <button class="btn btn-sm btn-info action-btn" onclick="viewStory(${story.id})"><i class="fas fa-eye me-1"></i>Preview</button>
+        <button class="btn btn-sm btn-warning action-btn" onclick="unpublishStory(${story.id})"><i class="fas fa-undo me-1"></i>Unpublish</button>
+      `;
+    }
+    
+    const storyElement = document.createElement('div');
+    storyElement.className = statusClass;
+    storyElement.innerHTML = `
+      <h6 class="text-dark">${story.title}</h6>
+      <p class="text-muted mb-2">By: ${story.author} • Genre: ${story.genre} • Status: ${statusBadge}</p>
+      <p class="mb-3">${story.synopsis}</p>
+      <div class="btn-group">
+        ${buttonsHTML}
+      </div>
+    `;
+    container.appendChild(storyElement);
+  });
+}
+
+// Get status badge HTML
+function getStatusBadge(status) {
+  switch(status) {
+    case 'pending':
+      return '<span class="badge bg-warning">Pending Review</span>';
+    case 'published':
+      return '<span class="badge bg-success">Published</span>';
+    case 'rejected':
+      return '<span class="badge bg-danger">Rejected</span>';
+    default:
+      return '<span class="badge bg-secondary">Unknown</span>';
+  }
+}
+
+// Setup pagination
+function setupPagination() {
+  const pagination = document.getElementById('pagination');
+  pagination.innerHTML = '';
+  
+  const pageCount = Math.ceil(filteredStories.length / storiesPerPage);
+  
+  // Previous button
+  const prevLi = document.createElement('li');
+  prevLi.className = `page-item ${currentPage === 1 ? 'disabled' : ''}`;
+  prevLi.innerHTML = `<a class="page-link" href="#" onclick="changePage(${currentPage - 1})">Previous</a>`;
+  pagination.appendChild(prevLi);
+  
+  // Page numbers
+  for (let i = 1; i <= pageCount; i++) {
+    const li = document.createElement('li');
+    li.className = `page-item ${i === currentPage ? 'active' : ''}`;
+    li.innerHTML = `<a class="page-link" href="#" onclick="changePage(${i})">${i}</a>`;
+    pagination.appendChild(li);
+  }
+  
+  // Next button
+  const nextLi = document.createElement('li');
+  nextLi.className = `page-item ${currentPage === pageCount ? 'disabled' : ''}`;
+  nextLi.innerHTML = `<a class="page-link" href="#" onclick="changePage(${currentPage + 1})">Next</a>`;
+  pagination.appendChild(nextLi);
+}
+
+// Change page
+function changePage(page) {
+  const pageCount = Math.ceil(filteredStories.length / storiesPerPage);
+  if (page < 1 || page > pageCount) return;
+  
+  currentPage = page;
+  displayStories();
+  setupPagination();
+}
+
+// Search stories
+function searchStories() {
+  const searchTerm = document.getElementById('searchInput').value.toLowerCase();
+  
+  filteredStories = stories.filter(story => 
+    story.title.toLowerCase().includes(searchTerm) ||
+    story.author.toLowerCase().includes(searchTerm) ||
+    story.genre.toLowerCase().includes(searchTerm) ||
+    story.synopsis.toLowerCase().includes(searchTerm)
+  );
+  
+  currentPage = 1;
+  displayStories();
+  setupPagination();
+}
+
+// Filter stories by status and genre
+function filterStories() {
+  const statusFilter = document.getElementById('statusFilter').value;
+  const genreFilter = document.getElementById('genreFilter').value;
+  
+  filteredStories = stories.filter(story => {
+    const statusMatch = statusFilter === 'all' || story.status === statusFilter;
+    const genreMatch = genreFilter === 'all' || story.genre.toLowerCase() === genreFilter;
+    return statusMatch && genreMatch;
+  });
+  
+  currentPage = 1;
+  displayStories();
+  setupPagination();
+}
+
+// Story Management Functions
+function approveStory(storyId) {
+  if (confirm('Are you sure you want to approve this story?')) {
+    const story = stories.find(s => s.id === storyId);
+    if (story) {
+      story.status = 'published';
+      alert(`Story "${story.title}" has been approved and published!`);
+      displayStories();
+    }
+  }
+}
+
+function rejectStory(storyId) {
+  const reason = prompt('Please enter the reason for rejection:');
+  if (reason) {
+    const story = stories.find(s => s.id === storyId);
+    if (story) {
+      story.status = 'rejected';
+      alert(`Story "${story.title}" has been rejected. Reason: ${reason}`);
+      displayStories();
+    }
+  }
+}
+
+function editStory(storyId) {
+  alert(`Editing Story #${storyId}\n\nThis would open the story editor.`);
+}
+
+function viewStory(storyId) {
+  const story = stories.find(s => s.id === storyId);
+  if (story) {
+    document.getElementById('detailTitle').textContent = story.title;
+    document.getElementById('detailAuthor').textContent = story.author;
+    document.getElementById('detailGenre').textContent = story.genre;
+    document.getElementById('detailStatus').innerHTML = getStatusBadge(story.status);
+    document.getElementById('detailDate').textContent = story.date;
+    document.getElementById('detailSynopsis').textContent = story.synopsis;
+    document.getElementById('detailContent').textContent = story.content;
+    
+    new bootstrap.Modal(document.getElementById('storyDetailModal')).show();
+  }
+}
+
+function unpublishStory(storyId) {
+  if (confirm('Are you sure you want to unpublish this story?')) {
+    const story = stories.find(s => s.id === storyId);
+    if (story) {
+      story.status = 'pending';
+      alert(`Story "${story.title}" has been unpublished!`);
+      displayStories();
+    }
+  }
+}
+
+function deleteStory(storyId) {
+  if (confirm('Are you sure you want to delete this story? This action cannot be undone.')) {
+    const storyIndex = stories.findIndex(s => s.id === storyId);
+    if (storyIndex !== -1) {
+      const storyTitle = stories[storyIndex].title;
+      stories.splice(storyIndex, 1);
+      alert(`Story "${storyTitle}" has been deleted successfully!`);
+      
+      // Update filtered stories as well
+      const filteredIndex = filteredStories.findIndex(s => s.id === storyId);
+      if (filteredIndex !== -1) {
+        filteredStories.splice(filteredIndex, 1);
+      }
+      
+      displayStories();
+      setupPagination();
+    }
+  }
+}
+
+// Profile Management Functions
+function changeProfilePicture() {
+  alert('Change Profile Picture\n\nThis would open a file picker to upload a new profile picture.');
+}
+
+function saveProfileChanges() {
+  const newUsername = document.getElementById('editUsername').value;
+  const newEmail = document.getElementById('editEmail').value;
+  const newBio = document.getElementById('editBio').value;
+  
+  if (!newUsername || !newEmail) {
+    alert('Please fill in all required fields.');
+    return;
+  }
+  
+  const currentUser = JSON.parse(localStorage.getItem('currentUser'));
+  currentUser.username = newUsername;
+  currentUser.name = newUsername;
+  currentUser.email = newEmail;
+  currentUser.bio = newBio;
+  
+  localStorage.setItem('currentUser', JSON.stringify(currentUser));
+  
+  document.getElementById('sidebarUserName').textContent = newUsername;
+  document.getElementById('modalUserName').textContent = newUsername;
+  document.getElementById('modalUserEmail').textContent = newEmail;
+  document.getElementById('sidebarUserEmail').textContent = newEmail;
+  
+  alert('Profile updated successfully!');
+  bootstrap.Modal.getInstance(document.getElementById('editProfileModal')).hide();
+}
+</script>
+</body>
+</html>

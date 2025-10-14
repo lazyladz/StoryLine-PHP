@@ -1,0 +1,672 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Manage Users</title>
+  <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+  <!-- Font Awesome for icons -->
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+  <style>
+    body {
+      background-color: #f8f9fb;
+    }
+    .sidebar {
+      min-height: 100vh;
+      background-color: #0d1321;
+      color: #fff;
+    }
+    .sidebar a {
+      color: #adb5bd;
+      text-decoration: none;
+      display: block;
+      padding: .75rem 1rem;
+      border-radius: .375rem;
+      transition: all 0.3s ease;
+    }
+    .sidebar a:hover, .sidebar a.active {
+      background-color: #1c2333;
+      color: #fff;
+    }
+    tr { cursor: pointer; }
+    .badge-admin {
+      background-color: #0d6efd;
+      color: white;
+    }
+    .badge-user {
+      background-color: #6c757d;
+      color: white;
+    }
+    .badge-moderator {
+      background-color: #fd7e14;
+      color: white;
+    }
+    .page-icon {
+      margin-right: 8px;
+    }
+    .action-icon {
+      margin-right: 5px;
+    }
+    .text-primary {
+      color: #0d6efd !important;
+    }
+  </style>
+</head>
+
+<body>
+<div class="container-fluid">
+  <div class="row">
+    <!-- Sidebar -->
+    <nav class="col-md-3 col-lg-2 d-md-block sidebar p-3">
+      <h4 class="text-white mb-4">StoryLine</h4>
+      <ul class="nav flex-column mt-4">
+        <li class="nav-item"><a href="index.html" class="nav-link"><i class="fas fa-chart-bar me-2"></i>Dashboard</a></li>
+        <li class="nav-item"><a href="manageUser.html" class="nav-link active text-white"><i class="fas fa-users me-2"></i>Manage Users</a></li>
+        <li class="nav-item"><a href="manageStories.html" class="nav-link"><i class="fas fa-book me-2"></i>Manage Stories</a></li>
+        <li class="nav-item"><a href="notifications.html" class="nav-link"><i class="fas fa-bell me-2"></i>Notifications</a></li>
+        <li class="nav-item"><a href="settings.html" class="nav-link"><i class="fas fa-cog me-2"></i>Settings</a></li>
+        <li class="nav-item"><a href="#" class="nav-link" id="logoutLink"><i class="fas fa-sign-out-alt me-2"></i>Log Out</a></li>
+      </ul>
+
+      <div class="mt-auto pt-3">
+        <!-- Button trigger modal -->
+        <button type="button" class="btn btn-outline-light w-100" data-bs-toggle="modal" data-bs-target="#userProfileModal">
+          <strong id="sidebarUserName">Loading...</strong><br>
+          <small id="sidebarUserEmail">Loading...</small>
+        </button>
+      </div>
+    </nav>
+      
+    <!-- User Profile Modal -->
+    <div class="modal fade" id="userProfileModal" tabindex="-1" aria-labelledby="userProfileLabel" aria-hidden="true">
+      <div class="modal-dialog modal-dialog-centered">
+        <div class="modal-content">
+          <div class="modal-header">
+            <h5 class="modal-title" id="userProfileLabel"><i class="fas fa-user-circle me-2"></i>User Profile</h5>
+            <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+          </div>
+          <div class="modal-body text-center">
+            <img src="https://via.placeholder.com/100" class="rounded-circle mb-3" alt="Profile Picture" id="profilePicture">
+            <h5 id="modalUserName">Loading...</h5>
+            <p class="text-muted" id="modalUserEmail">Loading...</p>
+            <hr>
+            <p><strong>Role:</strong> <span id="modalUserRole" class="fw-bold text-primary">Administrator</span></p>
+            <p><strong>Joined:</strong> <span id="modalUserJoined">Loading...</span></p>
+          </div>
+          <div class="modal-footer">
+            <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
+            <button type="button" class="btn btn-primary" id="editProfileBtn"><i class="fas fa-edit me-1"></i>Edit Profile</button>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Edit Profile Modal -->
+    <div class="modal fade" id="editProfileModal" tabindex="-1" aria-labelledby="editProfileLabel" aria-hidden="true">
+      <div class="modal-dialog modal-dialog-centered">
+        <div class="modal-content">
+          <div class="modal-header">
+            <h5 class="modal-title" id="editProfileLabel"><i class="fas fa-user-edit me-2"></i>Edit Profile</h5>
+            <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+          </div>
+          <div class="modal-body">
+            <div class="text-center mb-3">
+              <img src="https://via.placeholder.com/100" class="rounded-circle mb-2" alt="Profile Picture" id="editProfilePicture">
+              <br>
+              <button type="button" class="btn btn-outline-secondary btn-sm" onclick="changeProfilePicture()"><i class="fas fa-camera me-1"></i>Change Picture</button>
+            </div>
+            <div class="mb-3">
+              <label class="form-label"><i class="fas fa-user me-1"></i>Username</label>
+              <input type="text" class="form-control" id="editUsername" placeholder="Enter username">
+            </div>
+            <div class="mb-3">
+              <label class="form-label"><i class="fas fa-envelope me-1"></i>Email</label>
+              <input type="email" class="form-control" id="editEmail" placeholder="Enter email">
+            </div>
+            <div class="mb-3">
+              <label class="form-label"><i class="fas fa-info-circle me-1"></i>Bio</label>
+              <textarea class="form-control" id="editBio" rows="3" placeholder="Tell us about yourself..."></textarea>
+            </div>
+          </div>
+          <div class="modal-footer">
+            <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancel</button>
+            <button type="button" class="btn btn-primary" onclick="saveProfileChanges()"><i class="fas fa-save me-1"></i>Save Changes</button>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- User Detail Modal -->
+    <div class="modal fade" id="userDetailModal" tabindex="-1" aria-labelledby="userDetailLabel" aria-hidden="true">
+      <div class="modal-dialog modal-dialog-centered modal-lg">
+        <div class="modal-content border-0 shadow-lg rounded-4">
+          <div class="modal-header border-0 pb-0">
+            <h5 class="modal-title fw-bold text-primary" id="userDetailLabel"><i class="fas fa-user-circle me-2"></i>User Information</h5>
+            <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+          </div>
+          
+          <div class="modal-body">
+            <div class="text-center mb-4">
+              <img src="https://via.placeholder.com/120" class="rounded-circle shadow-sm border" alt="Profile Picture">
+              <h4 class="mt-3 fw-bold" id="modalName"></h4>
+              <p class="text-muted mb-1" id="modalEmail"></p>
+              <span class="badge rounded-pill" id="modalRoleBadge">User</span>
+            </div>
+            
+            <div class="row text-center g-3">
+              <div class="col-md-4">
+                <div class="p-3 bg-light rounded-3 shadow-sm h-100">
+                  <h6 class="text-secondary mb-1"><i class="fas fa-book me-1"></i>Stories Uploaded</h6>
+                  <h4 class="fw-bold text-dark" id="modalStories"></h4>
+                </div>
+              </div>
+              <div class="col-md-4">
+                <div class="p-3 bg-light rounded-3 shadow-sm h-100">
+                  <h6 class="text-secondary mb-1"><i class="fas fa-calendar-alt me-1"></i>Joined</h6>
+                  <h4 class="fw-bold text-dark" id="modalJoined"></h4>
+                </div>
+              </div>
+              <div class="col-md-4">
+                <div class="p-3 bg-light rounded-3 shadow-sm h-100">
+                  <h6 class="text-secondary mb-1"><i class="fas fa-id-card me-1"></i>User ID</h6>
+                  <h4 class="fw-bold text-dark" id="modalUserId"></h4>
+                </div>
+              </div>
+            </div>
+
+            <!-- User Actions -->
+            <div class="mt-4 p-3 bg-light rounded-3">
+              <h6 class="text-secondary mb-3"><i class="fas fa-cogs me-1"></i>User Management Actions</h6>
+              <div class="row g-2">
+                <div class="col-md-6">
+                  <button class="btn btn-outline-primary w-100 mb-2" onclick="changeUserRole()">
+                    <i class="fas fa-user-cog me-1"></i>Change Role
+                  </button>
+                </div>
+                <div class="col-md-6">
+                  <button class="btn btn-outline-warning w-100 mb-2" onclick="resetUserPassword()">
+                    <i class="fas fa-key me-1"></i>Reset Password
+                  </button>
+                </div>
+                <div class="col-md-6">
+                  <button class="btn btn-outline-info w-100 mb-2" onclick="viewUserStories()">
+                    <i class="fas fa-book me-1"></i>View Stories
+                  </button>
+                </div>
+                <div class="col-md-6">
+                  <button class="btn btn-outline-danger w-100 mb-2" onclick="deactivateUser()">
+                    <i class="fas fa-user-slash me-1"></i>Deactivate
+                  </button>
+                </div>
+              </div>
+            </div>
+          </div>
+          
+          <div class="modal-footer border-0">
+            <button type="button" class="btn btn-outline-secondary rounded-pill px-4" data-bs-dismiss="modal"><i class="fas fa-times me-1"></i>Close</button>
+            <button type="button" class="btn btn-primary rounded-pill px-4" onclick="openUserManagement()"><i class="fas fa-user-cog me-1"></i>Manage User</button>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- User Management Modal -->
+    <div class="modal fade" id="userManagementModal" tabindex="-1" aria-labelledby="userManagementLabel" aria-hidden="true">
+      <div class="modal-dialog modal-dialog-centered">
+        <div class="modal-content">
+          <div class="modal-header">
+            <h5 class="modal-title" id="userManagementLabel"><i class="fas fa-user-cog me-2"></i>Manage User: <span id="managementUserName"></span></h5>
+            <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+          </div>
+          <div class="modal-body">
+            <div class="mb-3">
+              <label class="form-label"><i class="fas fa-user-tag me-1"></i>Change User Role</label>
+              <select class="form-select" id="roleSelect">
+                <option value="user">User</option>
+                <option value="moderator">Moderator</option>
+                <option value="admin">Administrator</option>
+              </select>
+            </div>
+            <div class="mb-3">
+              <label class="form-label"><i class="fas fa-user-check me-1"></i>Account Status</label>
+              <select class="form-select" id="statusSelect">
+                <option value="active">Active</option>
+                <option value="suspended">Suspended</option>
+                <option value="banned">Banned</option>
+              </select>
+            </div>
+            <div class="mb-3">
+              <label class="form-label"><i class="fas fa-bell me-1"></i>Send Notification</label>
+              <textarea class="form-control" id="notificationMessage" rows="3" placeholder="Enter notification message..."></textarea>
+            </div>
+          </div>
+          <div class="modal-footer">
+            <button type="button" class="btn btn-secondary" data-bs-dismiss="modal"><i class="fas fa-times me-1"></i>Cancel</button>
+            <button type="button" class="btn btn-danger" onclick="deleteUser()"><i class="fas fa-trash me-1"></i>Delete User</button>
+            <button type="button" class="btn btn-success" onclick="saveUserChanges()"><i class="fas fa-save me-1"></i>Save Changes</button>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Main Content -->
+    <main class="col-md-9 ms-sm-auto col-lg-10 px-md-4 py-4">
+      <h2 class="mb-4"><i class="fas fa-users me-2"></i>Manage Users</h2>
+
+      <div class="card shadow-sm">
+        <div class="card-header bg-white">
+          <div class="d-flex justify-content-between align-items-center">
+            <h5 class="mb-0"><i class="fas fa-table me-2"></i>User List</h5>
+            <div class="d-flex">
+              <div class="input-group me-2" style="width: 250px;">
+                <span class="input-group-text"><i class="fas fa-search"></i></span>
+                <input type="text" class="form-control" placeholder="Search users..." id="searchInput">
+              </div>
+            </div>
+          </div>
+        </div>
+        <div class="card-body">
+          <div class="table-responsive">
+            <table class="table table-striped table-bordered">
+              <thead class="table-dark">
+                <tr>
+                  <th><i class="fas fa-id-card me-1"></i>ID No.</th>
+                  <th><i class="fas fa-user me-1"></i>First Name</th>
+                  <th><i class="fas fa-user me-1"></i>Last Name</th>
+                  <th><i class="fas fa-envelope me-1"></i>Email</th>
+                  <th><i class="fas fa-user-tag me-1"></i>Role</th>
+                  <th><i class="fas fa-cog me-1"></i>Actions</th>
+                </tr>
+              </thead>
+              <tbody id="userTable">
+                <!-- Filled by JS -->
+              </tbody>
+            </table>
+          </div>
+
+          <!-- Pagination -->
+          <nav>
+            <ul class="pagination justify-content-center" id="pagination">
+              <!-- Filled by JS -->
+            </ul>
+          </nav>
+        </div>
+      </div>
+    </main>
+  </div>
+</div>
+
+<script>
+// Global variable to store current selected user
+let currentSelectedUser = null;
+
+// Authentication and logout functionality
+document.addEventListener('DOMContentLoaded', function() {
+  // Check if user is logged in
+  const currentUser = JSON.parse(localStorage.getItem('currentUser'));
+  
+  if (!currentUser) {
+    // Redirect to login if not authenticated
+    window.location.href = 'login.html';
+    return;
+  }
+  
+  // Update user info in the sidebar
+  const sidebarUserName = document.getElementById('sidebarUserName');
+  const sidebarUserEmail = document.getElementById('sidebarUserEmail');
+  
+  if (sidebarUserName) sidebarUserName.textContent = currentUser.username || currentUser.name;
+  if (sidebarUserEmail) sidebarUserEmail.textContent = currentUser.email;
+  
+  // Update user profile modal
+  const modalUserName = document.getElementById('modalUserName');
+  const modalUserEmail = document.getElementById('modalUserEmail');
+  const modalUserRole = document.getElementById('modalUserRole');
+  const modalUserJoined = document.getElementById('modalUserJoined');
+  
+  if (modalUserName) modalUserName.textContent = currentUser.username || currentUser.name;
+  if (modalUserEmail) modalUserEmail.textContent = currentUser.email;
+  if (modalUserRole) modalUserRole.textContent = "Administrator";
+  if (modalUserJoined) modalUserJoined.textContent = currentUser.joined;
+  
+  // Populate edit profile form
+  document.getElementById('editUsername').value = currentUser.username || currentUser.name;
+  document.getElementById('editEmail').value = currentUser.email;
+  document.getElementById('editBio').value = currentUser.bio || "No bio yet...";
+  
+  // Edit Profile Button
+  document.getElementById('editProfileBtn').addEventListener('click', function() {
+    // Close profile modal and open edit modal
+    bootstrap.Modal.getInstance(document.getElementById('userProfileModal')).hide();
+    new bootstrap.Modal(document.getElementById('editProfileModal')).show();
+  });
+  
+  // Add logout functionality
+  const logoutLink = document.getElementById('logoutLink');
+  if (logoutLink) {
+    logoutLink.addEventListener('click', function(e) {
+      e.preventDefault();
+      
+      // Show confirmation dialog
+      if (confirm('Are you sure you want to log out?')) {
+        // Remove user data from localStorage
+        localStorage.removeItem('currentUser');
+        
+        // Show logout message
+        alert('You have been logged out successfully.');
+        
+        // Redirect to login page
+        window.location.href = 'login.html';
+      }
+    });
+  }
+});
+
+// Profile Management Functions
+function changeProfilePicture() {
+  alert('Change Profile Picture\n\nThis would open a file picker to upload a new profile picture.');
+  // In a real application, you would implement file upload functionality
+}
+
+function saveProfileChanges() {
+  const newUsername = document.getElementById('editUsername').value;
+  const newEmail = document.getElementById('editEmail').value;
+  const newBio = document.getElementById('editBio').value;
+  
+  if (!newUsername || !newEmail) {
+    alert('Please fill in all required fields.');
+    return;
+  }
+  
+  // Update current user in localStorage
+  const currentUser = JSON.parse(localStorage.getItem('currentUser'));
+  currentUser.username = newUsername;
+  currentUser.name = newUsername;
+  currentUser.email = newEmail;
+  currentUser.bio = newBio;
+  
+  localStorage.setItem('currentUser', JSON.stringify(currentUser));
+  
+  // Update UI
+  document.getElementById('sidebarUserName').textContent = newUsername;
+  document.getElementById('modalUserName').textContent = newUsername;
+  document.getElementById('modalUserEmail').textContent = newEmail;
+  document.getElementById('sidebarUserEmail').textContent = newEmail;
+  
+  alert('Profile updated successfully!');
+  
+  // Close modal
+  bootstrap.Modal.getInstance(document.getElementById('editProfileModal')).hide();
+}
+
+// Sample names
+const firstNames = ["Olivia", "Liam", "Emma", "Noah", "Ava", "Elijah", "Sophia", "Lucas", "Mia", "Amelia"];
+const lastNames = ["Smith", "Johnson", "Williams", "Brown", "Jones", "Garcia", "Miller", "Davis"];
+const domains = ["example.com", "mail.com", "test.org", "demo.net"];
+
+// Random helper
+function getRandom(arr) {
+  return arr[Math.floor(Math.random() * arr.length)];
+}
+
+// Generate fake users with roles
+const users = [];
+for (let i = 1; i <= 50; i++) {
+  const firstName = getRandom(firstNames);
+  const lastName = getRandom(lastNames);
+  const email = `${firstName.toLowerCase()}.${lastName.toLowerCase()}${i}@${getRandom(domains)}`;
+  const stories = Math.floor(Math.random() * 30);
+  const joinedDate = `202${Math.floor(Math.random()*5)}-0${Math.floor(Math.random()*9)+1}-15`;
+  
+  // Assign roles
+  let role = "user";
+  if (i === 1) {
+    role = "admin";
+  } else if (i <= 5) {
+    role = "moderator";
+  }
+
+  users.push({
+    id: i,
+    firstName,
+    lastName,
+    email,
+    stories,
+    joined: joinedDate,
+    role: role,
+    status: "active"
+  });
+}
+
+const rowsPerPage = 15;
+let currentPage = 1;
+
+function displayTable(page) {
+  const table = document.getElementById("userTable");
+  table.innerHTML = "";
+
+  const start = (page - 1) * rowsPerPage;
+  const end = start + rowsPerPage;
+  const paginatedUsers = users.slice(start, end);
+
+  paginatedUsers.forEach(user => {
+    const row = document.createElement("tr");
+    const roleBadge = user.role === "admin" ? 
+      '<span class="badge badge-admin"><i class="fas fa-crown me-1"></i>Admin</span>' : 
+      user.role === "moderator" ? 
+      '<span class="badge badge-moderator"><i class="fas fa-user-shield me-1"></i>Moderator</span>' : 
+      '<span class="badge badge-user"><i class="fas fa-user me-1"></i>User</span>';
+    
+    row.innerHTML = `
+      <td>${user.id}</td>
+      <td>${user.firstName}</td>
+      <td>${user.lastName}</td>
+      <td>${user.email}</td>
+      <td>${roleBadge}</td>
+      <td>
+        <button class="btn btn-sm btn-outline-primary" onclick="showUserDetail(${user.id})">
+          <i class="fas fa-eye"></i>
+        </button>
+        <button class="btn btn-sm btn-outline-warning" onclick="editUser(${user.id})">
+          <i class="fas fa-edit"></i>
+        </button>
+        <button class="btn btn-sm btn-outline-danger" onclick="deleteUserById(${user.id})">
+          <i class="fas fa-trash"></i>
+        </button>
+      </td>
+    `;
+    table.appendChild(row);
+  });
+}
+
+function setupPagination() {
+  const pageCount = Math.ceil(users.length / rowsPerPage);
+  const pagination = document.getElementById("pagination");
+  pagination.innerHTML = "";
+
+  // Previous button
+  pagination.innerHTML += `
+    <li class="page-item ${currentPage === 1 ? "disabled" : ""}">
+      <a class="page-link" href="#" onclick="changePage(${currentPage - 1})">
+        <i class="fas fa-chevron-left"></i>
+      </a>
+    </li>`;
+
+  for (let i = 1; i <= pageCount; i++) {
+    pagination.innerHTML += `
+      <li class="page-item ${i === currentPage ? "active" : ""}">
+        <a class="page-link" href="#" onclick="changePage(${i})">${i}</a>
+      </li>`;
+  }
+
+  // Next button
+  pagination.innerHTML += `
+    <li class="page-item ${currentPage === pageCount ? "disabled" : ""}">
+      <a class="page-link" href="#" onclick="changePage(${currentPage + 1})">
+        <i class="fas fa-chevron-right"></i>
+      </a>
+    </li>`;
+}
+
+function changePage(page) {
+  currentPage = page;
+  displayTable(page);
+  setupPagination();
+}
+
+// Show user detail modal
+function showUserDetail(userId) {
+  const user = users.find(u => u.id === userId);
+  if (!user) return;
+  
+  currentSelectedUser = user;
+  
+  document.getElementById("modalName").innerText = `${user.firstName} ${user.lastName}`;
+  document.getElementById("modalEmail").innerText = user.email;
+  document.getElementById("modalStories").innerText = user.stories;
+  document.getElementById("modalJoined").innerText = user.joined;
+  document.getElementById("modalUserId").innerText = `#${user.id}`;
+  
+  // Update role badge
+  const roleBadge = document.getElementById("modalRoleBadge");
+  roleBadge.textContent = user.role.charAt(0).toUpperCase() + user.role.slice(1);
+  roleBadge.className = "badge rounded-pill ";
+  
+  if (user.role === "admin") {
+    roleBadge.classList.add("badge-admin");
+  } else if (user.role === "moderator") {
+    roleBadge.classList.add("badge-moderator");
+  } else {
+    roleBadge.classList.add("badge-user");
+  }
+  
+  new bootstrap.Modal(document.getElementById("userDetailModal")).show();
+}
+
+// Manage User Functions
+function openUserManagement() {
+  if (!currentSelectedUser) return;
+  
+  document.getElementById("managementUserName").textContent = `${currentSelectedUser.firstName} ${currentSelectedUser.lastName}`;
+  document.getElementById("roleSelect").value = currentSelectedUser.role;
+  document.getElementById("statusSelect").value = currentSelectedUser.status;
+  document.getElementById("notificationMessage").value = "";
+  
+  // Close user detail modal and open management modal
+  bootstrap.Modal.getInstance(document.getElementById("userDetailModal")).hide();
+  new bootstrap.Modal(document.getElementById("userManagementModal")).show();
+}
+
+function saveUserChanges() {
+  if (!currentSelectedUser) return;
+  
+  const newRole = document.getElementById("roleSelect").value;
+  const newStatus = document.getElementById("statusSelect").value;
+  const notification = document.getElementById("notificationMessage").value;
+  
+  // Update user data
+  currentSelectedUser.role = newRole;
+  currentSelectedUser.status = newStatus;
+  
+  // Show success message
+  let message = `User ${currentSelectedUser.firstName} ${currentSelectedUser.lastName} updated successfully.`;
+  if (notification) {
+    message += ` Notification sent: "${notification}"`;
+  }
+  
+  alert(message);
+  
+  // Refresh the table
+  displayTable(currentPage);
+  
+  // Close modal
+  bootstrap.Modal.getInstance(document.getElementById("userManagementModal")).hide();
+}
+
+function deleteUser() {
+  if (!currentSelectedUser) return;
+  
+  if (confirm(`Are you sure you want to permanently delete user ${currentSelectedUser.firstName} ${currentSelectedUser.lastName}? This action cannot be undone.`)) {
+    // Remove user from array
+    const userIndex = users.findIndex(u => u.id === currentSelectedUser.id);
+    if (userIndex !== -1) {
+      users.splice(userIndex, 1);
+    }
+    
+    alert(`User ${currentSelectedUser.firstName} ${currentSelectedUser.lastName} has been deleted.`);
+    
+    // Refresh the table
+    displayTable(currentPage);
+    setupPagination();
+    
+    // Close modal
+    bootstrap.Modal.getInstance(document.getElementById("userManagementModal")).hide();
+  }
+}
+
+function deleteUserById(userId) {
+  const user = users.find(u => u.id === userId);
+  if (!user) return;
+  
+  if (confirm(`Are you sure you want to delete user ${user.firstName} ${user.lastName}?`)) {
+    const userIndex = users.findIndex(u => u.id === userId);
+    if (userIndex !== -1) {
+      users.splice(userIndex, 1);
+    }
+    
+    alert(`User ${user.firstName} ${user.lastName} has been deleted.`);
+    
+    // Refresh the table
+    displayTable(currentPage);
+    setupPagination();
+  }
+}
+
+function editUser(userId) {
+  const user = users.find(u => u.id === userId);
+  if (!user) return;
+  
+  currentSelectedUser = user;
+  openUserManagement();
+}
+
+function changeUserRole() {
+  if (!currentSelectedUser) return;
+  openUserManagement();
+}
+
+function resetUserPassword() {
+  if (!currentSelectedUser) return;
+  
+  if (confirm(`Reset password for ${currentSelectedUser.firstName} ${currentSelectedUser.lastName}? A temporary password will be generated and sent to their email.`)) {
+    const tempPassword = Math.random().toString(36).slice(-8);
+    alert(`Password reset successful! Temporary password: ${tempPassword}\nThis has been sent to ${currentSelectedUser.email}`);
+  }
+}
+
+function viewUserStories() {
+  if (!currentSelectedUser) return;
+  
+  alert(`Viewing stories by ${currentSelectedUser.firstName} ${currentSelectedUser.lastName}\nTotal Stories: ${currentSelectedUser.stories}\n\nThis would open a separate stories management interface.`);
+}
+
+function deactivateUser() {
+  if (!currentSelectedUser) return;
+  
+  if (confirm(`Deactivate account for ${currentSelectedUser.firstName} ${currentSelectedUser.lastName}? They will not be able to login until reactivated.`)) {
+    currentSelectedUser.status = "suspended";
+    alert(`User ${currentSelectedUser.firstName} ${currentSelectedUser.lastName} has been deactivated.`);
+    
+    // Refresh the table
+    displayTable(currentPage);
+  }
+}
+
+// Initial load
+displayTable(currentPage);
+setupPagination();
+</script>
+
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+</body>
+</html>
