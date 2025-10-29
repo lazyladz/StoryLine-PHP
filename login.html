@@ -100,50 +100,50 @@
 
   <script>
     document.getElementById("loginForm").addEventListener("submit", async function(e) {
-      e.preventDefault();
+    e.preventDefault();
 
-      const emailEl = document.getElementById("email");
-      const passwordEl = document.getElementById("password");
+    const emailEl = document.getElementById("email");
+    const passwordEl = document.getElementById("password");
 
-      // Clear previous errors
-      emailEl.classList.remove("is-invalid");
-      passwordEl.classList.remove("is-invalid");
-      emailEl.nextElementSibling.textContent = "";
-      passwordEl.nextElementSibling.textContent = "";
+    // Clear previous errors
+    emailEl.classList.remove("is-invalid");
+    passwordEl.classList.remove("is-invalid");
+    emailEl.nextElementSibling.textContent = "";
+    passwordEl.nextElementSibling.textContent = "";
 
-      if (!emailEl.value.trim()) {
+    if (!emailEl.value.trim()) {
         emailEl.classList.add("is-invalid");
         emailEl.nextElementSibling.textContent = "Email is required.";
         return;
-      }
+    }
 
-      if (!passwordEl.value.trim()) {
+    if (!passwordEl.value.trim()) {
         passwordEl.classList.add("is-invalid");
         passwordEl.nextElementSibling.textContent = "Password is required.";
         return;
-      }
+    }
 
-      const formData = new FormData();
-      formData.append("email", emailEl.value.trim());
-      formData.append("password", passwordEl.value);
+    const formData = new FormData();
+    formData.append("email", emailEl.value.trim());
+    formData.append("password", passwordEl.value);
 
-      try {
+    try {
         const res = await fetch("login.php", { method: "POST", body: formData });
         const data = await res.json();
 
         if (data.success) {
-          // Redirect to dashboard
-          window.location.href = data.redirect;
+            // Redirect based on role (admin goes to indexAdmin.html, user to dashboard.php)
+            window.location.href = data.redirect;
         } else {
-          emailEl.classList.add("is-invalid");
-          passwordEl.classList.add("is-invalid");
-          emailEl.nextElementSibling.textContent = data.errors[0];
-          passwordEl.nextElementSibling.textContent = "";
+            emailEl.classList.add("is-invalid");
+            passwordEl.classList.add("is-invalid");
+            emailEl.nextElementSibling.textContent = data.errors[0];
+            passwordEl.nextElementSibling.textContent = "";
         }
-      } catch (err) {
+    } catch (err) {
         console.error(err);
-      }
-    });
+    }
+});
 
     // Toggle password visibility
     document.querySelectorAll(".toggle-password").forEach(btn => {

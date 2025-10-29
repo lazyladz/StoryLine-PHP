@@ -43,16 +43,20 @@ try {
         exit;
     }
     
-    // ✅ Login successful: save session
+    // ✅ Login successful: save session with role
     $_SESSION['user'] = [
         "id" => $user['id'],
         "first_name" => $user['first_name'],
         "last_name" => $user['last_name'],
-        "email" => $user['email']
+        "email" => $user['email'],
+        "role" => $user['role'] // Add role to session
     ];
     
+    // ✅ Redirect based on role
+    $redirect = ($user['role'] == 'admin') ? 'indexAdmin.php' : 'dashboard.php';
+    
     // Respond with redirect
-    echo json_encode(["success" => true, "redirect" => "dashboard.php"]);
+    echo json_encode(["success" => true, "redirect" => $redirect]);
 
 } catch (Exception $e) {
     echo json_encode(["success" => false, "errors" => ["Database error: " . $e->getMessage()]]);

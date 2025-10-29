@@ -1,0 +1,117 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Settings - StoryLine</title>
+  <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+  <style>
+    body {
+      background-color: #f8f9fb;
+    }
+    .sidebar {
+      min-height: 100vh;
+      background-color: #0d1321;
+      color: #fff;
+    }
+    .sidebar a {
+      color: #adb5bd;
+      text-decoration: none;
+      display: block;
+      padding: .75rem 1rem;
+      border-radius: .375rem;
+    }
+    .sidebar a:hover {
+      background-color: #1c2333;
+      color: #fff;
+    }
+    .settings-section {
+      background: white;
+      padding: 1.5rem;
+      border-radius: .75rem;
+      margin-bottom: 1.5rem;
+    }
+  </style>
+</head>
+<body>
+<div class="container-fluid">
+  <div class="row">
+    <!-- Sidebar -->
+    <nav class="col-md-3 col-lg-2 d-md-block sidebar p-3">
+      <h4 class="text-white">StoryLine</h4>
+      <ul class="nav flex-column mt-4">
+        <li class="nav-item"><a href="index.html" class="nav-link">Dashboard</a></li>
+        <li class="nav-item"><a href="manageUser.html" class="nav-link">Manage Users</a></li>
+        <li class="nav-item"><a href="manageStories.html" class="nav-link">Manage Stories</a></li>
+        <li class="nav-item"><a href="notifications.html" class="nav-link">Notifications</a></li>
+        <li class="nav-item"><a href="settings.html" class="nav-link active text-white">Settings</a></li>
+        <li class="nav-item"><a href="#" class="nav-link" id="logoutLink">Log Out</a></li>
+      </ul>
+      <div class="mt-auto pt-3">
+        <button type="button" class="btn btn-outline-light w-100" data-bs-toggle="modal" data-bs-target="#userProfileModal">
+          <strong id="sidebarUserName">Loading...</strong><br>
+          <small id="sidebarUserEmail">Loading...</small>
+        </button>
+      </div>
+    </nav>
+
+    <!-- Main Content -->
+    <main class="col-md-9 ms-sm-auto col-lg-10 px-md-4 py-4">
+      <h2 class="mb-4">Settings</h2>
+      
+      <div class="settings-section">
+        <h5>Account Settings</h5>
+        <div class="mb-3">
+          <label class="form-label">Email Notifications</label>
+          <select class="form-select">
+            <option>All notifications</option>
+            <option>Important only</option>
+            <option>None</option>
+          </select>
+        </div>
+        <div class="form-check mb-3">
+          <input class="form-check-input" type="checkbox" id="newsletter">
+          <label class="form-check-label" for="newsletter">Receive newsletter</label>
+        </div>
+      </div>
+
+      <div class="settings-section">
+        <h5>Privacy Settings</h5>
+        <div class="form-check mb-3">
+          <input class="form-check-input" type="checkbox" id="profileVisibility" checked>
+          <label class="form-check-label" for="profileVisibility">Make profile public</label>
+        </div>
+        <div class="form-check mb-3">
+          <input class="form-check-input" type="checkbox" id="activityStatus" checked>
+          <label class="form-check-label" for="activityStatus">Show online status</label>
+        </div>
+      </div>
+
+      <button class="btn btn-primary">Save Settings</button>
+    </main>
+  </div>
+</div>
+
+<script>
+document.addEventListener('DOMContentLoaded', function() {
+  const currentUser = JSON.parse(localStorage.getItem('currentUser'));
+  if (!currentUser) {
+    window.location.href = 'login.html';
+    return;
+  }
+  
+  document.getElementById('sidebarUserName').textContent = currentUser.username || currentUser.name;
+  document.getElementById('sidebarUserEmail').textContent = currentUser.email;
+  
+  document.getElementById('logoutLink').addEventListener('click', function(e) {
+    e.preventDefault();
+    if (confirm('Are you sure you want to log out?')) {
+      localStorage.removeItem('currentUser');
+      alert('You have been logged out successfully.');
+      window.location.href = 'login.html';
+    }
+  });
+});
+</script>
+</body>
+</html>

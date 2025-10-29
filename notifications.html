@@ -1,0 +1,111 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Notifications - StoryLine</title>
+  <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+  <style>
+    body {
+      background-color: #f8f9fb;
+    }
+    .sidebar {
+      min-height: 100vh;
+      background-color: #0d1321;
+      color: #fff;
+    }
+    .sidebar a {
+      color: #adb5bd;
+      text-decoration: none;
+      display: block;
+      padding: .75rem 1rem;
+      border-radius: .375rem;
+    }
+    .sidebar a:hover {
+      background-color: #1c2333;
+      color: #fff;
+    }
+    .notification-item {
+      border-left: 4px solid #0d6efd;
+      padding: 1rem;
+      margin-bottom: 1rem;
+      background: white;
+      border-radius: .5rem;
+    }
+    .notification-unread {
+      background: #e7f1ff;
+    }
+  </style>
+</head>
+<body>
+<div class="container-fluid">
+  <div class="row">
+    <!-- Sidebar -->
+    <nav class="col-md-3 col-lg-2 d-md-block sidebar p-3">
+      <h4 class="text-white">StoryLine</h4>
+      <ul class="nav flex-column mt-4">
+        <li class="nav-item"><a href="index.html" class="nav-link">Dashboard</a></li>
+        <li class="nav-item"><a href="manageUser.html" class="nav-link">Manage Users</a></li>
+        <li class="nav-item"><a href="manageStories.html" class="nav-link">Manage Stories</a></li>
+        <li class="nav-item"><a href="notifications.html" class="nav-link active text-white">Notifications</a></li>
+        <li class="nav-item"><a href="settings.html" class="nav-link">Settings</a></li>
+        <li class="nav-item"><a href="#" class="nav-link" id="logoutLink">Log Out</a></li>
+      </ul>
+      <div class="mt-auto pt-3">
+        <button type="button" class="btn btn-outline-light w-100" data-bs-toggle="modal" data-bs-target="#userProfileModal">
+          <strong id="sidebarUserName">Loading...</strong><br>
+          <small id="sidebarUserEmail">Loading...</small>
+        </button>
+      </div>
+    </nav>
+
+    <!-- Main Content -->
+    <main class="col-md-9 ms-sm-auto col-lg-10 px-md-4 py-4">
+      <h2 class="mb-4">Notifications</h2>
+      
+      <div class="card shadow-sm">
+        <div class="card-body">
+          <div class="notification-item notification-unread">
+            <h6>New User Registration</h6>
+            <p class="text-muted mb-1">User "Sophia Williams" just registered on the platform.</p>
+            <small class="text-muted">2 minutes ago</small>
+          </div>
+          <div class="notification-item">
+            <h6>Story Submission</h6>
+            <p class="text-muted mb-1">New story "The Lost Kingdom" submitted by Liam Brown.</p>
+            <small class="text-muted">1 hour ago</small>
+          </div>
+          <div class="notification-item">
+            <h6>System Update</h6>
+            <p class="text-muted mb-1">System maintenance scheduled for tonight at 2:00 AM.</p>
+            <small class="text-muted">3 hours ago</small>
+          </div>
+        </div>
+      </div>
+    </main>
+  </div>
+</div>
+
+<script>
+document.addEventListener('DOMContentLoaded', function() {
+  const currentUser = JSON.parse(localStorage.getItem('currentUser'));
+  if (!currentUser) {
+    window.location.href = 'login.html';
+    return;
+  }
+  
+  document.getElementById('sidebarUserName').textContent = currentUser.username || currentUser.name;
+  document.getElementById('sidebarUserEmail').textContent = currentUser.email;
+  
+  document.getElementById('logoutLink').addEventListener('click', function(e) {
+    e.preventDefault();
+    if (confirm('Are you sure you want to log out?')) {
+      localStorage.removeItem('currentUser');
+      alert('You have been logged out successfully.');
+      window.location.href = 'login.html';
+    }
+  });
+});
+</script>
+</body>
+</html>
